@@ -1,0 +1,285 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-05-04T00:00:00.000Z",
+  "title": "Design System: Craig Ardent Portfolio",
+  "extensions": {
+    "colorMeta": {
+      "brand": {
+        "role": "primary",
+        "displayName": "Precision Signal",
+        "canonical": "oklch(62% 0.22 35)",
+        "tonalRamp": [
+          "oklch(20% 0.10 35)",
+          "oklch(30% 0.15 35)",
+          "oklch(40% 0.19 35)",
+          "oklch(52% 0.22 35)",
+          "oklch(62% 0.22 35)",
+          "oklch(73% 0.18 35)",
+          "oklch(84% 0.12 35)",
+          "oklch(93% 0.06 35)"
+        ]
+      },
+      "blue": {
+        "role": "secondary",
+        "displayName": "Technical Depth",
+        "canonical": "oklch(46% 0.27 265)",
+        "tonalRamp": [
+          "oklch(15% 0.15 265)",
+          "oklch(24% 0.20 265)",
+          "oklch(33% 0.24 265)",
+          "oklch(40% 0.26 265)",
+          "oklch(46% 0.27 265)",
+          "oklch(60% 0.22 265)",
+          "oklch(75% 0.15 265)",
+          "oklch(90% 0.07 265)"
+        ]
+      },
+      "acid": {
+        "role": "tertiary",
+        "displayName": "Acid Proof",
+        "canonical": "oklch(90% 0.19 115)",
+        "tonalRamp": [
+          "oklch(25% 0.12 115)",
+          "oklch(38% 0.17 115)",
+          "oklch(52% 0.20 115)",
+          "oklch(65% 0.22 115)",
+          "oklch(75% 0.22 115)",
+          "oklch(82% 0.21 115)",
+          "oklch(90% 0.19 115)",
+          "oklch(96% 0.10 115)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Warm Ink",
+        "canonical": "oklch(9% 0.007 50)",
+        "tonalRamp": [
+          "oklch(5% 0.004 50)",
+          "oklch(9% 0.007 50)",
+          "oklch(13% 0.009 50)",
+          "oklch(17% 0.010 50)",
+          "oklch(23% 0.012 50)",
+          "oklch(58% 0.012 50)",
+          "oklch(88% 0.008 50)",
+          "oklch(97% 0.004 60)"
+        ]
+      },
+      "void": {
+        "role": "neutral",
+        "displayName": "Warm Void",
+        "canonical": "oklch(5% 0.004 50)",
+        "tonalRamp": [
+          "oklch(5% 0.004 50)",
+          "oklch(9% 0.007 50)",
+          "oklch(13% 0.009 50)",
+          "oklch(17% 0.010 50)",
+          "oklch(23% 0.012 50)",
+          "oklch(58% 0.012 50)",
+          "oklch(88% 0.008 50)",
+          "oklch(97% 0.004 60)"
+        ]
+      },
+      "surface-950": {
+        "role": "neutral",
+        "displayName": "Warm Surface 950",
+        "canonical": "oklch(13% 0.009 50)",
+        "tonalRamp": [
+          "oklch(5% 0.004 50)",
+          "oklch(9% 0.007 50)",
+          "oklch(13% 0.009 50)",
+          "oklch(17% 0.010 50)",
+          "oklch(23% 0.012 50)",
+          "oklch(58% 0.012 50)",
+          "oklch(88% 0.008 50)",
+          "oklch(97% 0.004 60)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Warm Muted",
+        "canonical": "oklch(58% 0.012 50)",
+        "tonalRamp": [
+          "oklch(5% 0.004 50)",
+          "oklch(9% 0.007 50)",
+          "oklch(13% 0.009 50)",
+          "oklch(17% 0.010 50)",
+          "oklch(23% 0.012 50)",
+          "oklch(58% 0.012 50)",
+          "oklch(88% 0.008 50)",
+          "oklch(97% 0.004 60)"
+        ]
+      },
+      "surface-white": {
+        "role": "neutral",
+        "displayName": "Warm White",
+        "canonical": "oklch(99% 0.003 60)",
+        "tonalRamp": [
+          "oklch(5% 0.004 50)",
+          "oklch(9% 0.007 50)",
+          "oklch(13% 0.009 50)",
+          "oklch(17% 0.010 50)",
+          "oklch(23% 0.012 50)",
+          "oklch(58% 0.012 50)",
+          "oklch(88% 0.008 50)",
+          "oklch(97% 0.004 60)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Hero statements and primary page titles. One per page."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section headings and CTA headings."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Post titles, card headings, component labels."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Prose and descriptions. Max 65-75ch."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Tags, timestamps, navigation controls, metadata. Mono-only."
+      }
+    },
+    "shadows": [
+      {
+        "name": "shadow-layer",
+        "value": "0 35px 60px -15px rgba(0, 0, 0, 0.30)",
+        "purpose": "Structural separation only: images and device mockups lifted from the page. Never for cards, navigation, or tooltips."
+      },
+      {
+        "name": "device-shadow",
+        "value": "0 2.4cqi 4.8cqi -1.2cqi rgba(0,0,0,0.40), 0 1.2cqi 2.4cqi -1.2cqi rgba(0,0,0,0.25)",
+        "purpose": "iPhone device mockup frame shadow. Container-query-relative units scale with component width."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-state",
+        "value": "200ms ease-out",
+        "purpose": "Default for hover and active state transitions (brightness, color, transform)."
+      },
+      {
+        "name": "ease-theme",
+        "value": "500ms ease-out",
+        "purpose": "Theme toggle and navigation color transitions — slow enough to feel intentional."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "container-max", "value": "1440px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Main CTA. Warm Ink fill, Warm White text, mono type. Clean and direct.",
+      "html": "<button class=\"ds-btn-primary\">View Project</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; gap: 8px; background-color: oklch(9% 0.007 50); color: oklch(99% 0.003 60); font-family: 'IBM Plex Mono', monospace; font-size: 0.875rem; font-weight: 400; letter-spacing: 0; padding: 12px 24px; border-radius: 8px; border: none; cursor: pointer; text-decoration: none; white-space: nowrap; transition: background-color 200ms ease-out, transform 200ms ease-out; } .ds-btn-primary:hover { background-color: oklch(23% 0.012 50); } .ds-btn-primary:active { transform: scale(0.95) translateY(1px); } .ds-btn-primary:focus-visible { outline: 2px solid oklch(62% 0.22 35); outline-offset: 2px; }"
+    },
+    {
+      "name": "Primary Button (Dark Mode)",
+      "kind": "button",
+      "refersTo": "button-primary-dark",
+      "description": "Dark mode inversion: Warm White fill, Warm Ink text.",
+      "html": "<button class=\"ds-btn-primary-dark\">View Project</button>",
+      "css": ".ds-btn-primary-dark { display: inline-flex; align-items: center; gap: 8px; background-color: oklch(99% 0.003 60); color: oklch(9% 0.007 50); font-family: 'IBM Plex Mono', monospace; font-size: 0.875rem; font-weight: 400; letter-spacing: 0; padding: 12px 24px; border-radius: 8px; border: none; cursor: pointer; text-decoration: none; white-space: nowrap; transition: background-color 200ms ease-out, transform 200ms ease-out; } .ds-btn-primary-dark:hover { background-color: oklch(93% 0.006 55); } .ds-btn-primary-dark:active { transform: scale(0.95) translateY(1px); } .ds-btn-primary-dark:focus-visible { outline: 2px solid oklch(62% 0.22 35); outline-offset: 2px; }"
+    },
+    {
+      "name": "Post Card",
+      "kind": "card",
+      "refersTo": "post-card",
+      "description": "Two-layer card: warm surface-200 shell, warm surface-100 interior. Brightness-shift hover.",
+      "html": "<article class=\"ds-post-card\"><div class=\"ds-post-card-inner\"><p class=\"ds-tag-chip\"><span class=\"ds-tag-dot\"></span>UX Design</p><h3 class=\"ds-post-card-title\">Redesigning the onboarding flow</h3><p class=\"ds-post-card-excerpt\">A systematic approach to reducing drop-off during the first session through progressive disclosure.</p><time class=\"ds-post-card-date\">Jan 15, 2025</time></div></article>",
+      "css": ".ds-post-card { background-color: oklch(88% 0.008 50); border-radius: 16px; padding: 16px; cursor: pointer; transition: filter 200ms ease-out; text-decoration: none; display: flex; flex-direction: column; height: 100%; } .ds-post-card:hover { filter: brightness(0.95); } .ds-post-card:focus-visible { outline: 2px solid oklch(62% 0.22 35); outline-offset: 2px; } .ds-post-card-inner { background-color: oklch(93% 0.006 55); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; flex: 1; } .ds-post-card-title { font-family: 'PP Monument Normal', system-ui, sans-serif; font-size: 1.25rem; font-weight: 700; line-height: 1.3; letter-spacing: -0.01em; color: oklch(9% 0.007 50); margin: 0 0 8px; } .ds-post-card-excerpt { font-family: 'PP Monument Normal', system-ui, sans-serif; font-size: 0.875rem; line-height: 1.65; color: oklch(58% 0.012 50); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; flex: 1; margin: 0 0 16px; } .ds-post-card-date { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: oklch(58% 0.012 50); }"
+    },
+    {
+      "name": "Tag Chip",
+      "kind": "chip",
+      "refersTo": "tag-chip",
+      "description": "Category label with Precision Signal dot. Mono, uppercase, muted. Not interactive unless explicitly required.",
+      "html": "<span class=\"ds-tag-chip\"><span class=\"ds-tag-dot\"></span>UX Design</span>",
+      "css": ".ds-tag-chip { display: inline-flex; align-items: center; gap: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: oklch(58% 0.012 50); } .ds-tag-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background-color: oklch(62% 0.22 35); flex-shrink: 0; }"
+    },
+    {
+      "name": "Navigation Header",
+      "kind": "nav",
+      "refersTo": "nav-header",
+      "description": "Sticky, frosted. Active link: Precision Signal bottom border. Theme toggle in mono.",
+      "html": "<header class=\"ds-nav-header\"><nav class=\"ds-nav\"><a href=\"/work\" class=\"ds-nav-link ds-nav-link--active\">Work</a><a href=\"/writing\" class=\"ds-nav-link\">Writing</a><a href=\"/about\" class=\"ds-nav-link\">About</a><button class=\"ds-nav-toggle\">Dark</button></nav></header>",
+      "css": ".ds-nav-header { position: sticky; top: 0; z-index: 40; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); background-color: color-mix(in oklch, oklch(99% 0.003 60) 70%, transparent); transition: background-color 500ms ease-out; } .ds-nav { display: flex; align-items: stretch; justify-content: flex-end; gap: 32px; padding: 24px 24px 0; } .ds-nav-link { display: flex; align-items: center; font-family: 'PP Monument Normal', system-ui, sans-serif; font-size: 1rem; font-weight: 400; color: oklch(9% 0.007 50); text-decoration: none; padding-bottom: 24px; border-bottom: 2px solid transparent; transition: border-color 500ms ease-out; } .ds-nav-link:hover { border-color: oklch(9% 0.007 50); } .ds-nav-link--active { border-color: oklch(62% 0.22 35); } .ds-nav-toggle { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: oklch(58% 0.012 50); background: none; border: none; cursor: pointer; padding-bottom: 24px; align-self: center; transition: color 300ms ease-out; } .ds-nav-toggle:hover { color: oklch(9% 0.007 50); } .ds-nav-toggle:active { transform: scale(0.95); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Swiss Proof",
+    "overview": "This system is a demonstration before it is a presentation. Every layout decision is a proof of design competence: the grid holds because the designer understands grids, the type hierarchy is exact because the designer understands hierarchy, the restraint is deliberate because the designer understands ornament.\n\nThe palette is near-monochromatic. Warm ink grounds everything; the single orange accent activates sparingly; every neutral carries a warm tilt that makes the near-black feel considered rather than default-digital. Screen-blue grays are prohibited.\n\nNothing competes with the work. Navigation disappears. Every component steps back to let portfolio pieces occupy the frame. If an element cannot justify its presence, it is absent.",
+    "keyCharacteristics": [
+      "Warm-tinted neutrals throughout; never screen-blue or charcoal-gray",
+      "Single Precision Signal (orange) on ≤10% of any surface",
+      "Geometric sans + technical mono; two faces, no exceptions",
+      "Flat surfaces at rest; depth only for structural separation",
+      "Motion for state acknowledgement only; never choreography or decoration"
+    ],
+    "rules": [
+      {
+        "name": "The One Signal Rule",
+        "body": "The Precision Signal appears on ≤10% of any surface. It marks active state, focus, and brand identity. It does not fill backgrounds, decorate cards, or announce sections. Its rarity is the point.",
+        "section": "colors"
+      },
+      {
+        "name": "The Warm Ground Rule",
+        "body": "Every neutral leans warm (OKLCH hue 45–60). The cool-blue grays in the existing codebase are prohibited in new work. When in doubt, shift warmer.",
+        "section": "colors"
+      },
+      {
+        "name": "The Swiss Type Rule",
+        "body": "Hierarchy is built through scale and weight alone. Color is never used to signal importance in text.",
+        "section": "typography"
+      },
+      {
+        "name": "The Mono Reserve Rule",
+        "body": "IBM Plex Mono is restricted to labels, timestamps, buttons, and UI controls. It does not appear in prose headings or article body text.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat-By-Default Rule",
+        "body": "No shadow at rest. Brightness-shift on hover. shadow-layer only for structural image and device mockup separation.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do use Warm Ink (oklch(9% 0.007 50)) for all near-black values. The warm ground is non-negotiable.",
+      "Do keep the Precision Signal to ≤10% of any surface.",
+      "Do build type hierarchy through scale and weight alone.",
+      "Do use filter: brightness() for hover states on interactive containers.",
+      "Do restrict IBM Plex Mono to labels, timestamps, and UI controls.",
+      "Do apply text-wrap: balance to all headings.",
+      "Do cap body prose at 65–75ch.",
+      "Do use the two-layer card structure before reaching for borders or shadows.",
+      "Do use ease-out curves (ease-out-quart or expo) for all transitions."
+    ],
+    "donts": [
+      "Don't animate anything for decoration. State transitions only.",
+      "Don't use scroll-triggered reveal animations or parallax.",
+      "Don't use the .mesh grain texture on content areas or over portfolio work.",
+      "Don't use glassmorphism, 3D blobs, aurora backgrounds, or gradient-heavy treatments.",
+      "Don't fill large surfaces with the brand orange.",
+      "Don't use gradient text (background-clip: text with gradient fill).",
+      "Don't use side-stripe borders (border-left > 1px as a colored accent).",
+      "Don't nest cards inside cards.",
+      "Don't introduce a third typeface.",
+      "Don't apply shadow-layer to cards, navigation, tooltips, or dropdowns.",
+      "Don't replicate generic creative agency patterns: rotating hero text, identical icon-heading-text card grids, footer rows of social links.",
+      "Don't use cool-blue-gray neutrals (#0d0e12, #13141b). Replace with warm-tinted values."
+    ]
+  }
+}

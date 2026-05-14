@@ -15,11 +15,110 @@
 export declare const internalGroqTypeReferenceTo: unique symbol
 
 // Source: ../sanity.schema.json
-export type PageReference = {
+export type DeviceCroppedImage = {
+  image?: ImageImage
+  alt?: string
+}
+
+export type SanityImageAssetReference = {
   _ref: string
   _type: 'reference'
   _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'page'
+  [internalGroqTypeReferenceTo]?: 'sanity.imageAsset'
+}
+
+export type ImageImage = {
+  asset?: SanityImageAssetReference
+  media?: unknown // Unable to locate the referenced type "media" in schema
+  hotspot?: SanityImageHotspot
+  crop?: SanityImageCrop
+  _type: 'image'
+}
+
+export type ImageBlockImage = {
+  asset?: SanityImageAssetReference
+  media?: unknown // Unable to locate the referenced type "image.media" in schema
+  hotspot?: SanityImageHotspot
+  crop?: SanityImageCrop
+  _type: 'image'
+}
+
+export type CardImage = {
+  image: CardImageImage
+  alt: string
+}
+
+export type CardImageImage = {
+  asset?: SanityImageAssetReference
+  media?: unknown // Unable to locate the referenced type "image.image.media" in schema
+  hotspot?: SanityImageHotspot
+  crop?: SanityImageCrop
+  _type: 'image'
+}
+
+export type ItemsCardImage = {
+  image: ItemsCardImageImage
+  alt: string
+}
+
+export type ItemsCardImageImage = {
+  asset?: SanityImageAssetReference
+  media?: unknown // Unable to locate the referenced type "card.image.image.media" in schema
+  hotspot?: SanityImageHotspot
+  crop?: SanityImageCrop
+  _type: 'image'
+}
+
+export type ImagesImageBlockImage = {
+  asset?: SanityImageAssetReference
+  media?: unknown // Unable to locate the referenced type "imageBlock.image.media" in schema
+  hotspot?: SanityImageHotspot
+  crop?: SanityImageCrop
+  _type: 'image'
+}
+
+export type MinimalHeader = {
+  _type: 'minimalHeader'
+  label?: string
+  meta?: string
+  heading: string
+}
+
+export type StatsBlock = {
+  _type: 'statsBlock'
+  items: Array<{
+    value: string
+    label: string
+    _type: 'stat'
+    _key: string
+  }>
+  background?: 'none' | 'tint' | 'tile' | 'gradient'
+}
+
+export type PageHeader = {
+  _type: 'pageHeader'
+  heading: Array<{
+    children?: Array<{
+      marks?: Array<string>
+      text?: string
+      _type: 'span'
+      _key: string
+    }>
+    style?: 'normal'
+    listItem?: never
+    markDefs?: null
+    level?: number
+    _type: 'block'
+    _key: string
+  }>
+  subheading?: string
+}
+
+export type PostTagReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'postTag'
 }
 
 export type PostReference = {
@@ -29,6 +128,160 @@ export type PostReference = {
   [internalGroqTypeReferenceTo]?: 'post'
 }
 
+export type FeaturedPosts = {
+  _type: 'featuredPosts'
+  heading?: string
+  intro?: string
+  background?: 'none' | 'tint' | 'tile' | 'gradient'
+  selectionMode?: 'tag' | 'manual'
+  tag?: PostTagReference
+  posts?: Array<
+    {
+      _key: string
+    } & PostReference
+  >
+}
+
+export type ContentDetails = {
+  _type: 'contentDetails'
+  listItemsLabel?: string
+  items: Array<{
+    title: string
+    _type: 'item'
+    _key: string
+  }>
+  mainContentLabel?: string
+  body: BlockContent
+  background?: 'none' | 'tint' | 'tile' | 'gradient'
+}
+
+export type SectionHeading = {
+  _type: 'sectionHeading'
+  heading?: Array<{
+    children?: Array<{
+      marks?: Array<string>
+      text?: string
+      _type: 'span'
+      _key: string
+    }>
+    style?: 'normal'
+    listItem?: never
+    markDefs?: null
+    level?: number
+    _type: 'block'
+    _key: string
+  }>
+}
+
+export type ImageCollageContent = {
+  _type: 'imageCollageContent'
+  heading: string
+  label?: string
+  year?: string
+  description?: BlockContentTextOnly
+  background?: 'none' | 'tint' | 'tile' | 'gradient'
+}
+
+export type ImageCollage = {
+  _type: 'imageCollage'
+  images: Array<{
+    image: ImagesImageBlockImage
+    alt: string
+    _type: 'imageBlock'
+    _key: string
+  }>
+  background?: 'none' | 'tint' | 'tile' | 'gradient'
+}
+
+export type AbstractCardsCarousel = {
+  _type: 'abstractCardsCarousel'
+  items: Array<{
+    label: string
+    heading: string
+    body: string
+    image?: ItemsCardImage
+    link: Link
+    _type: 'card'
+    _key: string
+  }>
+}
+
+export type CarouselCards = {
+  _type: 'carouselCards'
+  background?: 'none' | 'tint' | 'tile' | 'gradient'
+  items: Array<{
+    image?: CardImage
+    label: string
+    title: string
+    link?: Link
+    _type: 'card'
+    _key: string
+  }>
+}
+
+export type ContentBlockGrid = {
+  _type: 'contentBlockGrid'
+  heading: string
+  intro: string
+  background?: 'none' | 'tint' | 'tile' | 'gradient'
+  items: Array<{
+    title: string
+    body: string
+    _type: 'item'
+    _key: string
+  }>
+}
+
+export type SanityFileAssetReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'sanity.fileAsset'
+}
+
+export type DeviceCropped = {
+  _type: 'deviceCropped'
+  label?: string
+  heading: string
+  mediaType?: 'image' | 'video'
+  image?: DeviceCroppedImage
+  video?: {
+    asset?: SanityFileAssetReference
+    media?: unknown
+    _type: 'file'
+  }
+  items: Array<{
+    title: string
+    body: string
+    _type: 'item'
+    _key: string
+  }>
+  background?: 'none' | 'tint' | 'tile' | 'gradient'
+  cropMode?: 'cropped' | 'full'
+  contentAlignment?: 'imageRight' | 'imageFirst'
+}
+
+export type HeroSplitImageRight = {
+  _type: 'heroSplitImageRight'
+  heading: string
+  images: Array<{
+    image: ImageBlockImage
+    alt: string
+    caption?: string
+    _type: 'imageBlock'
+    _key: string
+  }>
+  background?: 'none' | 'tint' | 'tile' | 'gradient'
+  contentAlignment?: 'imageRight' | 'imageFirst'
+}
+
+export type PageReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'page'
+}
+
 export type Link = {
   _type: 'link'
   linkType?: 'href' | 'page' | 'post'
@@ -36,13 +289,6 @@ export type Link = {
   page?: PageReference
   post?: PostReference
   openInNewTab?: boolean
-}
-
-export type SanityImageAssetReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'sanity.imageAsset'
 }
 
 export type CallToAction = {
@@ -58,7 +304,7 @@ export type CallToAction = {
     crop?: SanityImageCrop
     _type: 'image'
   }
-  theme?: 'light' | 'dark'
+  background?: 'none' | 'tint' | 'tile' | 'gradient'
   contentAlignment?: 'textFirst' | 'imageFirst'
 }
 
@@ -68,25 +314,6 @@ export type InfoSection = {
   subheading?: string
   content?: BlockContent
 }
-
-export type BlockContentTextOnly = Array<{
-  children?: Array<{
-    marks?: Array<string>
-    text?: string
-    _type: 'span'
-    _key: string
-  }>
-  style?: 'normal' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote'
-  listItem?: 'bullet' | 'number'
-  markDefs?: Array<{
-    href?: string
-    _type: 'link'
-    _key: string
-  }>
-  level?: number
-  _type: 'block'
-  _key: string
-}>
 
 export type BlockContent = Array<
   | {
@@ -121,10 +348,256 @@ export type BlockContent = Array<
     }
 >
 
+export type BlockContentTextOnly = Array<{
+  children?: Array<{
+    marks?: Array<string>
+    text?: string
+    _type: 'span'
+    _key: string
+  }>
+  style?: 'normal' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote'
+  listItem?: 'bullet' | 'number'
+  markDefs?: Array<{
+    href?: string
+    _type: 'link'
+    _key: string
+  }>
+  level?: number
+  _type: 'block'
+  _key: string
+}>
+
 export type Button = {
   _type: 'button'
   buttonText?: string
   link?: Link
+}
+
+export type PortfolioTag = {
+  _id: string
+  _type: 'portfolioTag'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name: string
+  slug: Slug
+}
+
+export type Slug = {
+  _type: 'slug'
+  current: string
+  source?: string
+}
+
+export type PortfolioTagReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'portfolioTag'
+}
+
+export type PortfolioProject = {
+  _id: string
+  _type: 'portfolioProject'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  orderRank?: string
+  title: string
+  slug: Slug
+  excerpt?: string
+  coverImage?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+  client?: string
+  year?: string
+  tags?: Array<
+    {
+      _key: string
+    } & PortfolioTagReference
+  >
+  pageBuilder?: Array<
+    | ({
+        _key: string
+      } & PageHeader)
+    | ({
+        _key: string
+      } & SectionHeading)
+    | ({
+        _key: string
+      } & StatsBlock)
+    | ({
+        _key: string
+      } & DeviceCropped)
+    | ({
+        _key: string
+      } & HeroSplitImageRight)
+    | ({
+        _key: string
+      } & ContentBlockGrid)
+    | ({
+        _key: string
+      } & CarouselCards)
+    | ({
+        _key: string
+      } & AbstractCardsCarousel)
+    | ({
+        _key: string
+      } & ImageCollageContent)
+    | ({
+        _key: string
+      } & ImageCollage)
+    | ({
+        _key: string
+      } & ContentDetails)
+  >
+  seoTitle?: string
+  seoDescription?: string
+}
+
+export type SanityImageCrop = {
+  _type: 'sanity.imageCrop'
+  top: number
+  bottom: number
+  left: number
+  right: number
+}
+
+export type SanityImageHotspot = {
+  _type: 'sanity.imageHotspot'
+  x: number
+  y: number
+  height: number
+  width: number
+}
+
+export type PostTag = {
+  _id: string
+  _type: 'postTag'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name: string
+  slug: Slug
+}
+
+export type PortfolioOverview = {
+  _id: string
+  _type: 'portfolioOverview'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  passwordProtected?: boolean
+  seoTitle?: string
+  seoDescription?: string
+  pageBuilder?: Array<
+    | ({
+        _key: string
+      } & PageHeader)
+    | ({
+        _key: string
+      } & SectionHeading)
+    | ({
+        _key: string
+      } & StatsBlock)
+    | ({
+        _key: string
+      } & DeviceCropped)
+    | ({
+        _key: string
+      } & HeroSplitImageRight)
+    | ({
+        _key: string
+      } & ContentBlockGrid)
+    | ({
+        _key: string
+      } & CarouselCards)
+    | ({
+        _key: string
+      } & AbstractCardsCarousel)
+    | ({
+        _key: string
+      } & ImageCollageContent)
+    | ({
+        _key: string
+      } & ImageCollage)
+    | ({
+        _key: string
+      } & ContentDetails)
+  >
+}
+
+export type Navigation = {
+  _id: string
+  _type: 'navigation'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  links?: Array<{
+    label: string
+    url: string
+    visible?: boolean
+    _key: string
+  }>
+  siteName?: string
+  logo?: {
+    image?: {
+      asset?: SanityImageAssetReference
+      media?: unknown
+      hotspot?: SanityImageHotspot
+      crop?: SanityImageCrop
+      _type: 'image'
+    }
+    alt?: string
+    url?: string
+  }
+}
+
+export type Homepage = {
+  _id: string
+  _type: 'homepage'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  seoTitle?: string
+  seoDescription?: string
+  pageBuilder?: Array<
+    | ({
+        _key: string
+      } & CallToAction)
+    | ({
+        _key: string
+      } & SectionHeading)
+    | ({
+        _key: string
+      } & DeviceCropped)
+    | ({
+        _key: string
+      } & HeroSplitImageRight)
+    | ({
+        _key: string
+      } & ContentBlockGrid)
+    | ({
+        _key: string
+      } & CarouselCards)
+    | ({
+        _key: string
+      } & AbstractCardsCarousel)
+    | ({
+        _key: string
+      } & ImageCollage)
+    | ({
+        _key: string
+      } & ContentDetails)
+    | ({
+        _key: string
+      } & FeaturedPosts)
+  >
 }
 
 export type Settings = {
@@ -167,22 +640,6 @@ export type Settings = {
   }
 }
 
-export type SanityImageCrop = {
-  _type: 'sanity.imageCrop'
-  top: number
-  bottom: number
-  left: number
-  right: number
-}
-
-export type SanityImageHotspot = {
-  _type: 'sanity.imageHotspot'
-  x: number
-  y: number
-  height: number
-  width: number
-}
-
 export type Page = {
   _id: string
   _type: 'page'
@@ -196,10 +653,46 @@ export type Page = {
   pageBuilder?: Array<
     | ({
         _key: string
+      } & PageHeader)
+    | ({
+        _key: string
       } & CallToAction)
     | ({
         _key: string
-      } & InfoSection)
+      } & SectionHeading)
+    | ({
+        _key: string
+      } & MinimalHeader)
+    | ({
+        _key: string
+      } & StatsBlock)
+    | ({
+        _key: string
+      } & DeviceCropped)
+    | ({
+        _key: string
+      } & HeroSplitImageRight)
+    | ({
+        _key: string
+      } & ContentBlockGrid)
+    | ({
+        _key: string
+      } & CarouselCards)
+    | ({
+        _key: string
+      } & AbstractCardsCarousel)
+    | ({
+        _key: string
+      } & ImageCollageContent)
+    | ({
+        _key: string
+      } & ImageCollage)
+    | ({
+        _key: string
+      } & ContentDetails)
+    | ({
+        _key: string
+      } & FeaturedPosts)
   >
 }
 
@@ -230,6 +723,11 @@ export type Post = {
   }
   date?: string
   author?: PersonReference
+  tags?: Array<
+    {
+      _key: string
+    } & PostTagReference
+  >
 }
 
 export type Person = {
@@ -248,12 +746,6 @@ export type Person = {
     alt?: string
     _type: 'image'
   }
-}
-
-export type Slug = {
-  _type: 'slug'
-  current: string
-  source?: string
 }
 
 export type SanityAssistInstructionTask = {
@@ -491,23 +983,53 @@ export type Geopoint = {
 }
 
 export type AllSanitySchemaTypes =
-  | PageReference
-  | PostReference
-  | Link
+  | DeviceCroppedImage
   | SanityImageAssetReference
+  | ImageImage
+  | ImageBlockImage
+  | CardImage
+  | CardImageImage
+  | ItemsCardImage
+  | ItemsCardImageImage
+  | ImagesImageBlockImage
+  | MinimalHeader
+  | StatsBlock
+  | PageHeader
+  | PostTagReference
+  | PostReference
+  | FeaturedPosts
+  | ContentDetails
+  | SectionHeading
+  | ImageCollageContent
+  | ImageCollage
+  | AbstractCardsCarousel
+  | CarouselCards
+  | ContentBlockGrid
+  | SanityFileAssetReference
+  | DeviceCropped
+  | HeroSplitImageRight
+  | PageReference
+  | Link
   | CallToAction
   | InfoSection
-  | BlockContentTextOnly
   | BlockContent
+  | BlockContentTextOnly
   | Button
-  | Settings
+  | PortfolioTag
+  | Slug
+  | PortfolioTagReference
+  | PortfolioProject
   | SanityImageCrop
   | SanityImageHotspot
+  | PostTag
+  | PortfolioOverview
+  | Navigation
+  | Homepage
+  | Settings
   | Page
   | PersonReference
   | Post
   | Person
-  | Slug
   | SanityAssistInstructionTask
   | SanityAssistTaskStatus
   | SanityAssistSchemaTypeAnnotations

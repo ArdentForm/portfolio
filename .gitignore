@@ -6,6 +6,10 @@
 .pnp.js
 .yarn/install-state.gz
 
+# Design references (dev-only)
+**/._design-refs/
+**/*.html
+
 # misc
 .DS_Store
 *.pem
@@ -28,4 +32,8 @@ yarn-error.log*
 next-env.d.ts
 
 # VS Code
-.vscode
+.vscode.claude/commands/
+
+# Claude Code / AI tooling
+.agents/
+.claude/

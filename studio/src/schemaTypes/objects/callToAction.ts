@@ -1,11 +1,11 @@
 import {defineField, defineType} from 'sanity'
 import {
-  BulbOutlineIcon,
   ComposeSparklesIcon,
   LinkIcon,
   ImageIcon,
   ControlsIcon,
 } from '@sanity/icons'
+import {MdOutlineCallToAction} from 'react-icons/md'
 
 /**
  * Call to action schema object.  Objects are reusable schema structures document.
@@ -16,7 +16,7 @@ export const callToAction = defineType({
   name: 'callToAction',
   title: 'Call to Action',
   type: 'object',
-  icon: BulbOutlineIcon,
+  icon: MdOutlineCallToAction,
   groups: [
     {
       name: 'contents',
@@ -69,19 +69,20 @@ export const callToAction = defineType({
       },
     }),
     defineField({
-      name: 'theme',
+      name: 'background',
+      title: 'Background',
       type: 'string',
-      title: 'Theme',
+      group: 'designSystem',
+      initialValue: 'none',
       options: {
         list: [
-          {title: 'Light', value: 'light'},
-          {title: 'Dark', value: 'dark'},
+          {title: 'None', value: 'none'},
+          {title: 'Tint', value: 'tint'},
+          {title: 'Tile', value: 'tile'},
+          {title: 'Gradient', value: 'gradient'},
         ],
         layout: 'radio',
       },
-      description: 'Use dark theme with white tile grid background',
-      initialValue: 'light',
-      group: 'designSystem',
     }),
     defineField({
       name: 'contentAlignment',

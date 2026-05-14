@@ -4,6 +4,19 @@ import Cta from '@/app/components/Cta'
 import Info from '@/app/components/InfoSection'
 import {dataAttr} from '@/sanity/lib/utils'
 import {PageBuilderSection} from '@/sanity/lib/types'
+import HeroSplitImageRightBlock from '@/app/components/HeroSplitImageRightBlock'
+import DeviceCroppedBlock from '@/app/components/DeviceCroppedBlock'
+import ContentBlockGridBlock from '@/app/components/ContentBlockGridBlock'
+import CarouselCardsBlock from '@/app/components/CarouselCardsBlock'
+import AbstractCardsCarouselBlock from '@/app/components/AbstractCardsCarouselBlock'
+import ImageCollageBlock from '@/app/components/ImageCollageBlock'
+import ImageCollageContentBlock from '@/app/components/ImageCollageContentBlock'
+import SectionHeadingBlock from '@/app/components/SectionHeadingBlock'
+import ContentDetailsBlock from '@/app/components/ContentDetailsBlock'
+import FeaturedPostsBlock from '@/app/components/FeaturedPostsBlock'
+import PageHeaderBlock from '@/app/components/PageHeaderBlock'
+import StatsBlockBlock from '@/app/components/StatsBlockBlock'
+import MinimalHeaderBlock from '@/app/components/MinimalHeaderBlock'
 
 type BlockProps = {
   index: number
@@ -12,14 +25,26 @@ type BlockProps = {
   pageType: string
 }
 
-type BlocksType = {
-  [key: string]: React.FC<BlockProps>
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type BlocksType = Record<string, React.FC<any>>
 
-const Blocks = {
+const Blocks: BlocksType = {
   callToAction: Cta,
   infoSection: Info,
-} as BlocksType
+  heroSplitImageRight: HeroSplitImageRightBlock,
+  deviceCropped: DeviceCroppedBlock,
+  contentBlockGrid: ContentBlockGridBlock,
+  carouselCards: CarouselCardsBlock,
+  abstractCardsCarousel: AbstractCardsCarouselBlock,
+  imageCollage: ImageCollageBlock,
+  imageCollageContent: ImageCollageContentBlock,
+  sectionHeading: SectionHeadingBlock,
+  contentDetails: ContentDetailsBlock,
+  featuredPosts: FeaturedPostsBlock,
+  pageHeader: PageHeaderBlock,
+  statsBlock: StatsBlockBlock,
+  minimalHeader: MinimalHeaderBlock,
+}
 
 /**
  * Used by the <PageBuilder>, this component renders a the component that matches the block type.

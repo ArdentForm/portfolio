@@ -1,29 +1,106 @@
-import {CogIcon} from '@sanity/icons'
+import {CogIcon, HomeIcon, ImagesIcon, DocumentTextIcon, DocumentIcon, TagIcon, UserIcon, MenuIcon, FolderIcon} from '@sanity/icons'
 import type {StructureBuilder, StructureResolver} from 'sanity/structure'
-import pluralize from 'pluralize-esm'
+import {orderableDocumentListDeskItem} from '@sanity/orderable-document-list'
 
-/**
- * Structure builder is useful whenever you want to control how documents are grouped and
- * listed in the studio or for adding additional in-studio previews or content to documents.
- * Learn more: https://www.sanity.io/docs/structure-builder-introduction
- */
+const HIDDEN_TYPES = [
+  'settings',
+  'homepage',
+  'portfolioOverview',
+  'portfolioProject',
+  'portfolioTag',
+  'postTag',
+  'post',
+  'page',
+  'person',
+  'navigation',
+  'assist.instruction.context',
+]
 
-const DISABLED_TYPES = ['settings', 'assist.instruction.context']
-
-export const structure: StructureResolver = (S: StructureBuilder) =>
+export const structure: StructureResolver = (S: StructureBuilder, context) =>
   S.list()
-    .title('Website Content')
+    .title('Content')
     .items([
-      ...S.documentTypeListItems()
-        // Remove the "assist.instruction.context" and "settings" content  from the list of content types
-        .filter((listItem: any) => !DISABLED_TYPES.includes(listItem.getId()))
-        // Pluralize the title of each document type.  This is not required but just an option to consider.
-        .map((listItem) => {
-          return listItem.title(pluralize(listItem.getTitle() as string))
-        }),
-      // Settings Singleton in order to view/edit the one particular document for Settings.  Learn more about Singletons: https://www.sanity.io/docs/create-a-link-to-a-single-edit-page-in-your-main-document-type-list
+      // Portfolio
       S.listItem()
-        .title('Site Settings')
-        .child(S.document().schemaType('settings').documentId('siteSettings'))
-        .icon(CogIcon),
+        .title('Portfolio')
+        .icon(FolderIcon)
+        .child(
+          S.list()
+            .title('Portfolio')
+            .items([
+              orderableDocumentListDeskItem({type: 'portfolioProject', title: 'Projects', S, context}),
+              S.listItem()
+                .title('Tags')
+                .icon(TagIcon)
+                .child(S.documentTypeList('portfolioTag').title('Portfolio Tags')),
+              S.divider(),
+              S.listItem()
+                .title('Portfolio Overview')
+                .icon(ImagesIcon)
+                .child(S.document().schemaType('portfolioOverview').documentId('portfolioOverview')),
+            ])
+        ),
+
+      // Blog
+      S.listItem()
+        .title('Blog')
+        .icon(DocumentTextIcon)
+        .child(
+          S.list()
+            .title('Blog')
+            .items([
+              S.listItem()
+                .title('Posts')
+                .icon(DocumentTextIcon)
+                .child(S.documentTypeList('post').title('Posts')),
+              S.listItem()
+                .title('Tags')
+                .icon(TagIcon)
+                .child(S.documentTypeList('postTag').title('Post Tags')),
+            ])
+        ),
+
+      // Pages
+      S.listItem()
+        .title('Pages')
+        .icon(DocumentIcon)
+        .child(
+          S.list()
+            .title('Pages')
+            .items([
+              S.listItem()
+                .title('Homepage')
+                .icon(HomeIcon)
+                .child(S.document().schemaType('homepage').documentId('homepage')),
+              S.listItem()
+                .title('Other Pages')
+                .icon(DocumentIcon)
+                .child(S.documentTypeList('page').title('Pages')),
+            ])
+        ),
+
+      S.divider(),
+
+      // Configuration
+      S.listItem()
+        .title('Configuration')
+        .icon(CogIcon)
+        .child(
+          S.list()
+            .title('Configuration')
+            .items([
+              S.listItem()
+                .title('Navigation')
+                .icon(MenuIcon)
+                .child(S.document().schemaType('navigation').documentId('navigation')),
+              S.listItem()
+                .title('Site Settings')
+                .icon(CogIcon)
+                .child(S.document().schemaType('settings').documentId('siteSettings')),
+              S.listItem()
+                .title('Authors')
+                .icon(UserIcon)
+                .child(S.documentTypeList('person').title('Authors')),
+            ])
+        ),
     ])

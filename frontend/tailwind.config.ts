@@ -3,6 +3,7 @@ import typography from '@tailwindcss/typography'
 
 export default {
   content: ['./app/**/*.{ts,tsx}', './sanity/**/*.{ts,tsx}'],
+  darkMode: 'class',
   theme: {
     container: {
       center: true,
@@ -12,9 +13,21 @@ export default {
       boxShadow: {
         layer: '0 35px 60px -15px rgba(0, 0, 0, 0.3)',
       },
+      keyframes: {
+        shake: {
+          '0%, 100%': {transform: 'translateX(0)'},
+          '20%': {transform: 'translateX(-5px)'},
+          '40%': {transform: 'translateX(5px)'},
+          '60%': {transform: 'translateX(-3px)'},
+          '80%': {transform: 'translateX(3px)'},
+        },
+      },
+      animation: {
+        shake: 'shake 0.35s ease-out',
+      },
       colors: {
-        black: '#0d0e12',
-        white: '#fff',
+        black: 'oklch(9% 0.007 50)',
+        white: 'oklch(99% 0.003 60)',
         cyan: {
           50: '#e7fefe',
           100: '#c5fcfc',
@@ -29,17 +42,17 @@ export default {
           950: '#0d181c',
         },
         gray: {
-          50: '#f6f6f8',
-          100: '#eeeef1',
-          200: '#e3e4e8',
-          300: '#bbbdc9',
-          400: '#9499ad',
-          500: '#727892',
-          600: '#515870',
-          700: '#383d51',
-          800: '#252837',
-          900: '#1b1d27',
-          950: '#13141b',
+          50:  'oklch(97% 0.004 60)',
+          100: 'oklch(93% 0.006 55)',
+          200: 'oklch(88% 0.008 50)',
+          300: 'oklch(78% 0.010 50)',
+          400: 'oklch(68% 0.011 50)',
+          500: 'oklch(58% 0.012 50)',
+          600: 'oklch(47% 0.010 50)',
+          700: 'oklch(35% 0.010 50)',
+          800: 'oklch(23% 0.012 50)',
+          900: 'oklch(17% 0.010 50)',
+          950: 'oklch(13% 0.009 50)',
         },
         red: {
           50: '#fff6f5',
@@ -95,7 +108,7 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['var(--font-inter)'],
+        sans: ['var(--font-monument)'],
         mono: ['var(--font-ibm-plex-mono)'],
       },
     },
@@ -103,5 +116,18 @@ export default {
   future: {
     hoverOnlyWhenSupported: true,
   },
-  plugins: [typography],
+  plugins: [
+    typography,
+    function ({ addUtilities }: any) {
+      addUtilities({
+        '.no-scrollbar': {
+          '-ms-overflow-style': 'none',
+          'scrollbar-width': 'none',
+          '&::-webkit-scrollbar': {
+            display: 'none',
+          },
+        },
+      })
+    },
+  ],
 } satisfies Config

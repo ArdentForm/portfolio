@@ -1,5 +1,9 @@
 @import 'tailwindcss';
 
+html {
+  scroll-behavior: smooth;
+}
+
 @plugin "@tailwindcss/typography";
 
 @layer base {
@@ -10,6 +14,7 @@
   h5,
   h6 {
     @apply font-medium tracking-tight;
+    text-wrap: balance;
   }
 }
 
@@ -20,26 +25,179 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+@theme inline {
+  --font-sans: var(--font-monument);
+  --font-mono: var(--font-ibm-plex-mono);
+}
+
 @theme {
   --shadow-layer: 0 35px 60px -15px rgba(0, 0, 0, 0.3);
 
-  --color-framework: #000;
-  --color-black: #0b0b0b;
-  --color-white: #fff;
+  --color-framework: oklch(5% 0.002 50);
+  --color-black: oklch(9% 0.003 50);
+  --color-white: oklch(99% 0.002 60);
   --color-brand: #f50;
   --color-blue: #0052ff;
   --color-yellow: #cdea19;
-  --color-gray-50: #f6f6f8;
-  --color-gray-100: #eeeef1;
-  --color-gray-200: #e3e4e8;
-  --color-gray-300: #bbbdc9;
-  --color-gray-400: #9499ad;
-  --color-gray-500: #727892;
-  --color-gray-600: #515870;
-  --color-gray-700: #383d51;
-  --color-gray-800: #252837;
-  --color-gray-900: #1b1d27;
-  --color-gray-950: #13141b;
+  --color-gray-50:  oklch(97% 0.003 60);
+  --color-gray-100: oklch(93% 0.003 58);
+  --color-gray-200: oklch(88% 0.004 55);
+  --color-gray-300: oklch(78% 0.005 52);
+  --color-gray-400: oklch(68% 0.006 50);
+  --color-gray-500: oklch(58% 0.007 50);
+  --color-gray-600: oklch(47% 0.005 50);
+  --color-gray-700: oklch(35% 0.004 50);
+  --color-gray-800: oklch(23% 0.003 50);
+  --color-gray-900: oklch(17% 0.002 50);
+  --color-gray-950: oklch(13% 0.002 50);
 
   --default-transition-duration: 250ms;
+}
+
+@layer components {
+
+  /* Hide scrollbar across browsers */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .dark .mesh {
+    position: relative;
+    isolation: isolate;
+    background-color: oklch(13% 0.009 50);
+    background-image:
+      radial-gradient(at 71% 44%, oklch(20% 0.04 35) 0%, transparent 55%),
+      radial-gradient(at 78% 88%, oklch(5% 0.004 50) 0%, transparent 55%),
+      radial-gradient(at 18% 12%, oklch(17% 0.012 50) 0%, transparent 60%);
+    --grain-color: #000000;
+    --grain-opacity: 0.66;
+    --grain-blend: normal;
+    --grain-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='290' height='290'><filter id='n'><feTurbulence type='turbulence' baseFrequency='0.38 0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1.2 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    --grain-mask-size: 290px 290px;
+    --grain-mask-repeat: repeat;
+    --grain-mask-composite: add;
+    --grain-filter: contrast(138%) brightness(116%);
+  }
+  
+  .dark .mesh::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-color: var(--grain-color);
+    opacity: var(--grain-opacity);
+    mix-blend-mode: var(--grain-blend);
+    -webkit-mask-image: var(--grain-mask);
+            mask-image: var(--grain-mask);
+    -webkit-mask-size: var(--grain-mask-size);
+            mask-size: var(--grain-mask-size);
+    -webkit-mask-repeat: var(--grain-mask-repeat);
+            mask-repeat: var(--grain-mask-repeat);
+            mask-composite: var(--grain-mask-composite);
+    filter: var(--grain-filter);
+  }
+
+  .mesh {
+    position: relative;
+    isolation: isolate;
+    background-color: oklch(97% 0.004 60);
+    background-image:
+      radial-gradient(at 0% 58%, oklch(87% 0.018 50) 0%, transparent 55%),
+      radial-gradient(at 82% 70%, oklch(91% 0.04 35) 0%, transparent 63%),
+      radial-gradient(at 44% 39%, oklch(94% 0.006 55) 0%, transparent 65%);
+    --grain-color: oklch(73% 0.008 50);
+    --grain-opacity: 1.00;
+    --grain-blend: multiply;
+    --grain-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='turbulence' baseFrequency='0.9 0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1.2 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"), radial-gradient(ellipse at center, transparent 35%, black 100%);
+    --grain-mask-size: 240px 240px, auto;
+    --grain-mask-repeat: repeat, no-repeat;
+    --grain-mask-composite: intersect;
+    --grain-filter: contrast(150%) brightness(95%);
+  }
+  
+  .mesh::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-color: var(--grain-color);
+    opacity: var(--grain-opacity);
+    mix-blend-mode: var(--grain-blend);
+    -webkit-mask-image: var(--grain-mask);
+            mask-image: var(--grain-mask);
+    -webkit-mask-size: var(--grain-mask-size);
+            mask-size: var(--grain-mask-size);
+    -webkit-mask-repeat: var(--grain-mask-repeat);
+            mask-repeat: var(--grain-mask-repeat);
+            mask-composite: var(--grain-mask-composite);
+    filter: var(--grain-filter);
+  }
+
+
+  /* Device mockup */
+  .device-frame {
+    container-type: inline-size;
+  }
+
+  .device-screen {
+    border-radius: 13cqi;
+  }
+
+  .device-screen.border-medium { border-width: 2.4cqi; }
+  .device-screen.border-thick  { border-width: 3.36cqi; }
+  .device-screen.border-chunky { border-width: 4.8cqi; }
+
+  .device-screen.crop-bottom {
+    border-radius: 13cqi 13cqi 0 0;
+    border-bottom: none;
+  }
+
+  .device-screen.shadow-device {
+    box-shadow:
+      0 2.4cqi 4.8cqi -1.2cqi rgba(0, 0, 0, 0.4),
+      0 1.2cqi 2.4cqi -1.2cqi rgba(0, 0, 0, 0.25);
+  }
+
+  .device-island {
+    position: absolute;
+    top: 2.97cqi;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 31.14cqi;
+    height: 9.14cqi;
+    background: black;
+    border-radius: 4.57cqi;
+    z-index: 20;
+  }
+
+  .device-screen:not([data-island="true"]) .device-island {
+    display: none;
+  }
+  .device-screen[data-island="true"] .device-island {
+    display: block;
+  }
+
+  .device-content {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  .device-content img,
+  .device-content video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+  }
+}
+/* outside @layer components, at the bottom of globals.css */
+.device-content img,
+.device-content video {
+  object-position: top;
 }

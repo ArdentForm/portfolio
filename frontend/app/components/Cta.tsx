@@ -4,6 +4,7 @@ import ResolvedLink from '@/app/components/ResolvedLink'
 import PortableText from '@/app/components/PortableText'
 import Image from '@/app/components/SanityImage'
 import {stegaClean} from '@sanity/client/stega'
+import {backgroundVariants, tileOverlay} from '@/app/components/backgrounds'
 import {ExtractPageBuilderType} from '@/sanity/lib/types'
 
 type CtaProps = {
@@ -14,22 +15,23 @@ type CtaProps = {
   pageId: string
 }
 
-export default function CTA({block}: CtaProps) {
-  const {heading, eyebrow, body = [], button, image, theme, contentAlignment} = block
 
-  const isDark = theme === 'dark'
+export default function CTA({block}: CtaProps) {
+  const {heading, eyebrow, body = [], button, image, background = 'none', contentAlignment} = block
+
+  const cleanBackground = stegaClean(background)
   const isImageFirst = stegaClean(contentAlignment) === 'imageFirst'
 
   return (
-    <section className={isDark ? 'relative dark dark:bg-black' : 'relative dark:bg-black'}>
-      <div className="absolute inset-0 bg-size-[5px] bg-[url(/images/tile-1-black.png)] dark:bg-[url(/images/tile-1-white.png)] opacity-25" />
-      <div className="container relative">
+    <section className={`relative ${cleanBackground !== 'tile' ? (backgroundVariants[cleanBackground] ?? '') : ''}`}>
+      {cleanBackground === 'tile' && <div className={`absolute inset-0 ${tileOverlay}`} />}
+      <div className="max-w-[1440px] mx-auto w-full px-4 sm:px-6 lg:px-10 py-12 relative">
         <div className="grid lg:grid-cols-2 gap-12 py-12">
           <div
             className={`${isImageFirst && image ? 'row-start-2 lg:row-start-1 lg:col-start-2' : ''} flex flex-col gap-2 `}
           >
             {eyebrow && (
-              <span className="text-sm uppercase dark:text-white font-mono tracking-tight opacity-70">
+              <span className="text-xs uppercase dark:text-white font-mono tracking-widest opacity-70">
                 {eyebrow}
               </span>
             )}
@@ -46,7 +48,7 @@ export default function CTA({block}: CtaProps) {
               <div className="flex mt-4">
                 <ResolvedLink
                   link={button?.link}
-                  className="rounded-full flex gap-2 font-mono text-sm whitespace-nowrap items-center bg-black dark:bg-white hover:bg-blue focus:bg-blue py-3 px-6 text-white dark:text-black dark:hover:text-white transition-colors duration-200"
+                  className="rounded-lg flex gap-2 font-mono text-sm whitespace-nowrap items-center bg-black dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 active:scale-95 active:translate-y-px py-3 px-6 text-white dark:text-black transition-all duration-200"
                 >
                   {button?.buttonText}
                 </ResolvedLink>
