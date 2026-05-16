@@ -14,11 +14,13 @@ export const MorePosts = async ({skip, limit}: {skip: string; limit: number}) =>
 
   return (
     <div>
-      <p className="text-xs font-mono tracking-widest uppercase text-gray-400 mb-8">More posts</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        {posts.map((post: MorePostResult) => (
-          <PostCard key={post._id} post={post} />
-        ))}
+      <p className="text-[10px] font-bold tracking-[0.2em] uppercase text-gray-400 mb-8">More posts</p>
+      <div className="border-l border-t border-gray-200 dark:border-gray-700">
+        <div className="grid grid-cols-1 sm:grid-cols-2">
+          {posts.map((post: MorePostResult, index: number) => (
+            <PostCard key={post._id} post={post} index={index} />
+          ))}
+        </div>
       </div>
     </div>
   )

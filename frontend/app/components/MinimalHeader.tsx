@@ -9,20 +9,20 @@ export default function MinimalHeader({label, meta, heading}: MinimalHeaderProps
     <div className="max-w-[1440px] mx-auto w-full px-4 sm:px-6 lg:px-10 pt-20 lg:pt-28">
       <div className="flex items-center justify-between pb-5">
         {label ? (
-          <span className="text-[11px] tracking-[0.2em] uppercase text-white/50 font-mono">
+          <span className="text-[11px] tracking-[0.2em] uppercase text-gray-400 dark:text-gray-600 font-mono">
             {label}
           </span>
         ) : (
           <span />
         )}
         {meta && (
-          <span className="text-[11px] tracking-[0.2em] uppercase text-white/50 font-mono">
+          <span className="text-[11px] tracking-[0.2em] uppercase text-gray-400 dark:text-gray-600 font-mono">
             {meta}
           </span>
         )}
       </div>
 
-      <div className="border-t border-white/10" />
+      <div className="border-t border-gray-200 dark:border-gray-800" />
 
       <div className="pt-8 pb-12">
         <h2 className="text-[clamp(3rem,7vw,5.5rem)] leading-[1.0] tracking-[-0.02em]">

@@ -17,52 +17,61 @@ type PostCardProps = {
     date?: string | null
     tags?: Array<{name: string | null; slug: string | null}> | null
   }
+  index?: number
 }
 
-export default function PostCard({post}: PostCardProps) {
+export default function PostCard({post, index}: PostCardProps) {
   const {title, slug, excerpt, coverImage, date, tags} = post
   const firstTag = tags?.[0]
+  const indexLabel = index !== undefined ? String(index + 1).padStart(2, '0') : undefined
 
   return (
-    <article className="h-full">
+    <article className="border-r border-b border-gray-200 dark:border-gray-700 flex flex-col cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors duration-200 ease-out">
       <Link
         href={`/posts/${slug}`}
-        className="bg-gray-200 dark:bg-gray-900 rounded-2xl p-4 sm:p-6 flex flex-col h-full hover:brightness-95 dark:hover:brightness-125 transition-[filter] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
+        className="flex flex-col h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-inset"
       >
-        <div className="bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden flex flex-col flex-1">
-          <div className="p-5 sm:p-6 flex-1 flex flex-col">
+        <div className="p-6 lg:p-8 flex flex-col flex-1 gap-6">
+          {indexLabel && (
+            <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-gray-400">
+              {indexLabel}
+            </span>
+          )}
+          <div>
             {firstTag?.name && (
-              <p className="flex items-center gap-1.5 text-xs text-gray-400 font-bold tracking-widest uppercase mb-3">
-                <span className="inline-block w-1.5 h-1.5 rounded-full bg-brand shrink-0" />
+              <p className="flex items-center gap-1.5 text-[10px] font-bold tracking-[0.2em] uppercase text-gray-400 mb-4">
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-brand shrink-0" aria-hidden="true" />
                 {firstTag.name}
               </p>
             )}
             {title && (
-              <h3 className="text-xl font-bold leading-snug mb-2">{title}</h3>
+              <h3 className="font-bold text-[1.15rem] leading-tight tracking-tight text-gray-950 dark:text-gray-50 mb-3">
+                {title}
+              </h3>
             )}
             {excerpt && (
-              <p className="text-sm leading-relaxed text-gray-500 dark:text-gray-400 line-clamp-3 flex-1">
+              <p className="text-[13px] text-gray-500 dark:text-gray-400 leading-relaxed">
                 {excerpt}
               </p>
             )}
             {date && (
-              <time dateTime={date} className="mt-4 text-xs font-mono text-gray-400 block">
+              <time dateTime={date} className="mt-4 text-[10px] font-bold tracking-[0.2em] uppercase text-gray-400 block">
                 <DateComponent dateString={date} />
               </time>
             )}
           </div>
-          {coverImage?.asset?._ref && (
-            <SanityImage
-              id={coverImage.asset._ref}
-              alt={coverImage.alt ?? ''}
-              width={600}
-              hotspot={coverImage.hotspot ?? undefined}
-              crop={coverImage.crop ?? undefined}
-              mode="cover"
-              className="w-full h-auto block"
-            />
-          )}
         </div>
+        {coverImage?.asset?._ref && (
+          <SanityImage
+            id={coverImage.asset._ref}
+            alt={coverImage.alt ?? ''}
+            width={600}
+            hotspot={coverImage.hotspot ?? undefined}
+            crop={coverImage.crop ?? undefined}
+            mode="cover"
+            className="w-full max-h-44 h-auto object-contain object-bottom block"
+          />
+        )}
       </Link>
     </article>
   )

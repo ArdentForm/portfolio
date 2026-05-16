@@ -120,37 +120,38 @@ export default function FeaturedPosts({block}: FeaturedPostsProps) {
                 const cleanLabel = firstTag ? stegaClean(firstTag) : null
 
                 return (
-                  <div key={post._id} className="snap-start w-full lg:w-[30%] flex-shrink-0">
+                  <div key={post._id} className="snap-start w-full lg:w-[30%] flex-shrink-0 border border-gray-200 dark:border-gray-800">
                     <Link
                       href={`/posts/${post.slug}`}
-                      className="bg-gray-200 dark:bg-gray-900 rounded-2xl p-4 sm:p-6 lg:p-6 h-full md:h-auto lg:h-full block cursor-pointer hover:brightness-95 dark:hover:brightness-125 transition-[filter] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950"
+                      className="flex flex-col h-full min-h-[340px] md:min-h-0 lg:min-h-[480px] cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-inset"
                     >
-                      <div className="bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden w-full flex flex-col md:flex-row lg:flex-col min-h-[340px] md:min-h-0 lg:min-h-[480px] h-full md:h-auto md:max-h-[260px] lg:h-full lg:max-h-none">
-                        {/* Text content */}
-                        <div className="p-6 pb-8 sm:pb-10 flex-1 flex flex-col justify-start md:pr-4">
+                      <div className="flex-1 flex flex-col md:flex-row lg:flex-col">
+                        <div className="p-6 lg:p-8 flex-1 flex flex-col justify-start md:pr-6 lg:pr-8">
+                          <span className="font-mono text-[10px] tracking-[0.18em] uppercase text-gray-400 mb-6">
+                            {String(index + 1).padStart(2, '0')}
+                          </span>
                           {cleanLabel && (
-                            <p className="flex items-center gap-1.5 text-xs text-gray-400 font-bold tracking-widest uppercase mb-3">
-                              <span className="inline-block w-1.5 h-1.5 rounded-full bg-brand"></span>
+                            <p className="flex items-center gap-1.5 font-mono text-[10px] tracking-[0.18em] uppercase text-gray-400 mb-4">
+                              <span className="inline-block w-1.5 h-1.5 rounded-full bg-brand shrink-0" aria-hidden="true" />
                               {cleanLabel}
                             </p>
                           )}
-                          <h2 className="text-2xl sm:text-2xl lg:text-2xl font-bold mb-3">
+                          <h2 className="font-bold text-[1.35rem] leading-tight tracking-tight text-gray-950 dark:text-gray-50 mb-3">
                             {post.title}
                           </h2>
                           {post.excerpt && (
-                            <p className="text-sm text-gray-600 dark:text-gray-100 leading-relaxed">{post.excerpt}</p>
+                            <p className="text-[13px] text-gray-500 dark:text-gray-400 leading-relaxed">{post.excerpt}</p>
                           )}
                         </div>
-                        {/* Cover image */}
                         {post.coverImage?.asset?._ref && (
-                          <div className="mt-auto md:mt-0 md:w-2/5 md:self-end lg:mt-auto lg:w-full flex-shrink-0 md:max-h-full">
+                          <div className="md:w-2/5 md:flex-shrink-0 lg:w-full overflow-hidden">
                             <SanityImage
                               id={post.coverImage.asset._ref}
                               alt={post.coverImage.alt ?? ''}
                               width={600}
                               hotspot={post.coverImage.hotspot ?? undefined}
                               crop={post.coverImage.crop ?? undefined}
-                              className="w-full h-auto block md:h-full md:object-cover"
+                              className="w-full h-auto block"
                             />
                           </div>
                         )}
@@ -168,7 +169,7 @@ export default function FeaturedPosts({block}: FeaturedPostsProps) {
               <button
                 onClick={handlePrev}
                 disabled={prevDisabled}
-                className={`p-3 rounded-xl bg-gray-200 dark:bg-gray-800 text-gray-950 dark:text-gray-50 hover:bg-gray-300 dark:hover:bg-gray-700 active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950 disabled:opacity-50 disabled:cursor-not-allowed`}
+                className={`p-3 border border-gray-200 dark:border-gray-800 text-gray-950 dark:text-gray-50 hover:bg-gray-50 dark:hover:bg-gray-900 active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950 disabled:opacity-50 disabled:cursor-not-allowed`}
                 aria-label="Previous slide"
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -178,7 +179,7 @@ export default function FeaturedPosts({block}: FeaturedPostsProps) {
               <button
                 onClick={handleNext}
                 disabled={nextDisabled}
-                className="p-3 rounded-xl bg-gray-200 dark:bg-gray-800 text-gray-950 dark:text-gray-50 hover:bg-gray-300 dark:hover:bg-gray-700 active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="p-3 border border-gray-200 dark:border-gray-800 text-gray-950 dark:text-gray-50 hover:bg-gray-50 dark:hover:bg-gray-900 active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950 disabled:opacity-50 disabled:cursor-not-allowed"
                 aria-label="Next slide"
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -204,7 +205,7 @@ export default function FeaturedPosts({block}: FeaturedPostsProps) {
             </div>
 
             {/* Slide counter — hidden on lg */}
-            <div className="flex justify-end text-sm font-medium text-gray-600 dark:text-gray-400 lg:hidden">
+            <div className="col-start-3 flex justify-end text-sm font-medium text-gray-600 dark:text-gray-400 lg:hidden">
               <span>{currentSlide + 1}</span>&nbsp;of&nbsp;<span>{resolvedPosts.length}</span>
             </div>
           </div>
