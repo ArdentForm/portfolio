@@ -1,5 +1,6 @@
 import {stegaClean} from '@sanity/client/stega'
 import {backgroundVariants, tileOverlay} from '@/app/components/backgrounds'
+import AnimatedStat from '@/app/components/AnimatedStat'
 
 type StatItem = {
   value?: string
@@ -35,9 +36,11 @@ export default function StatsBlock({block}: StatsBlockProps) {
               <dt className="text-xs font-mono tracking-widest uppercase text-gray-400 order-2">
                 {item.label}
               </dt>
-              <dd className="text-5xl sm:text-6xl lg:text-7xl font-light tracking-tighter leading-none order-1">
-                {item.value}
-              </dd>
+              {item.value ? (
+                <AnimatedStat value={item.value} />
+              ) : (
+                <dd className="text-5xl sm:text-6xl lg:text-7xl font-light tracking-tighter leading-none order-1" />
+              )}
             </div>
           ))}
         </dl>
