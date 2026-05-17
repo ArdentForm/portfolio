@@ -5,7 +5,7 @@ export default function HoldingPage() {
       {/* Corner identifiers — structural, not content */}
       <header className="flex justify-between items-center px-8 sm:px-12 lg:px-16 pt-8 sm:pt-10">
         <span className="font-mono text-[0.6875rem] tracking-[0.16em] uppercase text-orange-500">
-          Craig Ardent
+          Craig Anderson
         </span>
         <span className="font-mono text-[0.6875rem] tracking-[0.1em] text-gray-700 select-none">
           001
@@ -24,7 +24,7 @@ export default function HoldingPage() {
             className="font-sans font-bold text-white leading-[1.05] tracking-[-0.02em] text-balance mb-3"
             style={{fontSize: 'clamp(2.5rem, 6vw, 4.5rem)'}}
           >
-            Craig Ardent
+            Craig Anderson
           </h1>
 
           <p className="font-sans font-light text-gray-600 text-lg sm:text-xl tracking-[-0.01em] mb-10 sm:mb-12">
