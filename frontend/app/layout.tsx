@@ -12,6 +12,7 @@ import {Toaster} from 'sonner'
 import DraftModeToast from '@/app/components/DraftModeToast'
 import Footer from '@/app/components/Footer'
 import Header from '@/app/components/Header'
+import HoldingPage from '@/app/components/HoldingPage'
 import {ThemeProvider} from '@/app/components/ThemeProvider'
 import * as demo from '@/sanity/lib/demo'
 import {sanityFetch, SanityLive} from '@/sanity/lib/live'
@@ -73,7 +74,24 @@ const ibmPlexMono = IBM_Plex_Mono({
   display: 'swap',
 })
 
+// Set NEXT_PUBLIC_MAINTENANCE_MODE=true in Vercel dashboard (Settings → Environment Variables)
+// to show the holding page. Set to false (or remove) to show the full portfolio.
+// In .env.local this is always false so local dev always shows the full site.
+const isMaintenanceMode = process.env.NEXT_PUBLIC_MAINTENANCE_MODE === 'true'
+
 export default async function RootLayout({children}: {children: React.ReactNode}) {
+  if (isMaintenanceMode) {
+    return (
+      <html lang="en" suppressHydrationWarning className={`${ppMonument.variable} ${ibmPlexMono.variable}`}>
+        <body>
+          <ThemeProvider>
+            <HoldingPage />
+          </ThemeProvider>
+        </body>
+      </html>
+    )
+  }
+
   const {isEnabled: isDraftMode} = await draftMode()
 
   return (
