@@ -87,7 +87,8 @@ export function Navigation({ links }: NavigationProps) {
   return (
     <>
       <header className={`sticky top-0 backdrop-blur-md bg-white/70 dark:bg-gray-950/70 transition-colors duration-500 ${isMenuOpen ? 'z-[60]' : 'z-40'}`}>
-        <nav className="px-6 pt-6">
+        <nav className="pt-6">
+          <div className="max-w-[1440px] mx-auto w-full px-4 sm:px-6 lg:px-10">
           <div className="flex items-stretch justify-between">
 
             {/* Left: Anderson logo mark */}
@@ -146,6 +147,7 @@ export function Navigation({ links }: NavigationProps) {
               </button>
             </div>
 
+          </div>
           </div>
         </nav>
       </header>
