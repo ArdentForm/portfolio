@@ -384,14 +384,8 @@ export const portfolioProjectPagesSlugs = defineQuery(`
 
 export const NAVIGATION_QUERY = defineQuery(`
   *[_type == "navigation"][0]{
-    siteName,
     "links": links[visible == true]{
       label,
-      url
-    },
-    logo{
-      "image": image.asset->url,
-      alt,
       url
     }
   }

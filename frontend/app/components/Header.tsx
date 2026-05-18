@@ -10,8 +10,6 @@ export default async function Header() {
   return (
     <Navigation
       links={navigation?.links ?? []}
-      logo={navigation?.logo ?? undefined}
-      siteName={navigation?.siteName ?? undefined}
     />
   )
 }

@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import { useState, useEffect } from 'react';
@@ -10,16 +9,24 @@ interface NavLink {
   url: string;
 }
 
-interface Logo {
-  image?: string | null;
-  alt?: string | null;
-  url?: string | null;
-}
-
 interface NavigationProps {
   links: NavLink[];
-  logo?: Logo;
-  siteName?: string;
+}
+
+function AndersonLogo() {
+  return (
+    <svg
+      width="32" height="29"
+      viewBox="0 0 64 57"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      className="text-black dark:text-gray-50 transition-colors duration-500"
+    >
+      <path d="M9.73607 37.7901C15.1132 37.7901 19.4721 42.0903 19.4721 47.395C19.4721 52.6997 15.1132 57 9.73607 57C4.35899 57 0 52.6997 0 47.395C0 42.0903 4.35899 37.7901 9.73607 37.7901Z" fill="currentColor"/>
+      <path d="M31.0049 0C32.162 0 33.2285 0.61775 33.7924 1.61457L63.7954 54.6581C64.389 55.7076 63.6199 57 62.4016 57H47.2029C46.0458 57 44.9792 56.3822 44.4154 55.3854L14.4124 2.34189C13.8187 1.29235 14.5879 4.4568e-05 15.8062 0H31.0049Z" fill="currentColor"/>
+    </svg>
+  );
 }
 
 function SunIcon() {
@@ -65,7 +72,7 @@ function CloseIcon() {
   );
 }
 
-export function Navigation({ links, logo, siteName }: NavigationProps) {
+export function Navigation({ links }: NavigationProps) {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -77,39 +84,16 @@ export function Navigation({ links, logo, siteName }: NavigationProps) {
   const closeMenu = () => setIsMenuOpen(false);
   const isActive = (url: string) => pathname === url;
 
-  const logoHref = logo?.url || '/';
-  const hasLogo = !!logo?.image;
-  const hasBrand = hasLogo || !!siteName;
-
   return (
     <>
       <header className={`sticky top-0 backdrop-blur-md bg-white/70 dark:bg-gray-950/70 transition-colors duration-500 ${isMenuOpen ? 'z-[60]' : 'z-40'}`}>
         <nav className="px-6 pt-6">
           <div className="flex items-stretch justify-between">
 
-            {/* Left: Logo or site name */}
-            {hasBrand && (
-              <a
-                href={logoHref}
-                className="flex items-center pb-6 shrink-0 mr-8"
-                aria-label={logo?.alt || siteName || 'Home'}
-              >
-                {hasLogo ? (
-                  <Image
-                    src={logo!.image!}
-                    alt={logo?.alt || siteName || 'Logo'}
-                    width={120}
-                    height={32}
-                    className="h-7 w-auto object-contain"
-                    priority
-                  />
-                ) : (
-                  <span className="text-gray-900 dark:text-white font-mono font-light text-base transition-colors duration-500">
-                    {siteName}
-                  </span>
-                )}
-              </a>
-            )}
+            {/* Left: Anderson logo mark */}
+            <a href="/" className="flex items-center pb-6 shrink-0 mr-8" aria-label="Home">
+              <AndersonLogo />
+            </a>
 
             {/* Right: nav links (desktop) + theme toggle + hamburger (mobile) */}
             <div className="flex items-stretch gap-6 ml-auto">

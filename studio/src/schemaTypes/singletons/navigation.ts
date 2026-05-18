@@ -56,34 +56,5 @@ export const navigation = defineType({
         }),
       ],
     }),
-    defineField({
-      name: 'siteName',
-      title: 'Site Name',
-      type: 'string',
-      description: 'Shown in the header when no logo image is uploaded',
-    }),
-    defineField({
-      name: 'logo',
-      title: 'Logo',
-      type: 'object',
-      fields: [
-        defineField({
-          name: 'image',
-          title: 'Logo Image',
-          type: 'image',
-          options: { hotspot: true },
-        }),
-        defineField({
-          name: 'alt',
-          title: 'Alt Text',
-          type: 'string',
-        }),
-        defineField({
-          name: 'url',
-          title: 'Logo Link URL',
-          type: 'string',
-        }),
-      ],
-    }),
   ],
 })
