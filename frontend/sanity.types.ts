@@ -544,18 +544,6 @@ export type Navigation = {
     visible?: boolean
     _key: string
   }>
-  siteName?: string
-  logo?: {
-    image?: {
-      asset?: SanityImageAssetReference
-      media?: unknown
-      hotspot?: SanityImageHotspot
-      crop?: SanityImageCrop
-      _type: 'image'
-    }
-    alt?: string
-    url?: string
-  }
 }
 
 export type Homepage = {
@@ -2364,7 +2352,7 @@ export type PortfolioProjectPagesSlugsResult = Array<{
 
 // Source: sanity/lib/queries.ts
 // Variable: NAVIGATION_QUERY
-// Query: *[_type == "navigation"][0]{    "links": links[visible != false]{      label,      url    }  }
+// Query: *[_id == "navigation"][0]{    "links": links[visible != false]{      label,      url    }  }
 export type NAVIGATION_QUERY_RESULT = {
   links: Array<{
     label: string
@@ -2396,6 +2384,6 @@ declare module '@sanity/client' {
     '\n  *[_type == "portfolioProject" && defined(slug.current) && $tag in tags[]->slug.current] | order(orderRank asc) {\n    \n  _id,\n  "status": select(_originalId in path("drafts.**") => "draft", "published"),\n  "title": coalesce(title, "Untitled"),\n  "slug": slug.current,\n  excerpt,\n  coverImage,\n  client,\n  year,\n  "tags": tags[]->{name, "slug": slug.current}\n\n  }\n': PortfolioProjectsByTagQueryResult
     '\n  *[_type == "portfolioProject" && slug.current == $slug][0]{\n    _id,\n    _type,\n    "title": coalesce(title, "Untitled"),\n    "slug": slug.current,\n    excerpt,\n    coverImage,\n    client,\n    year,\n    seoTitle,\n    seoDescription,\n    \n  "pageBuilder": pageBuilder[]{\n    ...,\n    _type == "callToAction" => {\n      ...,\n      button {\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n      }\n\n      }\n    },\n    _type == "infoSection" => {\n      content[]{\n        ...,\n        markDefs[]{\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      }\n    },\n    _type == "sectionHeading" => {\n      _type,\n      _key,\n      heading\n    },\n    _type == "minimalHeader" => {\n      _type,\n      _key,\n      label,\n      meta,\n      heading\n    },\n    _type == "heroSplitImageRight" => {\n      _type,\n      _key,\n      heading,\n      background,\n      contentAlignment,\n      "images": images[] {\n        "image": image.asset->url,\n        alt,\n        caption\n      }\n    },\n    _type == "deviceCropped" => {\n      _type,\n      _key,\n      label,\n      heading,\n      mediaType,\n      cropMode,\n      image {\n        image { asset-> { url } },\n        alt\n      },\n      "videoUrl": video.asset->url,\n      background,\n      contentAlignment,\n      items[] {\n        title,\n        body\n      }\n    },\n    _type == "contentBlockGrid" => {\n      _type,\n      _key,\n      heading,\n      intro,\n      background,\n      items[] {\n        title,\n        body\n      }\n    },\n    _type == "carouselCards" => {\n      _type,\n      _key,\n      background,\n      items[] {\n        "image": image.image.asset->url,\n        "alt": image.alt,\n        label,\n        title,\n        link {\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      }\n    },\n    _type == "abstractCardsCarousel" => {\n      _type,\n      _key,\n      items[] {\n        label,\n        heading,\n        body,\n        "image": image.image.asset->url,\n        "alt": image.alt,\n        link {\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      }\n    },\n    _type == "imageCollage" => {\n      _type,\n      _key,\n      background,\n      "images": images[] {\n        "image": image.asset->url,\n        alt\n      }\n    },\n    _type == "imageCollageContent" => {\n      _type,\n      _key,\n      heading,\n      client,\n      year,\n      "descriptions": descriptions[] {\n        "content": content[] {\n          ...,\n          markDefs[] {\n            ...,\n            \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n          }\n        }\n      },\n      background,\n    },\n    _type == "contentDetails" => {\n      _type,\n      _key,\n      background,\n      listItemsLabel,\n      mainContentLabel,\n      body[] {\n        ...,\n        markDefs[] {\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      },\n      items[] {\n        title\n      }\n    },\n    _type == "featuredPosts" => {\n      _type,\n      _key,\n      heading,\n      intro,\n      background,\n      selectionMode,\n      "resolvedPosts": select(\n        selectionMode == "tag" => *[_type == "post" && references(^.tag._ref)] | order(date desc) [0...6] {\n          _id,\n          title,\n          "slug": slug.current,\n          excerpt,\n          coverImage,\n          "date": coalesce(date, _updatedAt),\n          "tags": tags[]->{name, "slug": slug.current}\n        },\n        selectionMode == "manual" => posts[]->{\n          _id,\n          title,\n          "slug": slug.current,\n          excerpt,\n          coverImage,\n          "date": coalesce(date, _updatedAt),\n          "tags": tags[]->{name, "slug": slug.current}\n        },\n        []\n      )\n    },\n  }\n\n  }\n': PortfolioProjectQueryResult
     '\n  *[_type == "portfolioProject" && defined(slug.current)]\n  {"slug": slug.current}\n': PortfolioProjectPagesSlugsResult
-    '\n  *[_type == "navigation"][0]{\n    "links": links[visible != false]{\n      label,\n      url\n    }\n  }\n': NAVIGATION_QUERY_RESULT
+    '\n  *[_id == "navigation"][0]{\n    "links": links[visible != false]{\n      label,\n      url\n    }\n  }\n': NAVIGATION_QUERY_RESULT
   }
 }
