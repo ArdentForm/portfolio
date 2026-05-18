@@ -6,7 +6,7 @@ export default async function Header() {
   const navigation = await client.fetch(
     NAVIGATION_QUERY,
     {},
-    { cache: 'no-store' },
+    { cache: 'no-store', next: { revalidate: 0 } },
   )
 
   return (
