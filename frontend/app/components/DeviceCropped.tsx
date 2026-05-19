@@ -65,27 +65,33 @@ export default function DeviceCropped({block}: DeviceCroppedProps) {
   )
 
   const contentPanel = (
-    <div className="flex flex-col gap-8 pb-16 lg:pb-20">
-      <div>
+    <div className="flex flex-col gap-12 pt-2 pb-16 lg:pb-20">
+      <div className="flex flex-col gap-5">
         {block.label && (
-          <p className="font-mono text-xs tracking-widest uppercase mb-2">{block.label}</p>
+          <span className="font-mono text-[11px] tracking-[0.2em] uppercase text-gray-500 dark:text-gray-400">
+            {block.label}
+          </span>
         )}
         {block.heading && (
-          <p className="text-4xl lg:text-5xl font-medium leading-[1.15] tracking-tight">
+          <h2 className="text-[clamp(2.25rem,4vw,3.25rem)] font-medium leading-[1.05] tracking-[-0.02em] text-balance max-w-[18ch]">
             {block.heading}
-          </p>
+          </h2>
         )}
       </div>
 
       {block.items && block.items.length > 0 && (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-9">
           {block.items.map((item, index) => (
-            <div key={index}>
+            <div key={index} className="flex flex-col gap-2">
               {item.title && (
-                <p className="text-lg font-medium mb-3">{item.title}</p>
+                <h3 className="text-[1.25rem] font-medium leading-[1.3] tracking-[-0.01em]">
+                  {item.title}
+                </h3>
               )}
               {item.body && (
-                <p className="text-base leading-[1.65] max-w-[65ch]">{item.body}</p>
+                <p className="text-[0.9375rem] leading-[1.7] max-w-[58ch] text-gray-600 dark:text-gray-400">
+                  {item.body}
+                </p>
               )}
             </div>
           ))}
