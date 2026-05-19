@@ -9,7 +9,6 @@ type MinimalHeaderBlockProps = {
 }
 
 export default function MinimalHeaderBlock({block}: MinimalHeaderBlockProps) {
-  if (!block.heading) return null
   return (
     <MinimalHeader
       label={block.label}
