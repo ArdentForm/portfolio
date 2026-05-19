@@ -81,7 +81,7 @@ export type MinimalHeader = {
   _type: 'minimalHeader'
   label?: string
   meta?: string
-  heading: string
+  heading?: string
 }
 
 export type StatsBlock = {
@@ -558,6 +558,9 @@ export type Homepage = {
     | ({
         _key: string
       } & CallToAction)
+    | ({
+        _key: string
+      } & MinimalHeader)
     | ({
         _key: string
       } & SectionHeading)
@@ -1299,6 +1302,13 @@ export type HomepageQueryResult = {
       }
     | {
         _key: string
+        _type: 'minimalHeader'
+        label: string | null
+        meta: string | null
+        heading: string | null
+      }
+    | {
+        _key: string
         _type: 'sectionHeading'
         heading: Array<{
           children?: Array<{
@@ -1550,7 +1560,7 @@ export type GetPageQueryResult = {
         _type: 'minimalHeader'
         label: string | null
         meta: string | null
-        heading: string
+        heading: string | null
       }
     | {
         _key: string
@@ -2353,12 +2363,17 @@ export type PortfolioProjectPagesSlugsResult = Array<{
 // Source: sanity/lib/queries.ts
 // Variable: NAVIGATION_QUERY
 // Query: *[_id == "navigation"][0]{    "links": links[visible != false]{      label,      url    }  }
-export type NAVIGATION_QUERY_RESULT = {
-  links: Array<{
-    label: string
-    url: string
-  }> | null
-} | null
+export type NAVIGATION_QUERY_RESULT =
+  | {
+      links: null
+    }
+  | {
+      links: Array<{
+        label: string
+        url: string
+      }> | null
+    }
+  | null
 
 // Query TypeMap
 import '@sanity/client'

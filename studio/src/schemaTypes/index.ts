@@ -27,6 +27,7 @@ import featuredPosts from './objects/featuredPosts'
 import pageHeader from './objects/pageHeader'
 import statsBlock from './objects/statsBlock'
 import minimalHeader from './objects/minimalHeader'
+import imageHero from './objects/imageHero'
 
 // Export an array of all the schema types.  This is used in the Sanity Studio configuration. https://www.sanity.io/docs/studio/schema-types
 
@@ -63,4 +64,5 @@ export const schemaTypes = [
   pageHeader,
   statsBlock,
   minimalHeader,
+  imageHero,
 ]

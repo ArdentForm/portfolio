@@ -69,6 +69,16 @@ const pageBuilderFields = /* groq */ `
       meta,
       heading
     },
+    _type == "imageHero" => {
+      _type,
+      _key,
+      "image": image.asset->url,
+      alt,
+      subtitle,
+      index,
+      heading,
+      lightPanel
+    },
     _type == "heroSplitImageRight" => {
       _type,
       _key,

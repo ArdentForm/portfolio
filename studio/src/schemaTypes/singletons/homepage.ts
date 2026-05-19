@@ -29,6 +29,7 @@ export const homepage = defineType({
         {type: 'minimalHeader'},
         {type: 'sectionHeading'},
         {type: 'deviceCropped'},
+        {type: 'imageHero'},
         {type: 'heroSplitImageRight'},
         {type: 'contentBlockGrid'},
         {type: 'carouselCards'},

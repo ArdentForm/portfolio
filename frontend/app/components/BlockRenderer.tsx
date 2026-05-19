@@ -17,6 +17,7 @@ import FeaturedPostsBlock from '@/app/components/FeaturedPostsBlock'
 import PageHeaderBlock from '@/app/components/PageHeaderBlock'
 import StatsBlockBlock from '@/app/components/StatsBlockBlock'
 import MinimalHeaderBlock from '@/app/components/MinimalHeaderBlock'
+import ImageHeroBlock from '@/app/components/ImageHeroBlock'
 
 type BlockProps = {
   index: number
@@ -44,6 +45,7 @@ const Blocks: BlocksType = {
   pageHeader: PageHeaderBlock,
   statsBlock: StatsBlockBlock,
   minimalHeader: MinimalHeaderBlock,
+  imageHero: ImageHeroBlock,
 }
 
 /**

@@ -81,7 +81,7 @@ export type MinimalHeader = {
   _type: 'minimalHeader'
   label?: string
   meta?: string
-  heading: string
+  heading?: string
 }
 
 export type StatsBlock = {
@@ -544,18 +544,6 @@ export type Navigation = {
     visible?: boolean
     _key: string
   }>
-  siteName?: string
-  logo?: {
-    image?: {
-      asset?: SanityImageAssetReference
-      media?: unknown
-      hotspot?: SanityImageHotspot
-      crop?: SanityImageCrop
-      _type: 'image'
-    }
-    alt?: string
-    url?: string
-  }
 }
 
 export type Homepage = {
@@ -570,6 +558,9 @@ export type Homepage = {
     | ({
         _key: string
       } & CallToAction)
+    | ({
+        _key: string
+      } & MinimalHeader)
     | ({
         _key: string
       } & SectionHeading)
