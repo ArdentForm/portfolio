@@ -26,6 +26,7 @@ export const homepage = defineType({
       type: 'array',
       of: [
         {type: 'callToAction'},
+        {type: 'minimalHeader'},
         {type: 'sectionHeading'},
         {type: 'deviceCropped'},
         {type: 'heroSplitImageRight'},
