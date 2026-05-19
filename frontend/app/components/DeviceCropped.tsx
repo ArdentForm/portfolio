@@ -80,22 +80,27 @@ export default function DeviceCropped({block}: DeviceCroppedProps) {
       </div>
 
       {block.items && block.items.length > 0 && (
-        <div className="flex flex-col gap-9">
+        <ol className="flex flex-col gap-9">
           {block.items.map((item, index) => (
-            <div key={index} className="flex flex-col gap-2">
-              {item.title && (
-                <h3 className="text-[1.25rem] font-medium leading-[1.3] tracking-[-0.01em]">
-                  {item.title}
-                </h3>
-              )}
-              {item.body && (
-                <p className="text-[0.9375rem] leading-[1.7] max-w-[58ch] text-gray-600 dark:text-gray-400">
-                  {item.body}
-                </p>
-              )}
-            </div>
+            <li key={index} className="flex gap-5">
+              <span className="font-mono text-[11px] tracking-[0.2em] text-gray-400 dark:text-gray-500 tabular-nums pt-[0.4rem] shrink-0">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              <div className="flex flex-col gap-2 min-w-0">
+                {item.title && (
+                  <h3 className="text-[1.25rem] font-medium leading-[1.3] tracking-[-0.01em]">
+                    {item.title}
+                  </h3>
+                )}
+                {item.body && (
+                  <p className="text-[0.9375rem] leading-[1.7] max-w-[58ch] text-gray-600 dark:text-gray-400">
+                    {item.body}
+                  </p>
+                )}
+              </div>
+            </li>
           ))}
-        </div>
+        </ol>
       )}
     </div>
   )
