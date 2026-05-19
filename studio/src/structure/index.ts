@@ -1,4 +1,4 @@
-import {CogIcon, HomeIcon, ImagesIcon, DocumentTextIcon, DocumentIcon, TagIcon, UserIcon, MenuIcon, FolderIcon} from '@sanity/icons'
+import {CogIcon, HomeIcon, ImagesIcon, DocumentTextIcon, DocumentIcon, TagIcon, UserIcon, MenuIcon} from '@sanity/icons'
 import type {StructureBuilder, StructureResolver} from 'sanity/structure'
 import {orderableDocumentListDeskItem} from '@sanity/orderable-document-list'
 
@@ -21,86 +21,53 @@ export const structure: StructureResolver = (S: StructureBuilder, context) =>
     .title('Content')
     .items([
       // Portfolio
+      orderableDocumentListDeskItem({type: 'portfolioProject', title: 'Projects', S, context}),
       S.listItem()
-        .title('Portfolio')
-        .icon(FolderIcon)
-        .child(
-          S.list()
-            .title('Portfolio')
-            .items([
-              orderableDocumentListDeskItem({type: 'portfolioProject', title: 'Projects', S, context}),
-              S.listItem()
-                .title('Tags')
-                .icon(TagIcon)
-                .child(S.documentTypeList('portfolioTag').title('Portfolio Tags')),
-              S.divider(),
-              S.listItem()
-                .title('Portfolio Overview')
-                .icon(ImagesIcon)
-                .child(S.document().schemaType('portfolioOverview').documentId('portfolioOverview')),
-            ])
-        ),
+        .title('Portfolio Tags')
+        .icon(TagIcon)
+        .child(S.documentTypeList('portfolioTag').title('Portfolio Tags')),
+      S.listItem()
+        .title('Portfolio Overview')
+        .icon(ImagesIcon)
+        .child(S.document().schemaType('portfolioOverview').documentId('portfolioOverview')),
+
+      S.divider(),
 
       // Blog
       S.listItem()
-        .title('Blog')
+        .title('Posts')
         .icon(DocumentTextIcon)
-        .child(
-          S.list()
-            .title('Blog')
-            .items([
-              S.listItem()
-                .title('Posts')
-                .icon(DocumentTextIcon)
-                .child(S.documentTypeList('post').title('Posts')),
-              S.listItem()
-                .title('Tags')
-                .icon(TagIcon)
-                .child(S.documentTypeList('postTag').title('Post Tags')),
-            ])
-        ),
+        .child(S.documentTypeList('post').title('Posts')),
+      S.listItem()
+        .title('Blog Tags')
+        .icon(TagIcon)
+        .child(S.documentTypeList('postTag').title('Blog Tags')),
+
+      S.divider(),
 
       // Pages
       S.listItem()
-        .title('Pages')
+        .title('Homepage')
+        .icon(HomeIcon)
+        .child(S.document().schemaType('homepage').documentId('homepage')),
+      S.listItem()
+        .title('Other Pages')
         .icon(DocumentIcon)
-        .child(
-          S.list()
-            .title('Pages')
-            .items([
-              S.listItem()
-                .title('Homepage')
-                .icon(HomeIcon)
-                .child(S.document().schemaType('homepage').documentId('homepage')),
-              S.listItem()
-                .title('Other Pages')
-                .icon(DocumentIcon)
-                .child(S.documentTypeList('page').title('Pages')),
-            ])
-        ),
+        .child(S.documentTypeList('page').title('Pages')),
 
       S.divider(),
 
       // Configuration
       S.listItem()
-        .title('Configuration')
+        .title('Navigation')
+        .icon(MenuIcon)
+        .child(S.document().schemaType('navigation').documentId('navigation')),
+      S.listItem()
+        .title('Site Settings')
         .icon(CogIcon)
-        .child(
-          S.list()
-            .title('Configuration')
-            .items([
-              S.listItem()
-                .title('Navigation')
-                .icon(MenuIcon)
-                .child(S.document().schemaType('navigation').documentId('navigation')),
-              S.listItem()
-                .title('Site Settings')
-                .icon(CogIcon)
-                .child(S.document().schemaType('settings').documentId('siteSettings')),
-              S.listItem()
-                .title('Authors')
-                .icon(UserIcon)
-                .child(S.documentTypeList('person').title('Authors')),
-            ])
-        ),
+        .child(S.document().schemaType('settings').documentId('siteSettings')),
+      S.listItem()
+        .title('Authors')
+        .icon(UserIcon)
+        .child(S.documentTypeList('person').title('Authors')),
     ])
