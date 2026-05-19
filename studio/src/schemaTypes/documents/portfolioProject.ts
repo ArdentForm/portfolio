@@ -86,6 +86,7 @@ export const portfolioProject = defineType({
         {type: 'pageHeader'},
         {type: 'sectionHeading'},
         {type: 'statsBlock'},
+        {type: 'imageHero'},
         {type: 'deviceCropped'},
         {type: 'heroSplitImageRight'},
         {type: 'contentBlockGrid'},
