@@ -3,7 +3,7 @@ import {defineField, defineType} from 'sanity'
 
 export default defineType({
   name: 'featuredPosts',
-  title: 'Featured Posts',
+  title: 'Featured Articles',
   type: 'object',
   icon: ImagesIcon,
   fields: [
@@ -56,8 +56,8 @@ export default defineType({
     }),
     defineField({
       name: 'posts',
-      title: 'Posts',
-      description: 'Manually pick which posts to show.',
+      title: 'Articles',
+      description: 'Manually pick which articles to show.',
       type: 'array',
       of: [{type: 'reference', to: [{type: 'post'}]}],
       hidden: ({parent}) => parent?.selectionMode !== 'manual',
@@ -77,7 +77,7 @@ export default defineType({
             ? 'Manual selection'
             : ''
       return {
-        title: heading || 'Featured Posts',
+        title: heading || 'Featured Articles',
         subtitle,
       }
     },

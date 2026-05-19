@@ -28,7 +28,7 @@ export default function PostCard({post, index}: PostCardProps) {
   return (
     <article className="border-r border-b border-gray-200 dark:border-gray-700 flex flex-col cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors duration-200 ease-out">
       <Link
-        href={`/posts/${slug}`}
+        href={`/articles/${slug}`}
         className="flex flex-col h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-inset"
       >
         <div className="p-6 lg:p-8 flex flex-col flex-1 gap-6">

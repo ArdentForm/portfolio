@@ -103,7 +103,7 @@ export default async function PostsPage({searchParams}: Props) {
           {tags && tags.length > 0 && (
             <nav className="flex items-center flex-wrap gap-x-6 gap-y-2 pb-1" aria-label="Filter by category">
               <Link
-                href="/posts"
+                href="/articles"
                 className={`inline-flex items-center gap-1.5 font-mono text-xs tracking-widest uppercase transition-colors ${
                   !tag
                     ? 'text-gray-900 dark:text-gray-100'
@@ -118,7 +118,7 @@ export default async function PostsPage({searchParams}: Props) {
               {tags.map((t: PostTag) => (
                 <Link
                   key={t.slug}
-                  href={`/posts?tag=${t.slug}`}
+                  href={`/articles?tag=${t.slug}`}
                   className={`inline-flex items-center gap-1.5 font-mono text-xs tracking-widest uppercase transition-colors ${
                     tag === t.slug
                       ? 'text-gray-900 dark:text-gray-100'
@@ -144,7 +144,7 @@ export default async function PostsPage({searchParams}: Props) {
             {/* Row 1: Featured — 7 / 5 split */}
             {featured && (
               <Link
-                href={`/posts/${featured.slug}`}
+                href={`/articles/${featured.slug}`}
                 className={`grid grid-cols-12 border-b ${d} cursor-pointer transition-colors duration-200 ease-out hover:bg-gray-50 dark:hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-inset`}
               >
                 <div className="col-span-12 md:col-span-7 p-8 md:p-12 lg:p-14 flex flex-col justify-start gap-8 min-h-[300px] md:min-h-[400px]">
@@ -190,7 +190,7 @@ export default async function PostsPage({searchParams}: Props) {
                   return (
                     <Link
                       key={post._id}
-                      href={`/posts/${post.slug}`}
+                      href={`/articles/${post.slug}`}
                       className={`col-span-12 md:col-span-4 flex flex-col cursor-pointer transition-colors duration-200 ease-out hover:bg-gray-50 dark:hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-inset ${
                         needsRightBorder ? `border-b ${d} md:border-b-0 md:border-r` : `border-b md:border-b-0 ${d}`
                       }`}
@@ -243,7 +243,7 @@ export default async function PostsPage({searchParams}: Props) {
                         </p>
                         {activeTagName ? (
                           <Link
-                            href="/posts"
+                            href="/articles"
                             className="group inline-flex items-center gap-2 font-mono text-[10px] tracking-[0.18em] uppercase text-gray-400 hover:text-gray-950 dark:hover:text-gray-50 transition-colors"
                           >
                             View all articles
@@ -266,7 +266,7 @@ export default async function PostsPage({searchParams}: Props) {
               <div className={`grid grid-cols-12 ${overflow.length > 0 ? `border-b ${d}` : ''}`}>
                 {landscape && (
                   <Link
-                    href={`/posts/${landscape.slug}`}
+                    href={`/articles/${landscape.slug}`}
                     className={`col-span-12 md:col-span-8 flex flex-col md:flex-row cursor-pointer transition-colors duration-200 ease-out hover:bg-gray-50 dark:hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-inset border-b ${d} md:border-b-0 md:border-r`}
                   >
                     <div className="p-6 lg:p-8 xl:p-10 flex flex-col justify-start gap-6 flex-1">
@@ -315,7 +315,7 @@ export default async function PostsPage({searchParams}: Props) {
                       </p>
                       {activeTagName ? (
                         <Link
-                          href="/posts"
+                          href="/articles"
                           className="group inline-flex items-center gap-2 font-mono text-[10px] tracking-[0.18em] uppercase text-gray-400 hover:text-gray-950 dark:hover:text-gray-50 transition-colors"
                         >
                           View all articles
@@ -346,7 +346,7 @@ export default async function PostsPage({searchParams}: Props) {
                       </p>
                       {activeTagName ? (
                         <Link
-                          href="/posts"
+                          href="/articles"
                           className="group inline-flex items-center gap-2 font-mono text-[10px] tracking-[0.18em] uppercase text-gray-400 hover:text-gray-950 dark:hover:text-gray-50 transition-colors"
                         >
                           View all articles
@@ -377,7 +377,7 @@ export default async function PostsPage({searchParams}: Props) {
                     return (
                       <Link
                         key={post._id}
-                        href={`/posts/${post.slug}`}
+                        href={`/articles/${post.slug}`}
                         className={`col-span-12 md:col-span-4 flex flex-col cursor-pointer transition-colors duration-200 ease-out hover:bg-gray-50 dark:hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-inset ${
                           !isLastInRow ? `border-b ${d} md:border-b-0 md:border-r` : `border-b md:border-b-0 ${d}`
                         }`}

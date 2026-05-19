@@ -122,7 +122,7 @@ export default function FeaturedPosts({block}: FeaturedPostsProps) {
                 return (
                   <div key={post._id} className="snap-start w-full lg:w-[30%] flex-shrink-0 border border-gray-200 dark:border-gray-800">
                     <Link
-                      href={`/posts/${post.slug}`}
+                      href={`/articles/${post.slug}`}
                       className="flex flex-col h-full min-h-[340px] md:min-h-0 lg:min-h-[480px] cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-inset"
                     >
                       <div className="flex-1 flex flex-col md:flex-row lg:flex-col">

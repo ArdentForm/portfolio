@@ -33,15 +33,15 @@ export const structure: StructureResolver = (S: StructureBuilder, context) =>
 
       S.divider(),
 
-      // Blog
+      // Articles
       S.listItem()
-        .title('Posts')
+        .title('Articles')
         .icon(DocumentTextIcon)
-        .child(S.documentTypeList('post').title('Posts')),
+        .child(S.documentTypeList('post').title('Articles')),
       S.listItem()
-        .title('Blog Tags')
+        .title('Article Tags')
         .icon(TagIcon)
-        .child(S.documentTypeList('postTag').title('Blog Tags')),
+        .child(S.documentTypeList('postTag').title('Article Tags')),
 
       S.divider(),
 

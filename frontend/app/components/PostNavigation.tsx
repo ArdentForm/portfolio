@@ -20,7 +20,7 @@ export default function PostNavigation({prev, next}: PostNavigationProps) {
           <div className="py-10 pr-8 sm:pr-12">
             {prev ? (
               <Link
-                href={`/posts/${prev.slug}`}
+                href={`/articles/${prev.slug}`}
                 className="group flex flex-col gap-3 focus-visible:outline-none"
               >
                 <span className="font-mono text-xs tracking-widest uppercase text-gray-400 group-hover:text-brand transition-colors duration-200">
@@ -38,7 +38,7 @@ export default function PostNavigation({prev, next}: PostNavigationProps) {
           <div className="py-10 pl-8 sm:pl-12 text-right">
             {next ? (
               <Link
-                href={`/posts/${next.slug}`}
+                href={`/articles/${next.slug}`}
                 className="group flex flex-col gap-3 focus-visible:outline-none items-end"
               >
                 <span className="font-mono text-xs tracking-widest uppercase text-gray-400 group-hover:text-brand transition-colors duration-200">
