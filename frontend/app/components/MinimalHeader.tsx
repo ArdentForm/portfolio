@@ -1,7 +1,7 @@
 type MinimalHeaderProps = {
   label?: string
   meta?: string
-  heading: string
+  heading?: string
 }
 
 export default function MinimalHeader({label, meta, heading}: MinimalHeaderProps) {
@@ -24,11 +24,15 @@ export default function MinimalHeader({label, meta, heading}: MinimalHeaderProps
 
       <div className="border-t border-gray-200 dark:border-gray-800" />
 
-      <div className="pt-8 pb-12">
-        <h2 className="text-[clamp(3rem,7vw,5.5rem)] leading-[1.0] tracking-[-0.02em]">
-          {heading}
-        </h2>
-      </div>
+      {heading ? (
+        <div className="pt-8 pb-12">
+          <h2 className="text-[clamp(3rem,7vw,5.5rem)] leading-[1.0] tracking-[-0.02em]">
+            {heading}
+          </h2>
+        </div>
+      ) : (
+        <div className="pb-12" />
+      )}
     </div>
   )
 }
