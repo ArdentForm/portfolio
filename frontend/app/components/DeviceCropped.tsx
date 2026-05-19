@@ -30,7 +30,7 @@ export default function DeviceCropped({block}: DeviceCroppedProps) {
   const isCropped = stegaClean(block.cropMode ?? 'cropped') === 'cropped'
 
   const devicePanel = (
-    <div className={isCropped ? 'px-10 lg:self-end' : 'flex items-center justify-center px-10 aspect-square lg:aspect-auto pb-16 lg:pb-20'}>
+    <div className={`flex items-center justify-center px-10 lg:aspect-auto${isCropped ? '' : ' pb-16 lg:pb-20'}`}>
       <div className="device-frame mx-auto w-full" style={{maxWidth: isCropped ? '400px' : '280px', clipPath: isCropped ? 'inset(-20px -20px 0 -20px)' : 'none'}}>
 
         <div
