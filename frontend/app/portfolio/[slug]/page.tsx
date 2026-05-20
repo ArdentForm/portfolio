@@ -3,8 +3,10 @@ import {notFound, redirect} from 'next/navigation'
 import {cookies} from 'next/headers'
 
 import PageBuilderPage from '@/app/components/PageBuilder'
+import PortfolioNavigation from '@/app/components/PortfolioNavigation'
 import {sanityFetch} from '@/sanity/lib/live'
 import {
+  adjacentPortfolioProjectsQuery,
   portfolioProjectPagesSlugs,
   portfolioProjectQuery,
   portfolioProtectionQuery,
@@ -68,7 +70,15 @@ export default async function PortfolioProjectPage(props: Props) {
     return notFound()
   }
 
+  const {data: adjacent} = await sanityFetch({
+    query: adjacentPortfolioProjectsQuery,
+    params: {id: project._id, orderRank: project.orderRank ?? ''},
+  })
+
   return (
-    <PageBuilderPage page={project as unknown as GetPageQueryResult} />
+    <>
+      <PageBuilderPage page={project as unknown as GetPageQueryResult} />
+      <PortfolioNavigation prev={adjacent?.prev} next={adjacent?.next} />
+    </>
   )
 }

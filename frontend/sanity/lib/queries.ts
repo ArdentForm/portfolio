@@ -381,9 +381,23 @@ export const portfolioProjectQuery = defineQuery(`
     coverImage,
     client,
     year,
+    orderRank,
     seoTitle,
     seoDescription,
     ${pageBuilderFields}
+  }
+`)
+
+export const adjacentPortfolioProjectsQuery = defineQuery(`
+  {
+    "prev": *[_type == "portfolioProject" && defined(slug.current) && _id != $id && orderRank < $orderRank] | order(orderRank desc) [0] {
+      "title": coalesce(title, "Untitled"),
+      "slug": slug.current
+    },
+    "next": *[_type == "portfolioProject" && defined(slug.current) && _id != $id && orderRank > $orderRank] | order(orderRank asc) [0] {
+      "title": coalesce(title, "Untitled"),
+      "slug": slug.current
+    }
   }
 `)
 
