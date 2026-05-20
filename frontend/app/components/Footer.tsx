@@ -2,24 +2,24 @@ import {RiInstagramLine, RiLinkedinLine} from 'react-icons/ri'
 
 export default function Footer() {
   return (
-    <footer className="">
-      <div className="max-w-[1440px] mx-auto w-full flex items-center justify-between px-4 sm:px-6 lg:px-10 py-6 border-t dark:border-gray-700 border-gray-200">
-        <p className="text-sm font-mono">
-          Designed and built by Me using{' '}
+    <footer>
+      <div className="max-w-[1440px] mx-auto w-full flex items-center justify-between px-4 sm:px-6 lg:px-10 py-8 border-t border-[oklch(88%_0.008_50)] dark:border-[oklch(23%_0.012_50)]">
+        <p className="font-mono text-xs tracking-widest uppercase text-[oklch(58%_0.012_50)]">
+          © 2026 Craig Ardent · Built with{' '}
           <a
             href="https://www.sanity.io"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-brand hover:opacity-80 transition-opacity"
+            className="underline decoration-[oklch(78%_0.010_50)] dark:decoration-[oklch(38%_0.012_50)] underline-offset-2 hover:text-[oklch(9%_0.007_50)] dark:hover:text-[oklch(93%_0.006_55)] transition-colors duration-200"
           >
-            Sanity.io
-          </a>{' '}
-          and{' '}
+            Sanity
+          </a>
+          {' '}+{' '}
           <a
             href="https://nextjs.org"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-brand hover:opacity-80 transition-opacity"
+            className="underline decoration-[oklch(78%_0.010_50)] dark:decoration-[oklch(38%_0.012_50)] underline-offset-2 hover:text-[oklch(9%_0.007_50)] dark:hover:text-[oklch(93%_0.006_55)] transition-colors duration-200"
           >
             Next.js
           </a>
@@ -30,18 +30,18 @@ export default function Footer() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Instagram"
-            className="dark:text-gray-600 dark:hover:text-gray-200 text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-[oklch(75%_0.010_50)] hover:text-[oklch(9%_0.007_50)] dark:text-[oklch(38%_0.012_50)] dark:hover:text-[oklch(80%_0.008_50)] transition-colors duration-200"
           >
-            <RiInstagramLine size={22} />
+            <RiInstagramLine size={18} />
           </a>
           <a
             href="https://www.linkedin.com"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="LinkedIn"
-            className="dark:text-gray-600 dark:hover:text-gray-200 text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-[oklch(75%_0.010_50)] hover:text-[oklch(9%_0.007_50)] dark:text-[oklch(38%_0.012_50)] dark:hover:text-[oklch(80%_0.008_50)] transition-colors duration-200"
           >
-            <RiLinkedinLine size={22} />
+            <RiLinkedinLine size={18} />
           </a>
         </div>
       </div>
