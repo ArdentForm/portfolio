@@ -5,7 +5,7 @@ export default function Footer() {
     <footer>
       <div className="max-w-[1440px] mx-auto w-full flex items-center justify-between px-4 sm:px-6 lg:px-10 py-8 border-t border-[oklch(88%_0.008_50)] dark:border-[oklch(23%_0.012_50)]">
         <p className="font-mono text-xs tracking-widest uppercase text-[oklch(58%_0.012_50)]">
-          © 2026 Craig Ardent · Built with{' '}
+          Craig Anderson · Built with{' '}
           <a
             href="https://www.sanity.io"
             target="_blank"
