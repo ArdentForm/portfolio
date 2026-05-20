@@ -16,6 +16,11 @@ function urlForImage(source: SanityImageSource) {
   return builder.image(source)
 }
 
+export function resolveFaviconUrl(image?: SanityImageSource | null) {
+  if (!image) return undefined
+  return urlForImage(image)?.width(64).height(64).fit('crop').url() ?? undefined
+}
+
 export function resolveOpenGraphImage(
   image?: SanityImageSource | null,
   width = 1200,

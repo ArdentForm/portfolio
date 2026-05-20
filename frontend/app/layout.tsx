@@ -17,7 +17,7 @@ import {ThemeProvider} from '@/app/components/ThemeProvider'
 import * as demo from '@/sanity/lib/demo'
 import {sanityFetch, SanityLive} from '@/sanity/lib/live'
 import {settingsQuery} from '@/sanity/lib/queries'
-import {resolveOpenGraphImage} from '@/sanity/lib/utils'
+import {resolveOpenGraphImage, resolveFaviconUrl} from '@/sanity/lib/utils'
 import {handleError} from '@/app/client-utils'
 
 export const dynamic = 'force-dynamic'
@@ -36,6 +36,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const description = settings?.description || demo.description
 
   const ogImage = resolveOpenGraphImage(settings?.ogImage)
+  const faviconUrl = resolveFaviconUrl(settings?.favicon)
   let metadataBase: URL | undefined = undefined
   try {
     metadataBase = settings?.ogImage?.metadataBase
@@ -54,6 +55,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       images: ogImage ? [ogImage] : [],
     },
+    icons: faviconUrl ? {icon: faviconUrl} : undefined,
   }
 }
 

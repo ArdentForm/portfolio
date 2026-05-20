@@ -116,6 +116,13 @@ export const settings = defineType({
       ],
     }),
     defineField({
+      name: 'favicon',
+      title: 'Favicon',
+      type: 'image',
+      description: 'Browser tab icon. Upload a square PNG or SVG (512×512 recommended).',
+      options: {hotspot: false},
+    }),
+    defineField({
       name: 'ogImage',
       title: 'Open Graph Image',
       type: 'image',

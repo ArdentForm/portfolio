@@ -620,6 +620,12 @@ export type Settings = {
     _type: 'block'
     _key: string
   }>
+  favicon?: {
+    asset?: SanityImageAssetReference
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+  }
   ogImage?: {
     asset?: SanityImageAssetReference
     media?: unknown
