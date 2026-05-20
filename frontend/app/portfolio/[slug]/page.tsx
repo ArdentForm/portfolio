@@ -69,8 +69,6 @@ export default async function PortfolioProjectPage(props: Props) {
   }
 
   return (
-    <div className="my-12">
-      <PageBuilderPage page={project as unknown as GetPageQueryResult} />
-    </div>
+    <PageBuilderPage page={project as unknown as GetPageQueryResult} />
   )
 }
