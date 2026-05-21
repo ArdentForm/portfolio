@@ -37,6 +37,7 @@ export const homepage = defineType({
         {type: 'imageCollage'},
         {type: 'contentDetails'},
         {type: 'featuredPosts'},
+        {type: 'bentoGrid'},
       ],
       options: {
         insertMenu: {

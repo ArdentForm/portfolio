@@ -18,6 +18,7 @@ import PageHeaderBlock from '@/app/components/PageHeaderBlock'
 import StatsBlockBlock from '@/app/components/StatsBlockBlock'
 import MinimalHeaderBlock from '@/app/components/MinimalHeaderBlock'
 import ImageHeroBlock from '@/app/components/ImageHeroBlock'
+import BentoGridBlock from '@/app/components/BentoGridBlock'
 
 type BlockProps = {
   index: number
@@ -46,6 +47,7 @@ const Blocks: BlocksType = {
   statsBlock: StatsBlockBlock,
   minimalHeader: MinimalHeaderBlock,
   imageHero: ImageHeroBlock,
+  bentoGrid: BentoGridBlock,
 }
 
 /**

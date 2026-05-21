@@ -96,6 +96,7 @@ export const portfolioProject = defineType({
         {type: 'imageCollageContent'},
         {type: 'imageCollage'},
         {type: 'contentDetails'},
+        {type: 'bentoGrid'},
       ],
       options: {
         insertMenu: {

@@ -44,7 +44,7 @@ export const page = defineType({
       name: 'pageBuilder',
       title: 'Page builder',
       type: 'array',
-      of: [{type: 'pageHeader'}, {type: 'callToAction'}, {type: 'sectionHeading'}, {type: 'minimalHeader'},{type: 'statsBlock'}, {type: 'deviceCropped'}, {type: 'imageHero'}, {type: 'heroSplitImageRight'}, {type: 'contentBlockGrid'}, {type: 'carouselCards'}, {type: 'abstractCardsCarousel'}, {type: 'imageCollageContent'}, {type: 'imageCollage'}, {type: 'contentDetails'}, {type: 'featuredPosts'}],
+      of: [{type: 'pageHeader'}, {type: 'callToAction'}, {type: 'sectionHeading'}, {type: 'minimalHeader'},{type: 'statsBlock'}, {type: 'deviceCropped'}, {type: 'imageHero'}, {type: 'heroSplitImageRight'}, {type: 'contentBlockGrid'}, {type: 'carouselCards'}, {type: 'abstractCardsCarousel'}, {type: 'imageCollageContent'}, {type: 'imageCollage'}, {type: 'contentDetails'}, {type: 'featuredPosts'}, {type: 'bentoGrid'}],
       options: {
         insertMenu: {
           // Configure the "Add Item" menu to display a thumbnail preview of the content type. https://www.sanity.io/docs/studio/array-type#efb1fe03459d

@@ -194,6 +194,32 @@ const pageBuilderFields = /* groq */ `
         title
       }
     },
+    _type == "bentoGrid" => {
+      _type,
+      _key,
+      background,
+      "items": items[] {
+        _key,
+        _type,
+        span,
+        // image fields
+        "image": image.asset->url,
+        alt,
+        overlayText,
+        overlayPosition,
+        // text fields
+        content,
+        textAlign,
+        fontSize,
+        // shared (text + cta)
+        backgroundColor,
+        // cta fields
+        headline,
+        description,
+        buttonText,
+        buttonLink,
+      }
+    },
     _type == "featuredPosts" => {
       _type,
       _key,

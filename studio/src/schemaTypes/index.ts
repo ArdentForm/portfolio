@@ -28,6 +28,7 @@ import pageHeader from './objects/pageHeader'
 import statsBlock from './objects/statsBlock'
 import minimalHeader from './objects/minimalHeader'
 import imageHero from './objects/imageHero'
+import bentoGrid from './objects/bentoGrid'
 
 // Export an array of all the schema types.  This is used in the Sanity Studio configuration. https://www.sanity.io/docs/studio/schema-types
 
@@ -65,4 +66,5 @@ export const schemaTypes = [
   statsBlock,
   minimalHeader,
   imageHero,
+  bentoGrid,
 ]
