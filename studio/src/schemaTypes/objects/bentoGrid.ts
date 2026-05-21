@@ -1,44 +1,9 @@
 import { defineField, defineType } from 'sanity'
 import { ComponentIcon, ControlsIcon, ImageIcon, DocumentTextIcon, LinkIcon } from '@sanity/icons'
 
-const spanField = defineField({
-  name: 'span',
-  title: 'Size',
-  type: 'object',
-  options: { collapsible: true, collapsed: false },
-  fields: [
-    defineField({
-      name: 'cols',
-      title: 'Width',
-      type: 'number',
-      initialValue: 1,
-      options: {
-        list: [
-          { title: '1 column', value: 1 },
-          { title: '2 columns', value: 2 },
-        ],
-        layout: 'radio',
-      },
-    }),
-    defineField({
-      name: 'rows',
-      title: 'Height',
-      type: 'number',
-      initialValue: 1,
-      options: {
-        list: [
-          { title: '1 row', value: 1 },
-          { title: '2 rows', value: 2 },
-        ],
-        layout: 'radio',
-      },
-    }),
-  ],
-})
-
 const backgroundColorField = defineField({
   name: 'backgroundColor',
-  title: 'Background color',
+  title: 'Background',
   type: 'string',
   initialValue: 'warm',
   options: {
@@ -46,8 +11,7 @@ const backgroundColorField = defineField({
       { title: 'Warm white', value: 'warm' },
       { title: 'Tint', value: 'tint' },
       { title: 'Dark', value: 'dark' },
-      { title: 'Accent (orange)', value: 'accent' },
-      { title: 'None', value: 'none' },
+      { title: 'Ink', value: 'ink' },
     ],
     layout: 'radio',
   },
@@ -68,6 +32,7 @@ export default defineType({
       title: 'Items',
       type: 'array',
       group: 'contents',
+      description: 'Image sizes are set automatically from aspect ratio. Landscape → wide cell, portrait → tall cell, square → standard.',
       of: [
         // ── Image block ───────────────────────────────────────────────────
         defineField({
@@ -76,7 +41,6 @@ export default defineType({
           type: 'object',
           icon: ImageIcon,
           fields: [
-            spanField,
             defineField({
               name: 'image',
               title: 'Image',
@@ -92,13 +56,13 @@ export default defineType({
             }),
             defineField({
               name: 'overlayText',
-              title: 'Overlay text',
+              title: 'Overlay label',
               type: 'string',
-              description: 'Optional caption shown on top of the image',
+              description: 'Optional caption shown over the image',
             }),
             defineField({
               name: 'overlayPosition',
-              title: 'Overlay position',
+              title: 'Label position',
               type: 'string',
               initialValue: 'bottom',
               hidden: ({ parent }) => !parent?.overlayText,
@@ -113,13 +77,9 @@ export default defineType({
             }),
           ],
           preview: {
-            select: { title: 'alt', media: 'image', cols: 'span.cols', rows: 'span.rows' },
-            prepare({ title, media, cols, rows }) {
-              return {
-                title: title || 'Image',
-                subtitle: cols && rows ? `${cols}×${rows}` : '1×1',
-                media,
-              }
+            select: { title: 'alt', media: 'image' },
+            prepare({ title, media }) {
+              return { title: title || 'Image', subtitle: 'Auto-sized from aspect ratio', media }
             },
           },
         }),
@@ -131,7 +91,6 @@ export default defineType({
           type: 'object',
           icon: DocumentTextIcon,
           fields: [
-            spanField,
             backgroundColorField,
             defineField({
               name: 'content',
@@ -141,7 +100,7 @@ export default defineType({
             }),
             defineField({
               name: 'textAlign',
-              title: 'Text alignment',
+              title: 'Alignment',
               type: 'string',
               initialValue: 'left',
               options: {
@@ -155,7 +114,7 @@ export default defineType({
             }),
             defineField({
               name: 'fontSize',
-              title: 'Font size',
+              title: 'Size',
               type: 'string',
               initialValue: 'base',
               options: {
@@ -163,20 +122,16 @@ export default defineType({
                   { title: 'Small', value: 'sm' },
                   { title: 'Base', value: 'base' },
                   { title: 'Large', value: 'lg' },
-                  { title: 'Extra large', value: 'xl' },
+                  { title: 'XL', value: 'xl' },
                 ],
                 layout: 'radio',
               },
             }),
           ],
           preview: {
-            select: { cols: 'span.cols', rows: 'span.rows', bg: 'backgroundColor' },
-            prepare({ cols, rows, bg }) {
-              return {
-                title: 'Text block',
-                subtitle: `${cols ?? 1}×${rows ?? 1} · ${bg ?? 'warm'}`,
-                media: DocumentTextIcon,
-              }
+            select: { bg: 'backgroundColor' },
+            prepare({ bg }) {
+              return { title: 'Text block', subtitle: bg ?? 'warm', media: DocumentTextIcon }
             },
           },
         }),
@@ -188,7 +143,6 @@ export default defineType({
           type: 'object',
           icon: LinkIcon,
           fields: [
-            spanField,
             backgroundColorField,
             defineField({
               name: 'headline',
@@ -208,24 +162,15 @@ export default defineType({
             }),
             defineField({
               name: 'buttonLink',
-              title: 'Button link',
+              title: 'Link',
               type: 'string',
-              description: 'URL or internal path (e.g. /about)',
+              description: 'URL or internal path (e.g. /work)',
             }),
           ],
           preview: {
-            select: {
-              title: 'headline',
-              cols: 'span.cols',
-              rows: 'span.rows',
-              bg: 'backgroundColor',
-            },
-            prepare({ title, cols, rows, bg }) {
-              return {
-                title: title || 'CTA',
-                subtitle: `${cols ?? 1}×${rows ?? 1} · ${bg ?? 'warm'}`,
-                media: LinkIcon,
-              }
+            select: { title: 'headline', bg: 'backgroundColor' },
+            prepare({ title, bg }) {
+              return { title: title || 'CTA', subtitle: bg ?? 'warm', media: LinkIcon }
             },
           },
         }),
@@ -254,10 +199,7 @@ export default defineType({
     select: { count: 'items' },
     prepare({ count }) {
       const n = Array.isArray(count) ? count.length : 0
-      return {
-        title: 'Bento Grid',
-        subtitle: `${n} item${n === 1 ? '' : 's'}`,
-      }
+      return { title: 'Bento Grid', subtitle: `${n} item${n === 1 ? '' : 's'} · auto-layout` }
     },
   },
 })

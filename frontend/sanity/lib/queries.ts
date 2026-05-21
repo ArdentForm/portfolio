@@ -204,6 +204,8 @@ const pageBuilderFields = /* groq */ `
         span,
         // image fields
         "image": image.asset->url,
+        "imageWidth": image.asset->metadata.dimensions.width,
+        "imageHeight": image.asset->metadata.dimensions.height,
         alt,
         overlayText,
         overlayPosition,

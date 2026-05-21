@@ -11,21 +11,17 @@ import { backgroundVariants, tileOverlay } from '@/app/components/backgrounds'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export interface BentoSpan {
-  cols?: 1 | 2
-  rows?: 1 | 2
-}
-
-export type BentoColor = 'none' | 'warm' | 'tint' | 'dark' | 'accent'
+export type BentoColor = 'warm' | 'tint' | 'dark' | 'ink'
 
 interface BaseBentoItem {
   _key: string
-  span?: BentoSpan
 }
 
 export interface BentoImageItem extends BaseBentoItem {
   _type: 'bentoImage'
   image?: string | null
+  imageWidth?: number | null
+  imageHeight?: number | null
   alt?: string | null
   overlayText?: string | null
   overlayPosition?: 'top' | 'center' | 'bottom' | null
@@ -57,71 +53,76 @@ export interface BentoGridProps {
   }
 }
 
+// ─── Layout ───────────────────────────────────────────────────────────────────
+
+interface Span { cols: 1 | 2; rows: 1 | 2 }
+
+function computeSpan(item: BentoItem): Span {
+  if (item._type !== 'bentoImage' || !item.imageWidth || !item.imageHeight) {
+    return { cols: 1, rows: 1 }
+  }
+  const ar = item.imageWidth / item.imageHeight
+  if (ar >= 1.5) return { cols: 2, rows: 1 }  // landscape → wide
+  if (ar <= 0.67) return { cols: 1, rows: 2 }  // portrait → tall
+  return { cols: 1, rows: 1 }
+}
+
+function cellClass(span: Span): string {
+  const c = span.cols === 2 ? 'sm:col-span-2' : ''
+  const r = span.rows === 2 ? 'row-span-2' : ''
+  return [c, r].filter(Boolean).join(' ')
+}
+
 // ─── Animation ────────────────────────────────────────────────────────────────
 
 const containerVariants = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.06 } },
+  visible: { transition: { staggerChildren: 0.055 } },
 }
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 12 },
+  hidden: { opacity: 0, y: 10 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
+    transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] },
   },
 }
 
 // ─── Color maps ───────────────────────────────────────────────────────────────
 
 const bgMap: Record<BentoColor, string> = {
-  none: 'bg-transparent',
   warm: 'bg-gray-50',
   tint: 'bg-gray-100',
   dark: 'bg-gray-900',
-  accent: 'bg-orange-500',
+  ink: 'bg-black',
 }
 
-const textMap: Record<BentoColor, string> = {
-  none: 'text-gray-900',
-  warm: 'text-gray-900',
-  tint: 'text-gray-900',
-  dark: 'text-gray-50',
-  accent: 'text-white',
+const fgMap: Record<BentoColor, string> = {
+  warm: 'text-black',
+  tint: 'text-black',
+  dark: 'text-white',
+  ink: 'text-white',
 }
 
-const borderMap: Record<BentoColor, string> = {
-  none: 'border-gray-900/15',
-  warm: 'border-gray-900/15',
-  tint: 'border-gray-900/15',
-  dark: 'border-white/20',
-  accent: 'border-white/30',
+// Button styles invert relative to the surface
+const btnMap: Record<BentoColor, string> = {
+  warm: 'bg-black text-white hover:bg-gray-800',
+  tint: 'bg-black text-white hover:bg-gray-800',
+  dark: 'bg-white text-black hover:bg-gray-100',
+  ink: 'bg-white text-black hover:bg-gray-100',
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function resolveColor(c?: BentoColor | null): BentoColor {
-  return c ?? 'warm'
-}
-
-function overlayJustify(pos: string): string {
-  if (pos === 'top') return 'justify-start'
-  if (pos === 'center') return 'justify-center'
-  return 'justify-end'
-}
-
-function cellClasses(item: BentoItem): string {
-  const cols = item.span?.cols === 2 ? 'sm:col-span-2' : ''
-  const rows = item.span?.rows === 2 ? 'row-span-2' : ''
-  return [cols, rows].filter(Boolean).join(' ')
+const overlayAnchor: Record<string, string> = {
+  top: 'justify-start',
+  center: 'justify-center',
+  bottom: 'justify-end',
 }
 
 // ─── Image block ──────────────────────────────────────────────────────────────
 
 function BentoImageBlock({ item }: { item: BentoImageItem }) {
   const pos = stegaClean(item.overlayPosition) ?? 'bottom'
-
   if (!item.image) return null
 
   return (
@@ -131,13 +132,13 @@ function BentoImageBlock({ item }: { item: BentoImageItem }) {
         alt={item.alt ?? ''}
         fill
         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-        className="object-cover transition-[transform,filter] duration-[400ms] ease-out group-hover:scale-[1.04] group-hover:brightness-105"
+        className="object-cover transition-[transform,filter] duration-[500ms] ease-out group-hover:scale-[1.03] group-hover:brightness-105"
       />
       {item.overlayText && (
-        <div className={`absolute inset-0 flex flex-col ${overlayJustify(pos)} p-5`}>
-          <p className="bg-black/50 backdrop-blur-sm rounded px-3 py-2 text-white text-sm font-medium w-fit max-w-[80%]">
+        <div className={`absolute inset-0 flex flex-col ${overlayAnchor[pos] ?? 'justify-end'} p-4`}>
+          <span className="font-mono text-[0.7rem] uppercase tracking-[0.12em] text-white bg-black/75 px-3 py-1.5 rounded-sm w-fit max-w-[85%]">
             {item.overlayText}
-          </p>
+          </span>
         </div>
       )}
     </div>
@@ -147,16 +148,17 @@ function BentoImageBlock({ item }: { item: BentoImageItem }) {
 // ─── Text block ───────────────────────────────────────────────────────────────
 
 function BentoTextBlock({ item }: { item: BentoTextItem }) {
-  const color = resolveColor(item.backgroundColor)
+  const color = item.backgroundColor ?? 'warm'
   const align = stegaClean(item.textAlign) ?? 'left'
   const size = stegaClean(item.fontSize) ?? 'base'
 
   const sizeClass: Record<string, string> = {
-    sm: 'text-sm',
-    base: 'text-base',
-    lg: 'text-lg leading-snug',
-    xl: 'text-xl leading-snug',
+    sm: '[&_p]:text-sm [&_p]:leading-relaxed',
+    base: '[&_p]:text-base [&_p]:leading-relaxed',
+    lg: '[&_p]:text-lg [&_p]:leading-snug',
+    xl: '[&_p]:text-xl [&_p]:leading-snug [&_p]:tracking-tight',
   }
+
   const alignClass: Record<string, string> = {
     left: 'text-left',
     center: 'text-center',
@@ -165,13 +167,9 @@ function BentoTextBlock({ item }: { item: BentoTextItem }) {
 
   return (
     <div
-      className={`h-full flex flex-col justify-center p-6 ${bgMap[color]} ${textMap[color]} ${alignClass[align] ?? 'text-left'}`}
+      className={`h-full flex flex-col justify-center p-6 ${bgMap[color]} ${fgMap[color]} ${alignClass[align] ?? 'text-left'} ${sizeClass[size] ?? ''}`}
     >
-      {item.content && (
-        <div className={sizeClass[size] ?? 'text-base'}>
-          <PortableText value={item.content} />
-        </div>
-      )}
+      {item.content && <PortableText value={item.content} />}
     </div>
   )
 }
@@ -179,45 +177,42 @@ function BentoTextBlock({ item }: { item: BentoTextItem }) {
 // ─── CTA block ────────────────────────────────────────────────────────────────
 
 function BentoCtaBlock({ item }: { item: BentoCtaItem }) {
-  const color = resolveColor(item.backgroundColor)
+  const color = item.backgroundColor ?? 'warm'
   const isExternal = item.buttonLink?.startsWith('http')
 
-  const buttonClass = `inline-flex items-center gap-2 text-sm font-medium border px-4 py-2 rounded-sm transition-opacity duration-200 hover:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current ${borderMap[color]}`
+  const btnClass = `inline-flex items-center font-mono text-[0.7rem] uppercase tracking-[0.12em] px-5 py-2.5 rounded-[8px] transition-colors duration-200 ease-out ${btnMap[color]}`
+
   const ariaLabel = item.buttonText
     ? `${item.buttonText}${item.headline ? ` — ${item.headline}` : ''}`
-    : item.headline ?? undefined
+    : (item.headline ?? undefined)
 
   return (
-    <div
-      className={`h-full flex flex-col justify-between p-6 ${bgMap[color]} ${textMap[color]}`}
-    >
+    <div className={`h-full flex flex-col justify-between p-6 ${bgMap[color]} ${fgMap[color]}`}>
       <div className="flex flex-col gap-3">
         {item.headline && (
-          <h3 className="text-lg font-medium tracking-tight leading-snug">{item.headline}</h3>
+          <h3 className="text-xl font-medium tracking-tight leading-snug text-wrap-balance">
+            {item.headline}
+          </h3>
         )}
         {item.description && (
-          <p className="text-sm opacity-70 leading-relaxed">{item.description}</p>
+          <p className="text-sm leading-relaxed opacity-60">{item.description}</p>
         )}
       </div>
 
       {item.buttonText && item.buttonLink && (
-        <div className="mt-5">
+        <div className="mt-6">
           {isExternal ? (
             <a
               href={item.buttonLink}
               target="_blank"
               rel="noopener noreferrer"
               aria-label={ariaLabel}
-              className={buttonClass}
+              className={btnClass}
             >
               {item.buttonText}
             </a>
           ) : (
-            <Link
-              href={item.buttonLink}
-              aria-label={ariaLabel}
-              className={buttonClass}
-            >
+            <Link href={item.buttonLink} aria-label={ariaLabel} className={btnClass}>
               {item.buttonText}
             </Link>
           )}
@@ -227,7 +222,7 @@ function BentoCtaBlock({ item }: { item: BentoCtaItem }) {
   )
 }
 
-// ─── Main component ───────────────────────────────────────────────────────────
+// ─── Main ─────────────────────────────────────────────────────────────────────
 
 export default function BentoGrid({ block }: BentoGridProps) {
   const { items, background = 'none' } = block
@@ -252,26 +247,29 @@ export default function BentoGrid({ block }: BentoGridProps) {
               variants={containerVariants}
               initial="hidden"
               animate={inView ? 'visible' : 'hidden'}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 [grid-auto-rows:minmax(220px,auto)] gap-2"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 [grid-auto-rows:minmax(220px,auto)] [grid-auto-flow:dense] gap-2"
             >
-              {items.map((item) => (
-                <motion.article
-                  key={item._key}
-                  variants={itemVariants}
-                  className={`relative overflow-hidden rounded-sm transition-shadow duration-300 hover:shadow-md ${cellClasses(item)}`}
-                  aria-label={
-                    item._type === 'bentoImage'
-                      ? (item.alt ?? undefined)
-                      : item._type === 'bentoCta'
-                      ? (item.headline ?? undefined)
-                      : undefined
-                  }
-                >
-                  {item._type === 'bentoImage' && <BentoImageBlock item={item} />}
-                  {item._type === 'bentoText' && <BentoTextBlock item={item} />}
-                  {item._type === 'bentoCta' && <BentoCtaBlock item={item} />}
-                </motion.article>
-              ))}
+              {items.map((item) => {
+                const span = computeSpan(item)
+                return (
+                  <motion.article
+                    key={item._key}
+                    variants={itemVariants}
+                    className={`relative overflow-hidden rounded-sm transition-[filter] duration-200 ease-out hover:brightness-95 ${cellClass(span)}`}
+                    aria-label={
+                      item._type === 'bentoImage'
+                        ? (item.alt ?? undefined)
+                        : item._type === 'bentoCta'
+                        ? (item.headline ?? undefined)
+                        : undefined
+                    }
+                  >
+                    {item._type === 'bentoImage' && <BentoImageBlock item={item} />}
+                    {item._type === 'bentoText' && <BentoTextBlock item={item} />}
+                    {item._type === 'bentoCta' && <BentoCtaBlock item={item} />}
+                  </motion.article>
+                )
+              })}
             </motion.div>
           )}
         </section>
