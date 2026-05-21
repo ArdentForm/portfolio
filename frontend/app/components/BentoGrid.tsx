@@ -74,10 +74,8 @@ const SPAN_OPTIONS: { cols: 1 | 2 | 3 | 4; rows: 1 | 2 | 3 }[] = [
   { cols: 1, rows: 3 }, { cols: 2, rows: 3 },
 ]
 
-function computeSpan(item: BentoItem): Span {
-  if (item._type !== 'bentoImage' || !item.imageWidth || !item.imageHeight) {
-    return { cols: 1, rows: 1 }
-  }
+function computeImageSpan(item: BentoImageItem): Span {
+  if (!item.imageWidth || !item.imageHeight) return { cols: 1, rows: 1 }
   const imageAr = item.imageWidth / item.imageHeight
   let best = SPAN_OPTIONS[0]
   let bestScore = Infinity
@@ -88,6 +86,77 @@ function computeSpan(item: BentoItem): Span {
     if (score < bestScore) { bestScore = score; best = opt }
   }
   return best
+}
+
+// ─── Grid packing simulation ──────────────────────────────────────────────────
+// Mirrors CSS grid-auto-flow:dense so text/CTA items fill the gaps images leave.
+
+const GRID_COLS = 4
+type GridState = boolean[][]
+
+function gEnsure(g: GridState, row: number) {
+  while (g.length <= row) g.push(new Array(GRID_COLS).fill(false))
+}
+
+function gFree(g: GridState, row: number, col: number, cols: number, rows: number): boolean {
+  if (col + cols > GRID_COLS) return false
+  for (let r = row; r < row + rows; r++) {
+    gEnsure(g, r)
+    for (let c = col; c < col + cols; c++) {
+      if (g[r][c]) return false
+    }
+  }
+  return true
+}
+
+function gPlace(g: GridState, row: number, col: number, cols: number, rows: number) {
+  for (let r = row; r < row + rows; r++) {
+    gEnsure(g, r)
+    for (let c = col; c < col + cols; c++) { g[r][c] = true }
+  }
+}
+
+function gFindDense(g: GridState, cols: number, rows: number): { row: number; col: number } {
+  for (let r = 0; ; r++) {
+    gEnsure(g, r)
+    for (let c = 0; c <= GRID_COLS - cols; c++) {
+      if (gFree(g, r, c, cols, rows)) return { row: r, col: c }
+    }
+  }
+}
+
+// Fill candidates ordered by preference: squarish > tall > wide > unit
+const FILL_CANDIDATES: [number, number][] = [
+  [2, 2], [1, 2], [2, 1], [2, 3], [1, 3], [1, 1],
+]
+
+function fillSpanAt(g: GridState, row: number, col: number): Span {
+  for (const [cols, rows] of FILL_CANDIDATES) {
+    if (gFree(g, row, col, cols, rows)) {
+      return { cols: cols as 1 | 2 | 3 | 4, rows: rows as 1 | 2 | 3 }
+    }
+  }
+  return { cols: 1, rows: 1 }
+}
+
+function packItems(items: BentoItem[]): Map<string, Span> {
+  const g: GridState = []
+  const out = new Map<string, Span>()
+  for (const item of items) {
+    if (item._type === 'bentoImage') {
+      const span = computeImageSpan(item)
+      const pos = gFindDense(g, span.cols, span.rows)
+      gPlace(g, pos.row, pos.col, span.cols, span.rows)
+      out.set(item._key, span)
+    } else {
+      // Anchor at the first free 1×1 cell, then expand to fill available space
+      const anchor = gFindDense(g, 1, 1)
+      const span = fillSpanAt(g, anchor.row, anchor.col)
+      gPlace(g, anchor.row, anchor.col, span.cols, span.rows)
+      out.set(item._key, span)
+    }
+  }
+  return out
 }
 
 // Complete class strings required for Tailwind JIT — no dynamic concatenation
@@ -270,6 +339,8 @@ export default function BentoGrid({ block }: BentoGridProps) {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
 
+  const spans = items && items.length > 0 ? packItems(items) : new Map<string, Span>()
+
   return (
     <div
       className={`relative w-full ${
@@ -290,7 +361,7 @@ export default function BentoGrid({ block }: BentoGridProps) {
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 [grid-auto-rows:minmax(220px,auto)] [grid-auto-flow:dense] gap-2"
             >
               {items.map((item) => {
-                const span = computeSpan(item)
+                const span = spans.get(item._key) ?? { cols: 1, rows: 1 } as Span
                 return (
                   <motion.article
                     key={item._key}
