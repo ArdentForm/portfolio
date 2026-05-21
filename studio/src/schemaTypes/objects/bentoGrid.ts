@@ -1,5 +1,5 @@
 import { defineField, defineType } from 'sanity'
-import { GridIcon, ControlsIcon, ImageIcon, DocumentTextIcon, LinkIcon } from '@sanity/icons'
+import { ComponentIcon, ControlsIcon, ImageIcon, DocumentTextIcon, LinkIcon } from '@sanity/icons'
 
 const spanField = defineField({
   name: 'span',
@@ -57,9 +57,9 @@ export default defineType({
   name: 'bentoGrid',
   title: 'Bento Grid',
   type: 'object',
-  icon: GridIcon,
+  icon: ComponentIcon,
   groups: [
-    { name: 'contents', icon: GridIcon, default: true },
+    { name: 'contents', icon: ComponentIcon, default: true },
     { name: 'designSystem', icon: ControlsIcon },
   ],
   fields: [
