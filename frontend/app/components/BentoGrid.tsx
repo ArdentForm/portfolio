@@ -55,22 +55,62 @@ export interface BentoGridProps {
 
 // ─── Layout ───────────────────────────────────────────────────────────────────
 
-interface Span { cols: 1 | 2; rows: 1 | 2 }
+interface Span { cols: 1 | 2 | 3 | 4; rows: 1 | 2 | 3 }
+
+// Exact cell geometry at 1440px desktop:
+// container = 1440 - 80px padding - 24px gap = 1336px / 4 cols = 334px per col
+const COL_W = 334
+const ROW_H = 220
+const GAP = 8
+const SIZE_PENALTY = 0.15
+
+function effectiveAr(cols: number, rows: number): number {
+  return (cols * COL_W + (cols - 1) * GAP) / (rows * ROW_H + (rows - 1) * GAP)
+}
+
+const SPAN_OPTIONS: { cols: 1 | 2 | 3 | 4; rows: 1 | 2 | 3 }[] = [
+  { cols: 1, rows: 1 }, { cols: 2, rows: 1 }, { cols: 3, rows: 1 }, { cols: 4, rows: 1 },
+  { cols: 1, rows: 2 }, { cols: 2, rows: 2 }, { cols: 3, rows: 2 }, { cols: 4, rows: 2 },
+  { cols: 1, rows: 3 }, { cols: 2, rows: 3 },
+]
 
 function computeSpan(item: BentoItem): Span {
   if (item._type !== 'bentoImage' || !item.imageWidth || !item.imageHeight) {
     return { cols: 1, rows: 1 }
   }
-  const ar = item.imageWidth / item.imageHeight
-  if (ar >= 1.5) return { cols: 2, rows: 1 }  // landscape → wide
-  if (ar <= 0.67) return { cols: 1, rows: 2 }  // portrait → tall
-  return { cols: 1, rows: 1 }
+  const imageAr = item.imageWidth / item.imageHeight
+  let best = SPAN_OPTIONS[0]
+  let bestScore = Infinity
+  for (const opt of SPAN_OPTIONS) {
+    const score =
+      Math.abs(Math.log(effectiveAr(opt.cols, opt.rows) / imageAr)) +
+      Math.log(opt.cols * opt.rows) * SIZE_PENALTY
+    if (score < bestScore) { bestScore = score; best = opt }
+  }
+  return best
+}
+
+// Complete class strings required for Tailwind JIT — no dynamic concatenation
+const COL_SPAN_CLASS: Record<number, string> = {
+  1: '',
+  2: 'sm:col-span-2 lg:col-span-2',
+  3: 'sm:col-span-2 lg:col-span-3',
+  4: 'sm:col-span-2 lg:col-span-4',
+}
+const ROW_SPAN_CLASS: Record<number, string> = {
+  1: '',
+  2: 'row-span-2',
+  3: 'row-span-3',
+}
+const SIZES_BY_COLS: Record<number, string> = {
+  1: '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw',
+  2: '(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 50vw',
+  3: '(max-width: 640px) 100vw, 75vw',
+  4: '100vw',
 }
 
 function cellClass(span: Span): string {
-  const c = span.cols === 2 ? 'sm:col-span-2' : ''
-  const r = span.rows === 2 ? 'row-span-2' : ''
-  return [c, r].filter(Boolean).join(' ')
+  return [COL_SPAN_CLASS[span.cols], ROW_SPAN_CLASS[span.rows]].filter(Boolean).join(' ')
 }
 
 // ─── Animation ────────────────────────────────────────────────────────────────
@@ -121,7 +161,7 @@ const overlayAnchor: Record<string, string> = {
 
 // ─── Image block ──────────────────────────────────────────────────────────────
 
-function BentoImageBlock({ item }: { item: BentoImageItem }) {
+function BentoImageBlock({ item, span }: { item: BentoImageItem; span: Span }) {
   const pos = stegaClean(item.overlayPosition) ?? 'bottom'
   if (!item.image) return null
 
@@ -131,7 +171,7 @@ function BentoImageBlock({ item }: { item: BentoImageItem }) {
         src={item.image}
         alt={item.alt ?? ''}
         fill
-        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+        sizes={SIZES_BY_COLS[span.cols] ?? SIZES_BY_COLS[1]}
         className="object-cover transition-[transform,filter] duration-[500ms] ease-out group-hover:scale-[1.03] group-hover:brightness-105"
       />
       {item.overlayText && (
@@ -264,7 +304,7 @@ export default function BentoGrid({ block }: BentoGridProps) {
                         : undefined
                     }
                   >
-                    {item._type === 'bentoImage' && <BentoImageBlock item={item} />}
+                    {item._type === 'bentoImage' && <BentoImageBlock item={item} span={span} />}
                     {item._type === 'bentoText' && <BentoTextBlock item={item} />}
                     {item._type === 'bentoCta' && <BentoCtaBlock item={item} />}
                   </motion.article>
