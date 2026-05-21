@@ -90,8 +90,8 @@ function computeImageSpan(item: BentoImageItem): Span {
 
 // ─── Grid packing simulation ──────────────────────────────────────────────────
 // Computes exact positions and spans for every item, then applies them as
-// explicit grid-column-start / grid-row-start so CSS never diverges from the
-// simulation. At sm/mobile, auto-flow handles reflow naturally.
+// explicit grid lines. Leftover cells become fillers so the grid always
+// resolves to a clean rectangle. At sm/mobile, auto-flow handles reflow.
 
 interface PlacedItem { span: Span; row: number; col: number }
 
@@ -142,38 +142,70 @@ function fillSpanAt(g: GridState, row: number, col: number): Span {
   return { cols: 1, rows: 1 }
 }
 
-function packItems(items: BentoItem[]): Map<string, PlacedItem> {
+// Greedily covers every empty cell with capped rectangles so no holes remain.
+function findFillers(g: GridState): PlacedItem[] {
+  const rects: PlacedItem[] = []
+  const R = g.length
+  for (let r = 0; r < R; r++) {
+    for (let c = 0; c < GRID_COLS; c++) {
+      if (g[r][c]) continue
+      let w = 0
+      while (w < GRID_COLS && c + w < GRID_COLS && !g[r][c + w]) w++
+      let h = 1
+      while (h < 3 && r + h < R) {
+        let rowFree = true
+        for (let cc = c; cc < c + w; cc++) {
+          if (g[r + h][cc]) { rowFree = false; break }
+        }
+        if (!rowFree) break
+        h++
+      }
+      gPlace(g, r, c, w, h)
+      rects.push({ span: { cols: w as 1 | 2 | 3 | 4, rows: h as 1 | 2 | 3 }, row: r, col: c })
+    }
+  }
+  return rects
+}
+
+function packItems(items: BentoItem[]): { placed: Map<string, PlacedItem>; fillers: PlacedItem[] } {
   const g: GridState = []
-  const out = new Map<string, PlacedItem>()
+  const placed = new Map<string, PlacedItem>()
   for (const item of items) {
     if (item._type === 'bentoImage') {
       const span = computeImageSpan(item)
       const pos = gFindDense(g, span.cols, span.rows)
       gPlace(g, pos.row, pos.col, span.cols, span.rows)
-      out.set(item._key, { span, row: pos.row, col: pos.col })
+      placed.set(item._key, { span, row: pos.row, col: pos.col })
     } else {
       const anchor = gFindDense(g, 1, 1)
       const span = fillSpanAt(g, anchor.row, anchor.col)
       gPlace(g, anchor.row, anchor.col, span.cols, span.rows)
-      out.set(item._key, { span, row: anchor.row, col: anchor.col })
+      placed.set(item._key, { span, row: anchor.row, col: anchor.col })
     }
   }
-  return out
+  return { placed, fillers: findFillers(g) }
 }
 
-// Explicit placement classes for lg — complete strings required for Tailwind JIT
+// Explicit grid-line classes for lg — complete strings required for Tailwind JIT.
+// start + end are two separate longhands, so neither resets the other; the
+// col-span shorthand would clobber grid-column-start and break placement.
 const LG_COL_START: Record<number, string> = {
-  0: 'lg:col-start-1', 1: 'lg:col-start-2', 2: 'lg:col-start-3', 3: 'lg:col-start-4',
+  1: 'lg:col-start-1', 2: 'lg:col-start-2', 3: 'lg:col-start-3', 4: 'lg:col-start-4',
+}
+const LG_COL_END: Record<number, string> = {
+  2: 'lg:col-end-2', 3: 'lg:col-end-3', 4: 'lg:col-end-4', 5: 'lg:col-end-5',
 }
 const LG_ROW_START: Record<number, string> = {
-  0: 'lg:row-start-1', 1: 'lg:row-start-2', 2: 'lg:row-start-3', 3: 'lg:row-start-4',
-  4: 'lg:row-start-5', 5: 'lg:row-start-6', 6: 'lg:row-start-7', 7: 'lg:row-start-8',
+  1: 'lg:row-start-1', 2: 'lg:row-start-2', 3: 'lg:row-start-3', 4: 'lg:row-start-4',
+  5: 'lg:row-start-5', 6: 'lg:row-start-6', 7: 'lg:row-start-7', 8: 'lg:row-start-8',
+  9: 'lg:row-start-9', 10: 'lg:row-start-10', 11: 'lg:row-start-11', 12: 'lg:row-start-12',
+  13: 'lg:row-start-13', 14: 'lg:row-start-14',
 }
-const LG_COL_SPAN: Record<number, string> = {
-  1: 'lg:col-span-1', 2: 'lg:col-span-2', 3: 'lg:col-span-3', 4: 'lg:col-span-4',
-}
-const LG_ROW_SPAN: Record<number, string> = {
-  1: 'lg:row-span-1', 2: 'lg:row-span-2', 3: 'lg:row-span-3',
+const LG_ROW_END: Record<number, string> = {
+  2: 'lg:row-end-2', 3: 'lg:row-end-3', 4: 'lg:row-end-4', 5: 'lg:row-end-5',
+  6: 'lg:row-end-6', 7: 'lg:row-end-7', 8: 'lg:row-end-8', 9: 'lg:row-end-9',
+  10: 'lg:row-end-10', 11: 'lg:row-end-11', 12: 'lg:row-end-12', 13: 'lg:row-end-13',
+  14: 'lg:row-end-14', 15: 'lg:row-end-15', 16: 'lg:row-end-16', 17: 'lg:row-end-17',
 }
 const SIZES_BY_COLS: Record<number, string> = {
   1: '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw',
@@ -184,11 +216,13 @@ const SIZES_BY_COLS: Record<number, string> = {
 
 function cellClass(p: PlacedItem): string {
   const smSpan = p.span.cols >= 2 ? 'sm:col-span-2' : ''
-  const smRows = p.span.rows >= 2 ? (p.span.rows === 3 ? 'sm:row-span-3' : 'sm:row-span-2') : ''
+  const smRows = p.span.rows >= 3 ? 'sm:row-span-3' : p.span.rows === 2 ? 'sm:row-span-2' : ''
   return [
     smSpan, smRows,
-    LG_COL_START[p.col] ?? '', LG_ROW_START[p.row] ?? '',
-    LG_COL_SPAN[p.span.cols] ?? '', LG_ROW_SPAN[p.span.rows] ?? '',
+    LG_COL_START[p.col + 1] ?? '',
+    LG_COL_END[p.col + 1 + p.span.cols] ?? '',
+    LG_ROW_START[p.row + 1] ?? '',
+    LG_ROW_END[p.row + 1 + p.span.rows] ?? '',
   ].filter(Boolean).join(' ')
 }
 
@@ -341,6 +375,26 @@ function BentoCtaBlock({ item }: { item: BentoCtaItem }) {
   )
 }
 
+// ─── Counter block ────────────────────────────────────────────────────────────
+// Fills leftover grid space with a count, so the layout resolves to a rectangle.
+
+function BentoCounterBlock({ count, label, large }: { count: number; label: string; large: boolean }) {
+  return (
+    <div className="h-full flex flex-col justify-between p-6 bg-gray-50">
+      <span className="font-mono text-[0.7rem] uppercase tracking-[0.12em] text-gray-400">
+        {label}
+      </span>
+      <p
+        className={`font-bold leading-none tracking-tight text-gray-900 ${
+          large ? 'text-[clamp(3rem,5vw,4.75rem)]' : 'text-[2.5rem]'
+        }`}
+      >
+        {String(count).padStart(2, '0')}
+      </p>
+    </div>
+  )
+}
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 export default function BentoGrid({ block }: BentoGridProps) {
@@ -349,7 +403,20 @@ export default function BentoGrid({ block }: BentoGridProps) {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
 
-  const placed = items && items.length > 0 ? packItems(items) : new Map<string, PlacedItem>()
+  const hasItems = !!items && items.length > 0
+  const { placed, fillers } = hasItems
+    ? packItems(items)
+    : { placed: new Map<string, PlacedItem>(), fillers: [] as PlacedItem[] }
+
+  const imageCount = hasItems ? items.filter((i) => i._type === 'bentoImage').length : 0
+  const counterCount = imageCount > 0 ? imageCount : (items?.length ?? 0)
+  const counterLabel = imageCount > 0 ? 'Images' : 'Items'
+  // Largest leftover rect carries the counter; any others are quiet fill.
+  const counterIdx = fillers.reduce(
+    (best, f, i, arr) =>
+      f.span.cols * f.span.rows > arr[best].span.cols * arr[best].span.rows ? i : best,
+    0,
+  )
 
   return (
     <div
@@ -391,6 +458,27 @@ export default function BentoGrid({ block }: BentoGridProps) {
                   </motion.article>
                 )
               })}
+
+              {fillers.map((f, i) => (
+                <motion.article
+                  key={`bento-filler-${i}`}
+                  variants={itemVariants}
+                  aria-hidden="true"
+                  className={`relative overflow-hidden rounded-sm ${
+                    i === counterIdx ? '' : 'hidden lg:block'
+                  } ${cellClass(f)}`}
+                >
+                  {i === counterIdx ? (
+                    <BentoCounterBlock
+                      count={counterCount}
+                      label={counterLabel}
+                      large={f.span.cols * f.span.rows >= 2}
+                    />
+                  ) : (
+                    <div className="h-full bg-gray-50" />
+                  )}
+                </motion.article>
+              ))}
             </motion.div>
           )}
         </section>
