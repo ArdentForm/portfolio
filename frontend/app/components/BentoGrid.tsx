@@ -89,7 +89,11 @@ function computeImageSpan(item: BentoImageItem): Span {
 }
 
 // ─── Grid packing simulation ──────────────────────────────────────────────────
-// Mirrors CSS grid-auto-flow:dense so text/CTA items fill the gaps images leave.
+// Computes exact positions and spans for every item, then applies them as
+// explicit grid-column-start / grid-row-start so CSS never diverges from the
+// simulation. At sm/mobile, auto-flow handles reflow naturally.
+
+interface PlacedItem { span: Span; row: number; col: number }
 
 const GRID_COLS = 4
 type GridState = boolean[][]
@@ -125,7 +129,6 @@ function gFindDense(g: GridState, cols: number, rows: number): { row: number; co
   }
 }
 
-// Fill candidates ordered by preference: squarish > tall > wide > unit
 const FILL_CANDIDATES: [number, number][] = [
   [2, 2], [1, 2], [2, 1], [2, 3], [1, 3], [1, 1],
 ]
@@ -139,37 +142,38 @@ function fillSpanAt(g: GridState, row: number, col: number): Span {
   return { cols: 1, rows: 1 }
 }
 
-function packItems(items: BentoItem[]): Map<string, Span> {
+function packItems(items: BentoItem[]): Map<string, PlacedItem> {
   const g: GridState = []
-  const out = new Map<string, Span>()
+  const out = new Map<string, PlacedItem>()
   for (const item of items) {
     if (item._type === 'bentoImage') {
       const span = computeImageSpan(item)
       const pos = gFindDense(g, span.cols, span.rows)
       gPlace(g, pos.row, pos.col, span.cols, span.rows)
-      out.set(item._key, span)
+      out.set(item._key, { span, row: pos.row, col: pos.col })
     } else {
-      // Anchor at the first free 1×1 cell, then expand to fill available space
       const anchor = gFindDense(g, 1, 1)
       const span = fillSpanAt(g, anchor.row, anchor.col)
       gPlace(g, anchor.row, anchor.col, span.cols, span.rows)
-      out.set(item._key, span)
+      out.set(item._key, { span, row: anchor.row, col: anchor.col })
     }
   }
   return out
 }
 
-// Complete class strings required for Tailwind JIT — no dynamic concatenation
-const COL_SPAN_CLASS: Record<number, string> = {
-  1: '',
-  2: 'sm:col-span-2 lg:col-span-2',
-  3: 'sm:col-span-2 lg:col-span-3',
-  4: 'sm:col-span-2 lg:col-span-4',
+// Explicit placement classes for lg — complete strings required for Tailwind JIT
+const LG_COL_START: Record<number, string> = {
+  0: 'lg:col-start-1', 1: 'lg:col-start-2', 2: 'lg:col-start-3', 3: 'lg:col-start-4',
 }
-const ROW_SPAN_CLASS: Record<number, string> = {
-  1: '',
-  2: 'row-span-2',
-  3: 'row-span-3',
+const LG_ROW_START: Record<number, string> = {
+  0: 'lg:row-start-1', 1: 'lg:row-start-2', 2: 'lg:row-start-3', 3: 'lg:row-start-4',
+  4: 'lg:row-start-5', 5: 'lg:row-start-6', 6: 'lg:row-start-7', 7: 'lg:row-start-8',
+}
+const LG_COL_SPAN: Record<number, string> = {
+  1: 'lg:col-span-1', 2: 'lg:col-span-2', 3: 'lg:col-span-3', 4: 'lg:col-span-4',
+}
+const LG_ROW_SPAN: Record<number, string> = {
+  1: 'lg:row-span-1', 2: 'lg:row-span-2', 3: 'lg:row-span-3',
 }
 const SIZES_BY_COLS: Record<number, string> = {
   1: '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw',
@@ -178,8 +182,14 @@ const SIZES_BY_COLS: Record<number, string> = {
   4: '100vw',
 }
 
-function cellClass(span: Span): string {
-  return [COL_SPAN_CLASS[span.cols], ROW_SPAN_CLASS[span.rows]].filter(Boolean).join(' ')
+function cellClass(p: PlacedItem): string {
+  const smSpan = p.span.cols >= 2 ? 'sm:col-span-2' : ''
+  const smRows = p.span.rows >= 2 ? (p.span.rows === 3 ? 'sm:row-span-3' : 'sm:row-span-2') : ''
+  return [
+    smSpan, smRows,
+    LG_COL_START[p.col] ?? '', LG_ROW_START[p.row] ?? '',
+    LG_COL_SPAN[p.span.cols] ?? '', LG_ROW_SPAN[p.span.rows] ?? '',
+  ].filter(Boolean).join(' ')
 }
 
 // ─── Animation ────────────────────────────────────────────────────────────────
@@ -339,7 +349,7 @@ export default function BentoGrid({ block }: BentoGridProps) {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
 
-  const spans = items && items.length > 0 ? packItems(items) : new Map<string, Span>()
+  const placed = items && items.length > 0 ? packItems(items) : new Map<string, PlacedItem>()
 
   return (
     <div
@@ -361,12 +371,12 @@ export default function BentoGrid({ block }: BentoGridProps) {
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 [grid-auto-rows:minmax(220px,auto)] [grid-auto-flow:dense] gap-2"
             >
               {items.map((item) => {
-                const span = spans.get(item._key) ?? { cols: 1, rows: 1 } as Span
+                const p = placed.get(item._key) ?? { span: { cols: 1, rows: 1 } as Span, row: 0, col: 0 }
                 return (
                   <motion.article
                     key={item._key}
                     variants={itemVariants}
-                    className={`relative overflow-hidden rounded-sm transition-[filter] duration-200 ease-out hover:brightness-95 ${cellClass(span)}`}
+                    className={`relative overflow-hidden rounded-sm transition-[filter] duration-200 ease-out hover:brightness-95 ${cellClass(p)}`}
                     aria-label={
                       item._type === 'bentoImage'
                         ? (item.alt ?? undefined)
@@ -375,7 +385,7 @@ export default function BentoGrid({ block }: BentoGridProps) {
                         : undefined
                     }
                   >
-                    {item._type === 'bentoImage' && <BentoImageBlock item={item} span={span} />}
+                    {item._type === 'bentoImage' && <BentoImageBlock item={item} span={p.span} />}
                     {item._type === 'bentoText' && <BentoTextBlock item={item} />}
                     {item._type === 'bentoCta' && <BentoCtaBlock item={item} />}
                   </motion.article>
