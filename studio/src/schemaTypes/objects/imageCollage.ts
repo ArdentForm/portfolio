@@ -22,7 +22,7 @@ export default defineType({
       name: 'images',
       title: 'Images',
       type: 'array',
-      description: 'Add exactly 6 images',
+      description: 'Add 3, 4, or 6 images',
       group: 'contents',
       of: [
         defineField({
@@ -49,7 +49,12 @@ export default defineType({
           },
         }),
       ],
-      validation: (Rule) => Rule.required().length(6),
+      validation: (Rule) =>
+        Rule.required().custom((images) => {
+          const count = (images as unknown[])?.length ?? 0
+          if (count === 3 || count === 4 || count === 6) return true
+          return 'Add 3, 4, or 6 images'
+        }),
     }),
     defineField({
       name: 'background',
