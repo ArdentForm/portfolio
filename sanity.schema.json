@@ -342,6 +342,449 @@
     }
   },
   {
+    "type": "type",
+    "name": "bentoImage.image",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "asset": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "inline",
+            "name": "sanity.imageAsset.reference"
+          },
+          "optional": true
+        },
+        "media": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "inline",
+            "name": "bentoImage.image.media"
+          },
+          "optional": true
+        },
+        "hotspot": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "inline",
+            "name": "sanity.imageHotspot"
+          },
+          "optional": true
+        },
+        "crop": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "inline",
+            "name": "sanity.imageCrop"
+          },
+          "optional": true
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "image"
+          }
+        }
+      }
+    }
+  },
+  {
+    "name": "bentoGrid",
+    "type": "type",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "bentoGrid"
+          }
+        },
+        "items": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "array",
+            "of": {
+              "type": "union",
+              "of": [
+                {
+                  "type": "object",
+                  "attributes": {
+                    "image": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "inline",
+                        "name": "bentoImage.image"
+                      },
+                      "optional": false
+                    },
+                    "alt": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "string"
+                      },
+                      "optional": false
+                    },
+                    "overlayText": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "string"
+                      },
+                      "optional": true
+                    },
+                    "overlayPosition": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "union",
+                        "of": [
+                          {
+                            "type": "string",
+                            "value": "top"
+                          },
+                          {
+                            "type": "string",
+                            "value": "center"
+                          },
+                          {
+                            "type": "string",
+                            "value": "bottom"
+                          }
+                        ]
+                      },
+                      "optional": true
+                    },
+                    "_type": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "string",
+                        "value": "bentoImage"
+                      }
+                    }
+                  },
+                  "rest": {
+                    "type": "object",
+                    "attributes": {
+                      "_key": {
+                        "type": "objectAttribute",
+                        "value": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "attributes": {
+                    "backgroundColor": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "union",
+                        "of": [
+                          {
+                            "type": "string",
+                            "value": "warm"
+                          },
+                          {
+                            "type": "string",
+                            "value": "tint"
+                          },
+                          {
+                            "type": "string",
+                            "value": "dark"
+                          },
+                          {
+                            "type": "string",
+                            "value": "ink"
+                          }
+                        ]
+                      },
+                      "optional": true
+                    },
+                    "content": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "inline",
+                        "name": "blockContentTextOnly"
+                      },
+                      "optional": false
+                    },
+                    "textAlign": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "union",
+                        "of": [
+                          {
+                            "type": "string",
+                            "value": "left"
+                          },
+                          {
+                            "type": "string",
+                            "value": "center"
+                          },
+                          {
+                            "type": "string",
+                            "value": "right"
+                          }
+                        ]
+                      },
+                      "optional": true
+                    },
+                    "fontSize": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "union",
+                        "of": [
+                          {
+                            "type": "string",
+                            "value": "sm"
+                          },
+                          {
+                            "type": "string",
+                            "value": "base"
+                          },
+                          {
+                            "type": "string",
+                            "value": "lg"
+                          },
+                          {
+                            "type": "string",
+                            "value": "xl"
+                          }
+                        ]
+                      },
+                      "optional": true
+                    },
+                    "_type": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "string",
+                        "value": "bentoText"
+                      }
+                    }
+                  },
+                  "rest": {
+                    "type": "object",
+                    "attributes": {
+                      "_key": {
+                        "type": "objectAttribute",
+                        "value": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "attributes": {
+                    "backgroundColor": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "union",
+                        "of": [
+                          {
+                            "type": "string",
+                            "value": "warm"
+                          },
+                          {
+                            "type": "string",
+                            "value": "tint"
+                          },
+                          {
+                            "type": "string",
+                            "value": "dark"
+                          },
+                          {
+                            "type": "string",
+                            "value": "ink"
+                          }
+                        ]
+                      },
+                      "optional": true
+                    },
+                    "headline": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "string"
+                      },
+                      "optional": true
+                    },
+                    "description": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "string"
+                      },
+                      "optional": true
+                    },
+                    "buttonText": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "string"
+                      },
+                      "optional": true
+                    },
+                    "buttonLink": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "string"
+                      },
+                      "optional": true
+                    },
+                    "_type": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "string",
+                        "value": "bentoCta"
+                      }
+                    }
+                  },
+                  "rest": {
+                    "type": "object",
+                    "attributes": {
+                      "_key": {
+                        "type": "objectAttribute",
+                        "value": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "optional": false
+        },
+        "background": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "none"
+              },
+              {
+                "type": "string",
+                "value": "tint"
+              },
+              {
+                "type": "string",
+                "value": "tile"
+              },
+              {
+                "type": "string",
+                "value": "gradient"
+              }
+            ]
+          },
+          "optional": true
+        }
+      }
+    }
+  },
+  {
+    "name": "imageHero",
+    "type": "type",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "imageHero"
+          }
+        },
+        "image": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "object",
+            "attributes": {
+              "asset": {
+                "type": "objectAttribute",
+                "value": {
+                  "type": "inline",
+                  "name": "sanity.imageAsset.reference"
+                },
+                "optional": true
+              },
+              "media": {
+                "type": "objectAttribute",
+                "value": {
+                  "type": "unknown"
+                },
+                "optional": true
+              },
+              "hotspot": {
+                "type": "objectAttribute",
+                "value": {
+                  "type": "inline",
+                  "name": "sanity.imageHotspot"
+                },
+                "optional": true
+              },
+              "crop": {
+                "type": "objectAttribute",
+                "value": {
+                  "type": "inline",
+                  "name": "sanity.imageCrop"
+                },
+                "optional": true
+              },
+              "_type": {
+                "type": "objectAttribute",
+                "value": {
+                  "type": "string",
+                  "value": "image"
+                }
+              }
+            }
+          },
+          "optional": false
+        },
+        "alt": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": false
+        },
+        "subtitle": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "index": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "heading": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "lightPanel": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      }
+    }
+  },
+  {
     "name": "minimalHeader",
     "type": "type",
     "value": {
@@ -2825,6 +3268,21 @@
                 },
                 "rest": {
                   "type": "inline",
+                  "name": "minimalHeader"
+                }
+              },
+              {
+                "type": "object",
+                "attributes": {
+                  "_key": {
+                    "type": "objectAttribute",
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rest": {
+                  "type": "inline",
                   "name": "sectionHeading"
                 }
               },
@@ -2841,6 +3299,21 @@
                 "rest": {
                   "type": "inline",
                   "name": "statsBlock"
+                }
+              },
+              {
+                "type": "object",
+                "attributes": {
+                  "_key": {
+                    "type": "objectAttribute",
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rest": {
+                  "type": "inline",
+                  "name": "imageHero"
                 }
               },
               {
@@ -2961,6 +3434,21 @@
                 "rest": {
                   "type": "inline",
                   "name": "contentDetails"
+                }
+              },
+              {
+                "type": "object",
+                "attributes": {
+                  "_key": {
+                    "type": "objectAttribute",
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rest": {
+                  "type": "inline",
+                  "name": "bentoGrid"
                 }
               }
             ]
@@ -3568,6 +4056,21 @@
                 },
                 "rest": {
                   "type": "inline",
+                  "name": "imageHero"
+                }
+              },
+              {
+                "type": "object",
+                "attributes": {
+                  "_key": {
+                    "type": "objectAttribute",
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rest": {
+                  "type": "inline",
                   "name": "heroSplitImageRight"
                 }
               },
@@ -3659,6 +4162,21 @@
                 "rest": {
                   "type": "inline",
                   "name": "featuredPosts"
+                }
+              },
+              {
+                "type": "object",
+                "attributes": {
+                  "_key": {
+                    "type": "objectAttribute",
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rest": {
+                  "type": "inline",
+                  "name": "bentoGrid"
                 }
               }
             ]
@@ -3890,6 +4408,53 @@
                     "type": "string"
                   }
                 }
+              }
+            }
+          }
+        },
+        "optional": true
+      },
+      "favicon": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "object",
+          "attributes": {
+            "asset": {
+              "type": "objectAttribute",
+              "value": {
+                "type": "inline",
+                "name": "sanity.imageAsset.reference"
+              },
+              "optional": true
+            },
+            "media": {
+              "type": "objectAttribute",
+              "value": {
+                "type": "unknown"
+              },
+              "optional": true
+            },
+            "hotspot": {
+              "type": "objectAttribute",
+              "value": {
+                "type": "inline",
+                "name": "sanity.imageHotspot"
+              },
+              "optional": true
+            },
+            "crop": {
+              "type": "objectAttribute",
+              "value": {
+                "type": "inline",
+                "name": "sanity.imageCrop"
+              },
+              "optional": true
+            },
+            "_type": {
+              "type": "objectAttribute",
+              "value": {
+                "type": "string",
+                "value": "image"
               }
             }
           }
@@ -4132,6 +4697,21 @@
                 },
                 "rest": {
                   "type": "inline",
+                  "name": "imageHero"
+                }
+              },
+              {
+                "type": "object",
+                "attributes": {
+                  "_key": {
+                    "type": "objectAttribute",
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rest": {
+                  "type": "inline",
                   "name": "heroSplitImageRight"
                 }
               },
@@ -4238,6 +4818,21 @@
                 "rest": {
                   "type": "inline",
                   "name": "featuredPosts"
+                }
+              },
+              {
+                "type": "object",
+                "attributes": {
+                  "_key": {
+                    "type": "objectAttribute",
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rest": {
+                  "type": "inline",
+                  "name": "bentoGrid"
                 }
               }
             ]
