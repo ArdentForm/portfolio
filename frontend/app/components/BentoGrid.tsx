@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import { motion, useInView } from 'motion/react'
 import { stegaClean } from '@sanity/client/stega'
 import { PortableTextBlock } from 'next-sanity'
@@ -88,10 +88,11 @@ function computeImageSpan(item: BentoImageItem): Span {
   return best
 }
 
-// ─── Grid packing simulation ──────────────────────────────────────────────────
-// Computes exact positions and spans for every item, then applies them as
-// explicit grid lines. Leftover cells become fillers so the grid always
-// resolves to a clean rectangle. At sm/mobile, auto-flow handles reflow.
+// ─── Layout solver ─────────────────────────────────────────────────────────────
+// Images are rigid — their span is locked to aspect ratio. Text/CTA boxes are
+// flexible: the solver searches span combinations and picks the one that tiles
+// into the cleanest rectangle (no orphan blanks, text boxes not grouped). Any
+// single leftover rectangle becomes the counter tile.
 
 interface PlacedItem { span: Span; row: number; col: number }
 
@@ -129,61 +130,167 @@ function gFindDense(g: GridState, cols: number, rows: number): { row: number; co
   }
 }
 
-const FILL_CANDIDATES: [number, number][] = [
-  [2, 2], [1, 2], [2, 1], [2, 3], [1, 3], [1, 1],
-]
-
-function fillSpanAt(g: GridState, row: number, col: number): Span {
-  for (const [cols, rows] of FILL_CANDIDATES) {
-    if (gFree(g, row, col, cols, rows)) {
-      return { cols: cols as 1 | 2 | 3 | 4, rows: rows as 1 | 2 | 3 }
-    }
+// Decomposes every empty cell into capped rectangles (non-destructive).
+function holeRects(g: GridState, height: number): PlacedItem[] {
+  const c: boolean[][] = []
+  for (let r = 0; r < height; r++) {
+    c.push((g[r] ?? new Array(GRID_COLS).fill(false)).slice())
   }
-  return { cols: 1, rows: 1 }
-}
-
-// Greedily covers every empty cell with capped rectangles so no holes remain.
-function findFillers(g: GridState): PlacedItem[] {
   const rects: PlacedItem[] = []
-  const R = g.length
-  for (let r = 0; r < R; r++) {
-    for (let c = 0; c < GRID_COLS; c++) {
-      if (g[r][c]) continue
+  for (let r = 0; r < height; r++) {
+    for (let col = 0; col < GRID_COLS; col++) {
+      if (c[r][col]) continue
       let w = 0
-      while (w < GRID_COLS && c + w < GRID_COLS && !g[r][c + w]) w++
+      while (w < GRID_COLS && col + w < GRID_COLS && !c[r][col + w]) w++
       let h = 1
-      while (h < 3 && r + h < R) {
+      while (h < 3 && r + h < height) {
         let rowFree = true
-        for (let cc = c; cc < c + w; cc++) {
-          if (g[r + h][cc]) { rowFree = false; break }
+        for (let cc = col; cc < col + w; cc++) {
+          if (c[r + h][cc]) { rowFree = false; break }
         }
         if (!rowFree) break
         h++
       }
-      gPlace(g, r, c, w, h)
-      rects.push({ span: { cols: w as 1 | 2 | 3 | 4, rows: h as 1 | 2 | 3 }, row: r, col: c })
+      for (let rr = r; rr < r + h; rr++) {
+        for (let cc = col; cc < col + w; cc++) c[rr][cc] = true
+      }
+      rects.push({ span: { cols: w as 1 | 2 | 3 | 4, rows: h as 1 | 2 | 3 }, row: r, col })
     }
   }
   return rects
 }
 
-function packItems(items: BentoItem[]): { placed: Map<string, PlacedItem>; fillers: PlacedItem[] } {
+interface KeyedSpan { key: string; span: Span }
+
+// Places rigid images first, then flexible boxes, both by dense flow.
+function simulate(images: KeyedSpan[], flex: KeyedSpan[]) {
   const g: GridState = []
   const placed = new Map<string, PlacedItem>()
-  for (const item of items) {
-    if (item._type === 'bentoImage') {
-      const span = computeImageSpan(item)
-      const pos = gFindDense(g, span.cols, span.rows)
-      gPlace(g, pos.row, pos.col, span.cols, span.rows)
-      placed.set(item._key, { span, row: pos.row, col: pos.col })
-    } else {
-      const anchor = gFindDense(g, 1, 1)
-      const span = fillSpanAt(g, anchor.row, anchor.col)
-      gPlace(g, anchor.row, anchor.col, span.cols, span.rows)
-      placed.set(item._key, { span, row: anchor.row, col: anchor.col })
+  for (const it of [...images, ...flex]) {
+    const pos = gFindDense(g, it.span.cols, it.span.rows)
+    gPlace(g, pos.row, pos.col, it.span.cols, it.span.rows)
+    placed.set(it.key, { span: it.span, row: pos.row, col: pos.col })
+  }
+  return { placed, height: g.length, grid: g }
+}
+
+// Two rectangles share an edge (used to keep text boxes apart).
+function rectsAdjacent(a: PlacedItem, b: PlacedItem): boolean {
+  const aR2 = a.row + a.span.rows, aC2 = a.col + a.span.cols
+  const bR2 = b.row + b.span.rows, bC2 = b.col + b.span.cols
+  const rowOverlap = a.row < bR2 && b.row < aR2
+  const colOverlap = a.col < bC2 && b.col < aC2
+  if (rowOverlap && (aC2 === b.col || bC2 === a.col)) return true
+  if (colOverlap && (aR2 === b.row || bR2 === a.row)) return true
+  return false
+}
+
+function scoreLayout(holes: PlacedItem[], flexPlaced: PlacedItem[]): number {
+  let s = 0
+  if (holes.length === 0) s += 120
+  else if (holes.length === 1) {
+    const a = holes[0].span.cols * holes[0].span.rows
+    s += a <= 6 ? 200 : -(a - 6) * 45
+  } else {
+    s -= 3000 * holes.length
+    s -= holes.reduce((t, h) => t + h.span.cols * h.span.rows, 0) * 20
+  }
+  for (const f of flexPlaced) {
+    const area = f.span.cols * f.span.rows
+    const ratio =
+      Math.max(f.span.cols, f.span.rows) / Math.min(f.span.cols, f.span.rows)
+    if (area === 1) s -= 35
+    if (area > 4) s -= (area - 4) * 22
+    if (ratio > 2) s -= (ratio - 2) * 16
+  }
+  for (let i = 0; i < flexPlaced.length; i++) {
+    for (let j = i + 1; j < flexPlaced.length; j++) {
+      if (rectsAdjacent(flexPlaced[i], flexPlaced[j])) s -= 70
     }
   }
-  return { placed, fillers: findFillers(g) }
+  return s
+}
+
+// Flexible-box span palette. Subsets keep the search bounded as box count grows.
+const FLEX_SPANS: Span[] = [
+  { cols: 1, rows: 1 }, { cols: 2, rows: 1 }, { cols: 1, rows: 2 }, { cols: 2, rows: 2 },
+  { cols: 3, rows: 1 }, { cols: 1, rows: 3 }, { cols: 3, rows: 2 }, { cols: 2, rows: 3 },
+]
+
+function flexPalette(count: number): Span[] {
+  if (count <= 4) return FLEX_SPANS          // 8^4 = 4096
+  if (count === 5) return FLEX_SPANS.slice(0, 5) // 5^5 = 3125
+  if (count === 6) return FLEX_SPANS.slice(0, 4) // 4^6 = 4096
+  return []                                  // greedy fallback
+}
+
+const GREEDY_FILL: [number, number][] = [
+  [2, 2], [1, 2], [2, 1], [2, 3], [1, 3], [1, 1],
+]
+
+// Fallback for grids with many text boxes: place each at the first fit.
+function greedyFlexSpans(images: KeyedSpan[], flexKeys: string[]): KeyedSpan[] {
+  const g: GridState = []
+  for (const im of images) {
+    const pos = gFindDense(g, im.span.cols, im.span.rows)
+    gPlace(g, pos.row, pos.col, im.span.cols, im.span.rows)
+  }
+  return flexKeys.map((key) => {
+    const a = gFindDense(g, 1, 1)
+    let span: Span = { cols: 1, rows: 1 }
+    for (const [cols, rows] of GREEDY_FILL) {
+      if (gFree(g, a.row, a.col, cols, rows)) {
+        span = { cols: cols as 1 | 2 | 3 | 4, rows: rows as 1 | 2 | 3 }
+        break
+      }
+    }
+    gPlace(g, a.row, a.col, span.cols, span.rows)
+    return { key, span }
+  })
+}
+
+function computeLayout(items: BentoItem[]): {
+  placed: Map<string, PlacedItem>
+  fillers: PlacedItem[]
+} {
+  const images: KeyedSpan[] = items
+    .filter((i): i is BentoImageItem => i._type === 'bentoImage')
+    .map((i) => ({ key: i._key, span: computeImageSpan(i) }))
+  const flexKeys = items.filter((i) => i._type !== 'bentoImage').map((i) => i._key)
+
+  if (flexKeys.length === 0) {
+    const sim = simulate(images, [])
+    return { placed: sim.placed, fillers: holeRects(sim.grid, sim.height) }
+  }
+
+  const palette = flexPalette(flexKeys.length)
+  if (palette.length === 0) {
+    const sim = simulate(images, greedyFlexSpans(images, flexKeys))
+    return { placed: sim.placed, fillers: holeRects(sim.grid, sim.height) }
+  }
+
+  // Exhaustively search flexible-box span combinations for the cleanest tiling.
+  const S = palette.length
+  const total = S ** flexKeys.length
+  let best: { placed: Map<string, PlacedItem>; fillers: PlacedItem[] } | null = null
+  let bestScore = -Infinity
+  for (let combo = 0; combo < total; combo++) {
+    let n = combo
+    const flex: KeyedSpan[] = flexKeys.map((key) => {
+      const span = palette[n % S]
+      n = Math.floor(n / S)
+      return { key, span }
+    })
+    const sim = simulate(images, flex)
+    const holes = holeRects(sim.grid, sim.height)
+    const flexPlaced = flex.map((f) => sim.placed.get(f.key)!)
+    const score = scoreLayout(holes, flexPlaced)
+    if (score > bestScore) {
+      bestScore = score
+      best = { placed: sim.placed, fillers: holes }
+    }
+  }
+  return best!
 }
 
 // Explicit grid-line classes for lg — complete strings required for Tailwind JIT.
@@ -404,9 +511,13 @@ export default function BentoGrid({ block }: BentoGridProps) {
   const inView = useInView(ref, { once: true, margin: '-80px' })
 
   const hasItems = !!items && items.length > 0
-  const { placed, fillers } = hasItems
-    ? packItems(items)
-    : { placed: new Map<string, PlacedItem>(), fillers: [] as PlacedItem[] }
+  const { placed, fillers } = useMemo(
+    () =>
+      hasItems
+        ? computeLayout(items)
+        : { placed: new Map<string, PlacedItem>(), fillers: [] as PlacedItem[] },
+    [hasItems, items],
+  )
 
   const imageCount = hasItems ? items.filter((i) => i._type === 'bentoImage').length : 0
   const counterCount = imageCount > 0 ? imageCount : (items?.length ?? 0)
