@@ -68,31 +68,76 @@ function effectiveAr(cols: number, rows: number): number {
   return (cols * COL_W + (cols - 1) * GAP) / (rows * ROW_H + (rows - 1) * GAP)
 }
 
-const SPAN_OPTIONS: { cols: 1 | 2 | 3 | 4; rows: 1 | 2 | 3 }[] = [
+const SPAN_OPTIONS: Span[] = [
   { cols: 1, rows: 1 }, { cols: 2, rows: 1 }, { cols: 3, rows: 1 }, { cols: 4, rows: 1 },
   { cols: 1, rows: 2 }, { cols: 2, rows: 2 }, { cols: 3, rows: 2 }, { cols: 4, rows: 2 },
   { cols: 1, rows: 3 }, { cols: 2, rows: 3 },
 ]
 
-function computeImageSpan(item: BentoImageItem): Span {
-  if (!item.imageWidth || !item.imageHeight) return { cols: 1, rows: 1 }
-  const imageAr = item.imageWidth / item.imageHeight
-  let best = SPAN_OPTIONS[0]
-  let bestScore = Infinity
-  for (const opt of SPAN_OPTIONS) {
-    const score =
-      Math.abs(Math.log(effectiveAr(opt.cols, opt.rows) / imageAr)) +
-      Math.log(opt.cols * opt.rows) * SIZE_PENALTY
-    if (score < bestScore) { bestScore = score; best = opt }
+// ─── Layout solver ─────────────────────────────────────────────────────────────
+// Every item carries a ranked list of spans it may occupy, each with a penalty.
+// The solver searches span combinations, simulates CSS grid-auto-flow:dense for
+// each, and keeps the cheapest gap-free tiling. Images flex only within a modest
+// aspect-ratio band and are the preferred absorber of leftover space; text/CTA
+// boxes flex freely; the counter is a small accent that grows only as a last
+// resort. Every cell ends up owned by a real item or the counter — there are no
+// blank filler tiles.
+
+// A span an item may occupy, paired with the cost of choosing it.
+interface Candidate { span: Span; penalty: number }
+
+// Images may drift up to ~55% off their best aspect-ratio fit — enough to grow
+// one step and absorb space (object-cover crops), not enough to lose the shot.
+const IMAGE_AR_BAND = 0.44 // ≈ log(1.55)
+
+function imageCandidates(item: BentoImageItem): Candidate[] {
+  if (!item.imageWidth || !item.imageHeight) {
+    return [{ span: { cols: 1, rows: 1 }, penalty: 0 }]
   }
-  return best
+  const imageAr = item.imageWidth / item.imageHeight
+  const scored = SPAN_OPTIONS.map((span) => ({
+    span,
+    dev: Math.abs(Math.log(effectiveAr(span.cols, span.rows) / imageAr)),
+  }))
+  const bestDev = Math.min(...scored.map((s) => s.dev))
+  return scored
+    .filter((s) => s.dev <= bestDev + IMAGE_AR_BAND)
+    .map((s) => ({
+      span: s.span,
+      // Crop drift dominates; a mild size term breaks ties toward smaller spans.
+      penalty: (s.dev - bestDev) * 4 + Math.log(s.span.cols * s.span.rows) * SIZE_PENALTY,
+    }))
+    .sort((a, b) => a.penalty - b.penalty)
+    .slice(0, 5)
 }
 
-// ─── Layout solver ─────────────────────────────────────────────────────────────
-// Images are rigid — their span is locked to aspect ratio. Text/CTA boxes are
-// flexible: the solver searches span combinations and picks the one that tiles
-// into the cleanest rectangle (no orphan blanks, text boxes not grouped). Any
-// single leftover rectangle becomes the counter tile.
+// Text/CTA penalties encode reading comfort: 2-wide shapes read best, 1×1 is
+// cramped, thin or oversized shapes are a last resort. Costs sit above the image
+// band so images absorb leftover space before a text box stretches to fill it.
+const FLEX_CANDIDATES: Candidate[] = [
+  { span: { cols: 2, rows: 1 }, penalty: 0 },
+  { span: { cols: 2, rows: 2 }, penalty: 0.6 },
+  { span: { cols: 1, rows: 2 }, penalty: 1.2 },
+  { span: { cols: 3, rows: 1 }, penalty: 1.8 },
+  { span: { cols: 1, rows: 3 }, penalty: 2.4 },
+  { span: { cols: 1, rows: 1 }, penalty: 2.8 },
+  { span: { cols: 3, rows: 2 }, penalty: 3.4 },
+  { span: { cols: 2, rows: 3 }, penalty: 3.6 },
+]
+
+// The counter is a designed accent, not a blank filler. It strongly prefers a
+// single cell and only grows when nothing else can close a gap.
+const COUNTER_KEY = '__bento_counter__'
+const COUNTER_CANDIDATES: Candidate[] = [
+  { span: { cols: 1, rows: 1 }, penalty: 0 },
+  { span: { cols: 2, rows: 1 }, penalty: 1.5 },
+  { span: { cols: 1, rows: 2 }, penalty: 1.5 },
+  { span: { cols: 2, rows: 2 }, penalty: 4 },
+  { span: { cols: 3, rows: 1 }, penalty: 7 },
+  { span: { cols: 1, rows: 3 }, penalty: 7 },
+  { span: { cols: 3, rows: 2 }, penalty: 11 },
+  { span: { cols: 2, rows: 3 }, penalty: 11 },
+]
 
 interface PlacedItem { span: Span; row: number; col: number }
 
@@ -162,11 +207,11 @@ function holeRects(g: GridState, height: number): PlacedItem[] {
 
 interface KeyedSpan { key: string; span: Span }
 
-// Places rigid images first, then flexible boxes, both by dense flow.
-function simulate(images: KeyedSpan[], flex: KeyedSpan[]) {
+// Places items in document order by dense flow (counter appended last).
+function simulate(items: KeyedSpan[]) {
   const g: GridState = []
   const placed = new Map<string, PlacedItem>()
-  for (const it of [...images, ...flex]) {
+  for (const it of items) {
     const pos = gFindDense(g, it.span.cols, it.span.rows)
     gPlace(g, pos.row, pos.col, it.span.cols, it.span.rows)
     placed.set(it.key, { span: it.span, row: pos.row, col: pos.col })
@@ -185,112 +230,80 @@ function rectsAdjacent(a: PlacedItem, b: PlacedItem): boolean {
   return false
 }
 
-function scoreLayout(holes: PlacedItem[], flexPlaced: PlacedItem[]): number {
-  let s = 0
-  if (holes.length === 0) s += 120
-  else if (holes.length === 1) {
-    const a = holes[0].span.cols * holes[0].span.rows
-    s += a <= 6 ? 200 : -(a - 6) * 45
-  } else {
-    s -= 3000 * holes.length
-    s -= holes.reduce((t, h) => t + h.span.cols * h.span.rows, 0) * 20
-  }
-  for (const f of flexPlaced) {
-    const area = f.span.cols * f.span.rows
-    const ratio =
-      Math.max(f.span.cols, f.span.rows) / Math.min(f.span.cols, f.span.rows)
-    if (area === 1) s -= 35
-    if (area > 4) s -= (area - 4) * 22
-    if (ratio > 2) s -= (ratio - 2) * 16
-  }
-  for (let i = 0; i < flexPlaced.length; i++) {
-    for (let j = i + 1; j < flexPlaced.length; j++) {
-      if (rectsAdjacent(flexPlaced[i], flexPlaced[j])) s -= 70
-    }
-  }
-  return s
-}
+interface SolverItem { key: string; isFlex: boolean; candidates: Candidate[] }
 
-// Flexible-box span palette. Subsets keep the search bounded as box count grows.
-const FLEX_SPANS: Span[] = [
-  { cols: 1, rows: 1 }, { cols: 2, rows: 1 }, { cols: 1, rows: 2 }, { cols: 2, rows: 2 },
-  { cols: 3, rows: 1 }, { cols: 1, rows: 3 }, { cols: 3, rows: 2 }, { cols: 2, rows: 3 },
-]
-
-function flexPalette(count: number): Span[] {
-  if (count <= 4) return FLEX_SPANS          // 8^4 = 4096
-  if (count === 5) return FLEX_SPANS.slice(0, 5) // 5^5 = 3125
-  if (count === 6) return FLEX_SPANS.slice(0, 4) // 4^6 = 4096
-  return []                                  // greedy fallback
-}
-
-const GREEDY_FILL: [number, number][] = [
-  [2, 2], [1, 2], [2, 1], [2, 3], [1, 3], [1, 1],
-]
-
-// Fallback for grids with many text boxes: place each at the first fit.
-function greedyFlexSpans(images: KeyedSpan[], flexKeys: string[]): KeyedSpan[] {
-  const g: GridState = []
-  for (const im of images) {
-    const pos = gFindDense(g, im.span.cols, im.span.rows)
-    gPlace(g, pos.row, pos.col, im.span.cols, im.span.rows)
-  }
-  return flexKeys.map((key) => {
-    const a = gFindDense(g, 1, 1)
-    let span: Span = { cols: 1, rows: 1 }
-    for (const [cols, rows] of GREEDY_FILL) {
-      if (gFree(g, a.row, a.col, cols, rows)) {
-        span = { cols: cols as 1 | 2 | 3 | 4, rows: rows as 1 | 2 | 3 }
-        break
-      }
-    }
-    gPlace(g, a.row, a.col, span.cols, span.rows)
-    return { key, span }
-  })
-}
+// Upper bound on span combinations searched. Candidate lists are trimmed evenly
+// (costliest first) until the product fits, keeping the search near-instant.
+const MAX_COMBOS = 80000
 
 function computeLayout(items: BentoItem[]): {
   placed: Map<string, PlacedItem>
   fillers: PlacedItem[]
 } {
-  const images: KeyedSpan[] = items
-    .filter((i): i is BentoImageItem => i._type === 'bentoImage')
-    .map((i) => ({ key: i._key, span: computeImageSpan(i) }))
-  const flexKeys = items.filter((i) => i._type !== 'bentoImage').map((i) => i._key)
+  const solverItems: SolverItem[] = items.map((it) => ({
+    key: it._key,
+    isFlex: it._type === 'bentoText' || it._type === 'bentoCta',
+    candidates: it._type === 'bentoImage' ? imageCandidates(it) : [...FLEX_CANDIDATES],
+  }))
+  // The counter is appended last so dense flow lets it mop up a leftover cell.
+  solverItems.push({ key: COUNTER_KEY, isFlex: false, candidates: [...COUNTER_CANDIDATES] })
 
-  if (flexKeys.length === 0) {
-    const sim = simulate(images, [])
-    return { placed: sim.placed, fillers: holeRects(sim.grid, sim.height) }
+  for (const si of solverItems) si.candidates.sort((a, b) => a.penalty - b.penalty)
+  const comboCount = () => solverItems.reduce((p, si) => p * si.candidates.length, 1)
+  while (comboCount() > MAX_COMBOS) {
+    let widest: SolverItem | null = null
+    for (const si of solverItems) {
+      if (si.candidates.length > 1 && (!widest || si.candidates.length > widest.candidates.length)) {
+        widest = si
+      }
+    }
+    if (!widest) break
+    widest.candidates.pop()
   }
 
-  const palette = flexPalette(flexKeys.length)
-  if (palette.length === 0) {
-    const sim = simulate(images, greedyFlexSpans(images, flexKeys))
-    return { placed: sim.placed, fillers: holeRects(sim.grid, sim.height) }
-  }
+  const flexKeys = new Set(solverItems.filter((s) => s.isFlex).map((s) => s.key))
+  const total = comboCount()
+  let bestPlaced: Map<string, PlacedItem> | null = null
+  let bestGrid: GridState = []
+  let bestHeight = 0
+  let bestCost = Infinity
 
-  // Exhaustively search flexible-box span combinations for the cleanest tiling.
-  const S = palette.length
-  const total = S ** flexKeys.length
-  let best: { placed: Map<string, PlacedItem>; fillers: PlacedItem[] } | null = null
-  let bestScore = -Infinity
   for (let combo = 0; combo < total; combo++) {
     let n = combo
-    const flex: KeyedSpan[] = flexKeys.map((key) => {
-      const span = palette[n % S]
-      n = Math.floor(n / S)
-      return { key, span }
+    let penaltySum = 0
+    const keyed: KeyedSpan[] = solverItems.map((si) => {
+      const len = si.candidates.length
+      const c = si.candidates[n % len]
+      n = Math.floor(n / len)
+      penaltySum += c.penalty
+      return { key: si.key, span: c.span }
     })
-    const sim = simulate(images, flex)
+    const sim = simulate(keyed)
     const holes = holeRects(sim.grid, sim.height)
-    const flexPlaced = flex.map((f) => sim.placed.get(f.key)!)
-    const score = scoreLayout(holes, flexPlaced)
-    if (score > bestScore) {
-      bestScore = score
-      best = { placed: sim.placed, fillers: holes }
+    const holeArea = holes.reduce((t, h) => t + h.span.cols * h.span.rows, 0)
+
+    let adjacent = 0
+    const flexPlaced = keyed
+      .filter((k) => flexKeys.has(k.key))
+      .map((k) => sim.placed.get(k.key)!)
+    for (let i = 0; i < flexPlaced.length; i++) {
+      for (let j = i + 1; j < flexPlaced.length; j++) {
+        if (rectsAdjacent(flexPlaced[i], flexPlaced[j])) adjacent++
+      }
+    }
+
+    // Holes dominate so a gap-free rectangle always wins; span penalties and
+    // text-box adjacency are fine-grained tiebreakers among clean tilings.
+    const cost = holes.length * 4000 + holeArea * 300 + penaltySum + adjacent * 10
+    if (cost < bestCost) {
+      bestCost = cost
+      bestPlaced = sim.placed
+      bestGrid = sim.grid
+      bestHeight = sim.height
     }
   }
-  return best!
+
+  return { placed: bestPlaced!, fillers: holeRects(bestGrid, bestHeight) }
 }
 
 // Explicit grid-line classes for lg — complete strings required for Tailwind JIT.
@@ -483,7 +496,8 @@ function BentoCtaBlock({ item }: { item: BentoCtaItem }) {
 }
 
 // ─── Counter block ────────────────────────────────────────────────────────────
-// Fills leftover grid space with a count, so the layout resolves to a rectangle.
+// A small designed accent showing the item count — placed by the solver as a
+// real tile, not a blank filler.
 
 function BentoCounterBlock({ count, label, large }: { count: number; label: string; large: boolean }) {
   return (
@@ -522,12 +536,7 @@ export default function BentoGrid({ block }: BentoGridProps) {
   const imageCount = hasItems ? items.filter((i) => i._type === 'bentoImage').length : 0
   const counterCount = imageCount > 0 ? imageCount : (items?.length ?? 0)
   const counterLabel = imageCount > 0 ? 'Images' : 'Items'
-  // Largest leftover rect carries the counter; any others are quiet fill.
-  const counterIdx = fillers.reduce(
-    (best, f, i, arr) =>
-      f.span.cols * f.span.rows > arr[best].span.cols * arr[best].span.rows ? i : best,
-    0,
-  )
+  const counterPlaced = placed.get(COUNTER_KEY) ?? null
 
   return (
     <div
@@ -570,24 +579,29 @@ export default function BentoGrid({ block }: BentoGridProps) {
                 )
               })}
 
+              {counterPlaced && (
+                <motion.article
+                  key="bento-counter"
+                  variants={itemVariants}
+                  aria-hidden="true"
+                  className={`relative overflow-hidden rounded-sm ${cellClass(counterPlaced)}`}
+                >
+                  <BentoCounterBlock
+                    count={counterCount}
+                    label={counterLabel}
+                    large={counterPlaced.span.cols * counterPlaced.span.rows >= 2}
+                  />
+                </motion.article>
+              )}
+
               {fillers.map((f, i) => (
                 <motion.article
                   key={`bento-filler-${i}`}
                   variants={itemVariants}
                   aria-hidden="true"
-                  className={`relative overflow-hidden rounded-sm ${
-                    i === counterIdx ? '' : 'hidden lg:block'
-                  } ${cellClass(f)}`}
+                  className={`relative overflow-hidden rounded-sm hidden lg:block ${cellClass(f)}`}
                 >
-                  {i === counterIdx ? (
-                    <BentoCounterBlock
-                      count={counterCount}
-                      label={counterLabel}
-                      large={f.span.cols * f.span.rows >= 2}
-                    />
-                  ) : (
-                    <div className="h-full bg-gray-50" />
-                  )}
+                  <div className="h-full bg-gray-50" />
                 </motion.article>
               ))}
             </motion.div>
