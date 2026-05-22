@@ -19,5 +19,8 @@ export default defineCliConfig({
     schema: '../sanity.schema.json',
     generates: './sanity.types.ts',
     overloadClientMethods: true,
+    // sanity.types.ts is a generated build artifact — skip prettier so typegen
+    // doesn't depend on resolving @sanity/prettier-config at build time.
+    formatGeneratedCode: false,
   },
 })
