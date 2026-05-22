@@ -77,6 +77,62 @@ export type ImagesImageBlockImage = {
   _type: 'image'
 }
 
+export type BentoImageImage = {
+  asset?: SanityImageAssetReference
+  media?: unknown // Unable to locate the referenced type "bentoImage.image.media" in schema
+  hotspot?: SanityImageHotspot
+  crop?: SanityImageCrop
+  _type: 'image'
+}
+
+export type BentoGrid = {
+  _type: 'bentoGrid'
+  items: Array<
+    | {
+        image: BentoImageImage
+        alt: string
+        overlayText?: string
+        overlayPosition?: 'top' | 'center' | 'bottom'
+        _type: 'bentoImage'
+        _key: string
+      }
+    | {
+        backgroundColor?: 'warm' | 'tint' | 'dark' | 'ink'
+        content: BlockContentTextOnly
+        textAlign?: 'left' | 'center' | 'right'
+        fontSize?: 'sm' | 'base' | 'lg' | 'xl'
+        _type: 'bentoText'
+        _key: string
+      }
+    | {
+        backgroundColor?: 'warm' | 'tint' | 'dark' | 'ink'
+        headline?: string
+        description?: string
+        buttonText?: string
+        buttonLink?: string
+        _type: 'bentoCta'
+        _key: string
+      }
+  >
+  background?: 'none' | 'tint' | 'tile' | 'gradient'
+}
+
+export type ImageHero = {
+  _type: 'imageHero'
+  image: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+  }
+  alt: string
+  subtitle?: string
+  index?: string
+  heading?: string
+  lightPanel?: boolean
+}
+
 export type MinimalHeader = {
   _type: 'minimalHeader'
   label?: string
@@ -427,10 +483,16 @@ export type PortfolioProject = {
       } & PageHeader)
     | ({
         _key: string
+      } & MinimalHeader)
+    | ({
+        _key: string
       } & SectionHeading)
     | ({
         _key: string
       } & StatsBlock)
+    | ({
+        _key: string
+      } & ImageHero)
     | ({
         _key: string
       } & DeviceCropped)
@@ -455,6 +517,9 @@ export type PortfolioProject = {
     | ({
         _key: string
       } & ContentDetails)
+    | ({
+        _key: string
+      } & BentoGrid)
   >
   seoTitle?: string
   seoDescription?: string
@@ -569,6 +634,9 @@ export type Homepage = {
       } & DeviceCropped)
     | ({
         _key: string
+      } & ImageHero)
+    | ({
+        _key: string
       } & HeroSplitImageRight)
     | ({
         _key: string
@@ -588,6 +656,9 @@ export type Homepage = {
     | ({
         _key: string
       } & FeaturedPosts)
+    | ({
+        _key: string
+      } & BentoGrid)
   >
 }
 
@@ -622,6 +693,7 @@ export type Settings = {
   }>
   favicon?: {
     asset?: SanityImageAssetReference
+    media?: unknown
     hotspot?: SanityImageHotspot
     crop?: SanityImageCrop
     _type: 'image'
@@ -668,6 +740,9 @@ export type Page = {
       } & DeviceCropped)
     | ({
         _key: string
+      } & ImageHero)
+    | ({
+        _key: string
       } & HeroSplitImageRight)
     | ({
         _key: string
@@ -690,6 +765,9 @@ export type Page = {
     | ({
         _key: string
       } & FeaturedPosts)
+    | ({
+        _key: string
+      } & BentoGrid)
   >
 }
 
@@ -989,6 +1067,9 @@ export type AllSanitySchemaTypes =
   | ItemsCardImage
   | ItemsCardImageImage
   | ImagesImageBlockImage
+  | BentoImageImage
+  | BentoGrid
+  | ImageHero
   | MinimalHeader
   | StatsBlock
   | PageHeader
@@ -1081,6 +1162,13 @@ export type SettingsQueryResult = {
     _type: 'block'
     _key: string
   }>
+  favicon?: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    _type: 'image'
+  }
   ogImage?: {
     asset?: SanityImageAssetReference
     media?: unknown
@@ -1094,7 +1182,7 @@ export type SettingsQueryResult = {
 
 // Source: sanity/lib/queries.ts
 // Variable: homepageQuery
-// Query: *[_type == "homepage"][0]{    _id,    _type,    seoTitle,    seoDescription,      "pageBuilder": pageBuilder[]{    ...,    _type == "callToAction" => {      ...,      button {        ...,          link {      ...,        _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }      }      }    },    _type == "infoSection" => {      content[]{        ...,        markDefs[]{          ...,            _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }        }      }    },    _type == "sectionHeading" => {      _type,      _key,      heading    },    _type == "minimalHeader" => {      _type,      _key,      label,      meta,      heading    },    _type == "heroSplitImageRight" => {      _type,      _key,      heading,      background,      contentAlignment,      "images": images[] {        "image": image.asset->url,        alt,        caption      }    },    _type == "deviceCropped" => {      _type,      _key,      label,      heading,      mediaType,      cropMode,      image {        image { asset-> { url } },        alt      },      "videoUrl": video.asset->url,      background,      contentAlignment,      items[] {        title,        body      }    },    _type == "contentBlockGrid" => {      _type,      _key,      heading,      intro,      background,      items[] {        title,        body      }    },    _type == "carouselCards" => {      _type,      _key,      background,      items[] {        "image": image.image.asset->url,        "alt": image.alt,        label,        title,        link {          ...,            _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }        }      }    },    _type == "abstractCardsCarousel" => {      _type,      _key,      items[] {        label,        heading,        body,        "image": image.image.asset->url,        "alt": image.alt,        link {          ...,            _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }        }      }    },    _type == "imageCollage" => {      _type,      _key,      background,      "images": images[] {        "image": image.asset->url,        alt      }    },    _type == "imageCollageContent" => {      _type,      _key,      heading,      client,      year,      "descriptions": descriptions[] {        "content": content[] {          ...,          markDefs[] {            ...,              _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }          }        }      },      background,    },    _type == "contentDetails" => {      _type,      _key,      background,      listItemsLabel,      mainContentLabel,      body[] {        ...,        markDefs[] {          ...,            _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }        }      },      items[] {        title      }    },    _type == "featuredPosts" => {      _type,      _key,      heading,      intro,      background,      selectionMode,      "resolvedPosts": select(        selectionMode == "tag" => *[_type == "post" && references(^.tag._ref)] | order(date desc) [0...6] {          _id,          title,          "slug": slug.current,          excerpt,          coverImage,          "date": coalesce(date, _updatedAt),          "tags": tags[]->{name, "slug": slug.current}        },        selectionMode == "manual" => posts[]->{          _id,          title,          "slug": slug.current,          excerpt,          coverImage,          "date": coalesce(date, _updatedAt),          "tags": tags[]->{name, "slug": slug.current}        },        []      )    },  }  }
+// Query: *[_type == "homepage"][0]{    _id,    _type,    seoTitle,    seoDescription,      "pageBuilder": pageBuilder[]{    ...,    _type == "callToAction" => {      ...,      button {        ...,          link {      ...,        _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }      }      }    },    _type == "infoSection" => {      content[]{        ...,        markDefs[]{          ...,            _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }        }      }    },    _type == "sectionHeading" => {      _type,      _key,      heading    },    _type == "minimalHeader" => {      _type,      _key,      label,      meta,      heading    },    _type == "imageHero" => {      _type,      _key,      "image": image.asset->url,      alt,      subtitle,      index,      heading,      lightPanel    },    _type == "heroSplitImageRight" => {      _type,      _key,      heading,      background,      contentAlignment,      "images": images[] {        "image": image.asset->url,        alt,        caption      }    },    _type == "deviceCropped" => {      _type,      _key,      label,      heading,      mediaType,      cropMode,      image {        image { asset-> { url } },        alt      },      "videoUrl": video.asset->url,      background,      contentAlignment,      items[] {        title,        body      }    },    _type == "contentBlockGrid" => {      _type,      _key,      heading,      intro,      background,      items[] {        title,        body      }    },    _type == "carouselCards" => {      _type,      _key,      background,      items[] {        "image": image.image.asset->url,        "alt": image.alt,        label,        title,        link {          ...,            _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }        }      }    },    _type == "abstractCardsCarousel" => {      _type,      _key,      items[] {        label,        heading,        body,        "image": image.image.asset->url,        "alt": image.alt,        link {          ...,            _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }        }      }    },    _type == "imageCollage" => {      _type,      _key,      background,      "images": images[] {        "image": image.asset->url,        alt      }    },    _type == "imageCollageContent" => {      _type,      _key,      heading,      client,      year,      "descriptions": descriptions[] {        "content": content[] {          ...,          markDefs[] {            ...,              _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }          }        }      },      background,    },    _type == "contentDetails" => {      _type,      _key,      background,      listItemsLabel,      mainContentLabel,      body[] {        ...,        markDefs[] {          ...,            _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }        }      },      items[] {        title      }    },    _type == "bentoGrid" => {      _type,      _key,      background,      "items": items[] {        _key,        _type,        span,        // image fields        "image": image.asset->url,        "imageWidth": image.asset->metadata.dimensions.width,        "imageHeight": image.asset->metadata.dimensions.height,        alt,        overlayText,        overlayPosition,        // text fields        content,        textAlign,        fontSize,        // shared (text + cta)        backgroundColor,        // cta fields        headline,        description,        buttonText,        buttonLink,      }    },    _type == "featuredPosts" => {      _type,      _key,      heading,      intro,      background,      selectionMode,      "resolvedPosts": select(        selectionMode == "tag" => *[_type == "post" && references(^.tag._ref)] | order(date desc) [0...6] {          _id,          title,          "slug": slug.current,          excerpt,          coverImage,          "date": coalesce(date, _updatedAt),          "tags": tags[]->{name, "slug": slug.current}        },        selectionMode == "manual" => posts[]->{          _id,          title,          "slug": slug.current,          excerpt,          coverImage,          "date": coalesce(date, _updatedAt),          "tags": tags[]->{name, "slug": slug.current}        },        []      )    },  }  }
 export type HomepageQueryResult = {
   _id: string
   _type: 'homepage'
@@ -1119,6 +1207,70 @@ export type HomepageQueryResult = {
             openInNewTab?: boolean
           }
         }>
+      }
+    | {
+        _key: string
+        _type: 'bentoGrid'
+        items: Array<
+          | {
+              _key: string
+              _type: 'bentoCta'
+              span: null
+              image: null
+              imageWidth: null
+              imageHeight: null
+              alt: null
+              overlayText: null
+              overlayPosition: null
+              content: null
+              textAlign: null
+              fontSize: null
+              backgroundColor: 'dark' | 'ink' | 'tint' | 'warm' | null
+              headline: string | null
+              description: string | null
+              buttonText: string | null
+              buttonLink: string | null
+            }
+          | {
+              _key: string
+              _type: 'bentoImage'
+              span: null
+              image: string | null
+              imageWidth: number | null
+              imageHeight: number | null
+              alt: string
+              overlayText: string | null
+              overlayPosition: 'bottom' | 'center' | 'top' | null
+              content: null
+              textAlign: null
+              fontSize: null
+              backgroundColor: null
+              headline: null
+              description: null
+              buttonText: null
+              buttonLink: null
+            }
+          | {
+              _key: string
+              _type: 'bentoText'
+              span: null
+              image: null
+              imageWidth: null
+              imageHeight: null
+              alt: null
+              overlayText: null
+              overlayPosition: null
+              content: BlockContentTextOnly
+              textAlign: 'center' | 'left' | 'right' | null
+              fontSize: 'base' | 'lg' | 'sm' | 'xl' | null
+              backgroundColor: 'dark' | 'ink' | 'tint' | 'warm' | null
+              headline: null
+              description: null
+              buttonText: null
+              buttonLink: null
+            }
+        >
+        background: 'gradient' | 'none' | 'tile' | 'tint' | null
       }
     | {
         _key: string
@@ -1308,6 +1460,16 @@ export type HomepageQueryResult = {
       }
     | {
         _key: string
+        _type: 'imageHero'
+        image: string | null
+        alt: string
+        subtitle: string | null
+        index: string | null
+        heading: string | null
+        lightPanel: boolean | null
+      }
+    | {
+        _key: string
         _type: 'minimalHeader'
         label: string | null
         meta: string | null
@@ -1336,7 +1498,7 @@ export type HomepageQueryResult = {
 
 // Source: sanity/lib/queries.ts
 // Variable: getPageQuery
-// Query: *[_type == 'page' && slug.current == $slug][0]{    _id,    _type,    name,    slug,    heading,    subheading,      "pageBuilder": pageBuilder[]{    ...,    _type == "callToAction" => {      ...,      button {        ...,          link {      ...,        _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }      }      }    },    _type == "infoSection" => {      content[]{        ...,        markDefs[]{          ...,            _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }        }      }    },    _type == "sectionHeading" => {      _type,      _key,      heading    },    _type == "minimalHeader" => {      _type,      _key,      label,      meta,      heading    },    _type == "heroSplitImageRight" => {      _type,      _key,      heading,      background,      contentAlignment,      "images": images[] {        "image": image.asset->url,        alt,        caption      }    },    _type == "deviceCropped" => {      _type,      _key,      label,      heading,      mediaType,      cropMode,      image {        image { asset-> { url } },        alt      },      "videoUrl": video.asset->url,      background,      contentAlignment,      items[] {        title,        body      }    },    _type == "contentBlockGrid" => {      _type,      _key,      heading,      intro,      background,      items[] {        title,        body      }    },    _type == "carouselCards" => {      _type,      _key,      background,      items[] {        "image": image.image.asset->url,        "alt": image.alt,        label,        title,        link {          ...,            _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }        }      }    },    _type == "abstractCardsCarousel" => {      _type,      _key,      items[] {        label,        heading,        body,        "image": image.image.asset->url,        "alt": image.alt,        link {          ...,            _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }        }      }    },    _type == "imageCollage" => {      _type,      _key,      background,      "images": images[] {        "image": image.asset->url,        alt      }    },    _type == "imageCollageContent" => {      _type,      _key,      heading,      client,      year,      "descriptions": descriptions[] {        "content": content[] {          ...,          markDefs[] {            ...,              _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }          }        }      },      background,    },    _type == "contentDetails" => {      _type,      _key,      background,      listItemsLabel,      mainContentLabel,      body[] {        ...,        markDefs[] {          ...,            _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }        }      },      items[] {        title      }    },    _type == "featuredPosts" => {      _type,      _key,      heading,      intro,      background,      selectionMode,      "resolvedPosts": select(        selectionMode == "tag" => *[_type == "post" && references(^.tag._ref)] | order(date desc) [0...6] {          _id,          title,          "slug": slug.current,          excerpt,          coverImage,          "date": coalesce(date, _updatedAt),          "tags": tags[]->{name, "slug": slug.current}        },        selectionMode == "manual" => posts[]->{          _id,          title,          "slug": slug.current,          excerpt,          coverImage,          "date": coalesce(date, _updatedAt),          "tags": tags[]->{name, "slug": slug.current}        },        []      )    },  }  }
+// Query: *[_type == 'page' && slug.current == $slug][0]{    _id,    _type,    name,    slug,    heading,    subheading,      "pageBuilder": pageBuilder[]{    ...,    _type == "callToAction" => {      ...,      button {        ...,          link {      ...,        _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }      }      }    },    _type == "infoSection" => {      content[]{        ...,        markDefs[]{          ...,            _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }        }      }    },    _type == "sectionHeading" => {      _type,      _key,      heading    },    _type == "minimalHeader" => {      _type,      _key,      label,      meta,      heading    },    _type == "imageHero" => {      _type,      _key,      "image": image.asset->url,      alt,      subtitle,      index,      heading,      lightPanel    },    _type == "heroSplitImageRight" => {      _type,      _key,      heading,      background,      contentAlignment,      "images": images[] {        "image": image.asset->url,        alt,        caption      }    },    _type == "deviceCropped" => {      _type,      _key,      label,      heading,      mediaType,      cropMode,      image {        image { asset-> { url } },        alt      },      "videoUrl": video.asset->url,      background,      contentAlignment,      items[] {        title,        body      }    },    _type == "contentBlockGrid" => {      _type,      _key,      heading,      intro,      background,      items[] {        title,        body      }    },    _type == "carouselCards" => {      _type,      _key,      background,      items[] {        "image": image.image.asset->url,        "alt": image.alt,        label,        title,        link {          ...,            _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }        }      }    },    _type == "abstractCardsCarousel" => {      _type,      _key,      items[] {        label,        heading,        body,        "image": image.image.asset->url,        "alt": image.alt,        link {          ...,            _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }        }      }    },    _type == "imageCollage" => {      _type,      _key,      background,      "images": images[] {        "image": image.asset->url,        alt      }    },    _type == "imageCollageContent" => {      _type,      _key,      heading,      client,      year,      "descriptions": descriptions[] {        "content": content[] {          ...,          markDefs[] {            ...,              _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }          }        }      },      background,    },    _type == "contentDetails" => {      _type,      _key,      background,      listItemsLabel,      mainContentLabel,      body[] {        ...,        markDefs[] {          ...,            _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }        }      },      items[] {        title      }    },    _type == "bentoGrid" => {      _type,      _key,      background,      "items": items[] {        _key,        _type,        span,        // image fields        "image": image.asset->url,        "imageWidth": image.asset->metadata.dimensions.width,        "imageHeight": image.asset->metadata.dimensions.height,        alt,        overlayText,        overlayPosition,        // text fields        content,        textAlign,        fontSize,        // shared (text + cta)        backgroundColor,        // cta fields        headline,        description,        buttonText,        buttonLink,      }    },    _type == "featuredPosts" => {      _type,      _key,      heading,      intro,      background,      selectionMode,      "resolvedPosts": select(        selectionMode == "tag" => *[_type == "post" && references(^.tag._ref)] | order(date desc) [0...6] {          _id,          title,          "slug": slug.current,          excerpt,          coverImage,          "date": coalesce(date, _updatedAt),          "tags": tags[]->{name, "slug": slug.current}        },        selectionMode == "manual" => posts[]->{          _id,          title,          "slug": slug.current,          excerpt,          coverImage,          "date": coalesce(date, _updatedAt),          "tags": tags[]->{name, "slug": slug.current}        },        []      )    },  }  }
 export type GetPageQueryResult = {
   _id: string
   _type: 'page'
@@ -1363,6 +1525,70 @@ export type GetPageQueryResult = {
             openInNewTab?: boolean
           }
         }>
+      }
+    | {
+        _key: string
+        _type: 'bentoGrid'
+        items: Array<
+          | {
+              _key: string
+              _type: 'bentoCta'
+              span: null
+              image: null
+              imageWidth: null
+              imageHeight: null
+              alt: null
+              overlayText: null
+              overlayPosition: null
+              content: null
+              textAlign: null
+              fontSize: null
+              backgroundColor: 'dark' | 'ink' | 'tint' | 'warm' | null
+              headline: string | null
+              description: string | null
+              buttonText: string | null
+              buttonLink: string | null
+            }
+          | {
+              _key: string
+              _type: 'bentoImage'
+              span: null
+              image: string | null
+              imageWidth: number | null
+              imageHeight: number | null
+              alt: string
+              overlayText: string | null
+              overlayPosition: 'bottom' | 'center' | 'top' | null
+              content: null
+              textAlign: null
+              fontSize: null
+              backgroundColor: null
+              headline: null
+              description: null
+              buttonText: null
+              buttonLink: null
+            }
+          | {
+              _key: string
+              _type: 'bentoText'
+              span: null
+              image: null
+              imageWidth: null
+              imageHeight: null
+              alt: null
+              overlayText: null
+              overlayPosition: null
+              content: BlockContentTextOnly
+              textAlign: 'center' | 'left' | 'right' | null
+              fontSize: 'base' | 'lg' | 'sm' | 'xl' | null
+              backgroundColor: 'dark' | 'ink' | 'tint' | 'warm' | null
+              headline: null
+              description: null
+              buttonText: null
+              buttonLink: null
+            }
+        >
+        background: 'gradient' | 'none' | 'tile' | 'tint' | null
       }
     | {
         _key: string
@@ -1560,6 +1786,16 @@ export type GetPageQueryResult = {
         background: 'gradient' | 'none' | 'tile' | 'tint' | null
         client: null
         descriptions: null
+      }
+    | {
+        _key: string
+        _type: 'imageHero'
+        image: string | null
+        alt: string
+        subtitle: string | null
+        index: string | null
+        heading: string | null
+        lightPanel: boolean | null
       }
     | {
         _key: string
@@ -1858,7 +2094,7 @@ export type AdjacentPostsQueryResult = {
 
 // Source: sanity/lib/queries.ts
 // Variable: portfolioOverviewQuery
-// Query: *[_type == "portfolioOverview"][0]{    _id,    _type,    passwordProtected,    seoTitle,    seoDescription,      "pageBuilder": pageBuilder[]{    ...,    _type == "callToAction" => {      ...,      button {        ...,          link {      ...,        _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }      }      }    },    _type == "infoSection" => {      content[]{        ...,        markDefs[]{          ...,            _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }        }      }    },    _type == "sectionHeading" => {      _type,      _key,      heading    },    _type == "minimalHeader" => {      _type,      _key,      label,      meta,      heading    },    _type == "heroSplitImageRight" => {      _type,      _key,      heading,      background,      contentAlignment,      "images": images[] {        "image": image.asset->url,        alt,        caption      }    },    _type == "deviceCropped" => {      _type,      _key,      label,      heading,      mediaType,      cropMode,      image {        image { asset-> { url } },        alt      },      "videoUrl": video.asset->url,      background,      contentAlignment,      items[] {        title,        body      }    },    _type == "contentBlockGrid" => {      _type,      _key,      heading,      intro,      background,      items[] {        title,        body      }    },    _type == "carouselCards" => {      _type,      _key,      background,      items[] {        "image": image.image.asset->url,        "alt": image.alt,        label,        title,        link {          ...,            _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }        }      }    },    _type == "abstractCardsCarousel" => {      _type,      _key,      items[] {        label,        heading,        body,        "image": image.image.asset->url,        "alt": image.alt,        link {          ...,            _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }        }      }    },    _type == "imageCollage" => {      _type,      _key,      background,      "images": images[] {        "image": image.asset->url,        alt      }    },    _type == "imageCollageContent" => {      _type,      _key,      heading,      client,      year,      "descriptions": descriptions[] {        "content": content[] {          ...,          markDefs[] {            ...,              _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }          }        }      },      background,    },    _type == "contentDetails" => {      _type,      _key,      background,      listItemsLabel,      mainContentLabel,      body[] {        ...,        markDefs[] {          ...,            _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }        }      },      items[] {        title      }    },    _type == "featuredPosts" => {      _type,      _key,      heading,      intro,      background,      selectionMode,      "resolvedPosts": select(        selectionMode == "tag" => *[_type == "post" && references(^.tag._ref)] | order(date desc) [0...6] {          _id,          title,          "slug": slug.current,          excerpt,          coverImage,          "date": coalesce(date, _updatedAt),          "tags": tags[]->{name, "slug": slug.current}        },        selectionMode == "manual" => posts[]->{          _id,          title,          "slug": slug.current,          excerpt,          coverImage,          "date": coalesce(date, _updatedAt),          "tags": tags[]->{name, "slug": slug.current}        },        []      )    },  }  }
+// Query: *[_type == "portfolioOverview"][0]{    _id,    _type,    passwordProtected,    seoTitle,    seoDescription,      "pageBuilder": pageBuilder[]{    ...,    _type == "callToAction" => {      ...,      button {        ...,          link {      ...,        _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }      }      }    },    _type == "infoSection" => {      content[]{        ...,        markDefs[]{          ...,            _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }        }      }    },    _type == "sectionHeading" => {      _type,      _key,      heading    },    _type == "minimalHeader" => {      _type,      _key,      label,      meta,      heading    },    _type == "imageHero" => {      _type,      _key,      "image": image.asset->url,      alt,      subtitle,      index,      heading,      lightPanel    },    _type == "heroSplitImageRight" => {      _type,      _key,      heading,      background,      contentAlignment,      "images": images[] {        "image": image.asset->url,        alt,        caption      }    },    _type == "deviceCropped" => {      _type,      _key,      label,      heading,      mediaType,      cropMode,      image {        image { asset-> { url } },        alt      },      "videoUrl": video.asset->url,      background,      contentAlignment,      items[] {        title,        body      }    },    _type == "contentBlockGrid" => {      _type,      _key,      heading,      intro,      background,      items[] {        title,        body      }    },    _type == "carouselCards" => {      _type,      _key,      background,      items[] {        "image": image.image.asset->url,        "alt": image.alt,        label,        title,        link {          ...,            _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }        }      }    },    _type == "abstractCardsCarousel" => {      _type,      _key,      items[] {        label,        heading,        body,        "image": image.image.asset->url,        "alt": image.alt,        link {          ...,            _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }        }      }    },    _type == "imageCollage" => {      _type,      _key,      background,      "images": images[] {        "image": image.asset->url,        alt      }    },    _type == "imageCollageContent" => {      _type,      _key,      heading,      client,      year,      "descriptions": descriptions[] {        "content": content[] {          ...,          markDefs[] {            ...,              _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }          }        }      },      background,    },    _type == "contentDetails" => {      _type,      _key,      background,      listItemsLabel,      mainContentLabel,      body[] {        ...,        markDefs[] {          ...,            _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }        }      },      items[] {        title      }    },    _type == "bentoGrid" => {      _type,      _key,      background,      "items": items[] {        _key,        _type,        span,        // image fields        "image": image.asset->url,        "imageWidth": image.asset->metadata.dimensions.width,        "imageHeight": image.asset->metadata.dimensions.height,        alt,        overlayText,        overlayPosition,        // text fields        content,        textAlign,        fontSize,        // shared (text + cta)        backgroundColor,        // cta fields        headline,        description,        buttonText,        buttonLink,      }    },    _type == "featuredPosts" => {      _type,      _key,      heading,      intro,      background,      selectionMode,      "resolvedPosts": select(        selectionMode == "tag" => *[_type == "post" && references(^.tag._ref)] | order(date desc) [0...6] {          _id,          title,          "slug": slug.current,          excerpt,          coverImage,          "date": coalesce(date, _updatedAt),          "tags": tags[]->{name, "slug": slug.current}        },        selectionMode == "manual" => posts[]->{          _id,          title,          "slug": slug.current,          excerpt,          coverImage,          "date": coalesce(date, _updatedAt),          "tags": tags[]->{name, "slug": slug.current}        },        []      )    },  }  }
 export type PortfolioOverviewQueryResult = {
   _id: string
   _type: 'portfolioOverview'
@@ -2136,7 +2372,7 @@ export type PortfolioProjectsByTagQueryResult = Array<{
 
 // Source: sanity/lib/queries.ts
 // Variable: portfolioProjectQuery
-// Query: *[_type == "portfolioProject" && slug.current == $slug][0]{    _id,    _type,    "title": coalesce(title, "Untitled"),    "slug": slug.current,    excerpt,    coverImage,    client,    year,    seoTitle,    seoDescription,      "pageBuilder": pageBuilder[]{    ...,    _type == "callToAction" => {      ...,      button {        ...,          link {      ...,        _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }      }      }    },    _type == "infoSection" => {      content[]{        ...,        markDefs[]{          ...,            _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }        }      }    },    _type == "sectionHeading" => {      _type,      _key,      heading    },    _type == "minimalHeader" => {      _type,      _key,      label,      meta,      heading    },    _type == "heroSplitImageRight" => {      _type,      _key,      heading,      background,      contentAlignment,      "images": images[] {        "image": image.asset->url,        alt,        caption      }    },    _type == "deviceCropped" => {      _type,      _key,      label,      heading,      mediaType,      cropMode,      image {        image { asset-> { url } },        alt      },      "videoUrl": video.asset->url,      background,      contentAlignment,      items[] {        title,        body      }    },    _type == "contentBlockGrid" => {      _type,      _key,      heading,      intro,      background,      items[] {        title,        body      }    },    _type == "carouselCards" => {      _type,      _key,      background,      items[] {        "image": image.image.asset->url,        "alt": image.alt,        label,        title,        link {          ...,            _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }        }      }    },    _type == "abstractCardsCarousel" => {      _type,      _key,      items[] {        label,        heading,        body,        "image": image.image.asset->url,        "alt": image.alt,        link {          ...,            _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }        }      }    },    _type == "imageCollage" => {      _type,      _key,      background,      "images": images[] {        "image": image.asset->url,        alt      }    },    _type == "imageCollageContent" => {      _type,      _key,      heading,      client,      year,      "descriptions": descriptions[] {        "content": content[] {          ...,          markDefs[] {            ...,              _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }          }        }      },      background,    },    _type == "contentDetails" => {      _type,      _key,      background,      listItemsLabel,      mainContentLabel,      body[] {        ...,        markDefs[] {          ...,            _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }        }      },      items[] {        title      }    },    _type == "featuredPosts" => {      _type,      _key,      heading,      intro,      background,      selectionMode,      "resolvedPosts": select(        selectionMode == "tag" => *[_type == "post" && references(^.tag._ref)] | order(date desc) [0...6] {          _id,          title,          "slug": slug.current,          excerpt,          coverImage,          "date": coalesce(date, _updatedAt),          "tags": tags[]->{name, "slug": slug.current}        },        selectionMode == "manual" => posts[]->{          _id,          title,          "slug": slug.current,          excerpt,          coverImage,          "date": coalesce(date, _updatedAt),          "tags": tags[]->{name, "slug": slug.current}        },        []      )    },  }  }
+// Query: *[_type == "portfolioProject" && slug.current == $slug][0]{    _id,    _type,    "title": coalesce(title, "Untitled"),    "slug": slug.current,    excerpt,    coverImage,    client,    year,    orderRank,    seoTitle,    seoDescription,      "pageBuilder": pageBuilder[]{    ...,    _type == "callToAction" => {      ...,      button {        ...,          link {      ...,        _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }      }      }    },    _type == "infoSection" => {      content[]{        ...,        markDefs[]{          ...,            _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }        }      }    },    _type == "sectionHeading" => {      _type,      _key,      heading    },    _type == "minimalHeader" => {      _type,      _key,      label,      meta,      heading    },    _type == "imageHero" => {      _type,      _key,      "image": image.asset->url,      alt,      subtitle,      index,      heading,      lightPanel    },    _type == "heroSplitImageRight" => {      _type,      _key,      heading,      background,      contentAlignment,      "images": images[] {        "image": image.asset->url,        alt,        caption      }    },    _type == "deviceCropped" => {      _type,      _key,      label,      heading,      mediaType,      cropMode,      image {        image { asset-> { url } },        alt      },      "videoUrl": video.asset->url,      background,      contentAlignment,      items[] {        title,        body      }    },    _type == "contentBlockGrid" => {      _type,      _key,      heading,      intro,      background,      items[] {        title,        body      }    },    _type == "carouselCards" => {      _type,      _key,      background,      items[] {        "image": image.image.asset->url,        "alt": image.alt,        label,        title,        link {          ...,            _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }        }      }    },    _type == "abstractCardsCarousel" => {      _type,      _key,      items[] {        label,        heading,        body,        "image": image.image.asset->url,        "alt": image.alt,        link {          ...,            _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }        }      }    },    _type == "imageCollage" => {      _type,      _key,      background,      "images": images[] {        "image": image.asset->url,        alt      }    },    _type == "imageCollageContent" => {      _type,      _key,      heading,      client,      year,      "descriptions": descriptions[] {        "content": content[] {          ...,          markDefs[] {            ...,              _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }          }        }      },      background,    },    _type == "contentDetails" => {      _type,      _key,      background,      listItemsLabel,      mainContentLabel,      body[] {        ...,        markDefs[] {          ...,            _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }        }      },      items[] {        title      }    },    _type == "bentoGrid" => {      _type,      _key,      background,      "items": items[] {        _key,        _type,        span,        // image fields        "image": image.asset->url,        "imageWidth": image.asset->metadata.dimensions.width,        "imageHeight": image.asset->metadata.dimensions.height,        alt,        overlayText,        overlayPosition,        // text fields        content,        textAlign,        fontSize,        // shared (text + cta)        backgroundColor,        // cta fields        headline,        description,        buttonText,        buttonLink,      }    },    _type == "featuredPosts" => {      _type,      _key,      heading,      intro,      background,      selectionMode,      "resolvedPosts": select(        selectionMode == "tag" => *[_type == "post" && references(^.tag._ref)] | order(date desc) [0...6] {          _id,          title,          "slug": slug.current,          excerpt,          coverImage,          "date": coalesce(date, _updatedAt),          "tags": tags[]->{name, "slug": slug.current}        },        selectionMode == "manual" => posts[]->{          _id,          title,          "slug": slug.current,          excerpt,          coverImage,          "date": coalesce(date, _updatedAt),          "tags": tags[]->{name, "slug": slug.current}        },        []      )    },  }  }
 export type PortfolioProjectQueryResult = {
   _id: string
   _type: 'portfolioProject'
@@ -2153,6 +2389,7 @@ export type PortfolioProjectQueryResult = {
   } | null
   client: string | null
   year: string | null
+  orderRank: string | null
   seoTitle: string | null
   seoDescription: string | null
   pageBuilder: Array<
@@ -2174,6 +2411,70 @@ export type PortfolioProjectQueryResult = {
             openInNewTab?: boolean
           }
         }>
+      }
+    | {
+        _key: string
+        _type: 'bentoGrid'
+        items: Array<
+          | {
+              _key: string
+              _type: 'bentoCta'
+              span: null
+              image: null
+              imageWidth: null
+              imageHeight: null
+              alt: null
+              overlayText: null
+              overlayPosition: null
+              content: null
+              textAlign: null
+              fontSize: null
+              backgroundColor: 'dark' | 'ink' | 'tint' | 'warm' | null
+              headline: string | null
+              description: string | null
+              buttonText: string | null
+              buttonLink: string | null
+            }
+          | {
+              _key: string
+              _type: 'bentoImage'
+              span: null
+              image: string | null
+              imageWidth: number | null
+              imageHeight: number | null
+              alt: string
+              overlayText: string | null
+              overlayPosition: 'bottom' | 'center' | 'top' | null
+              content: null
+              textAlign: null
+              fontSize: null
+              backgroundColor: null
+              headline: null
+              description: null
+              buttonText: null
+              buttonLink: null
+            }
+          | {
+              _key: string
+              _type: 'bentoText'
+              span: null
+              image: null
+              imageWidth: null
+              imageHeight: null
+              alt: null
+              overlayText: null
+              overlayPosition: null
+              content: BlockContentTextOnly
+              textAlign: 'center' | 'left' | 'right' | null
+              fontSize: 'base' | 'lg' | 'sm' | 'xl' | null
+              backgroundColor: 'dark' | 'ink' | 'tint' | 'warm' | null
+              headline: null
+              description: null
+              buttonText: null
+              buttonLink: null
+            }
+        >
+        background: 'gradient' | 'none' | 'tile' | 'tint' | null
       }
     | {
         _key: string
@@ -2310,6 +2611,23 @@ export type PortfolioProjectQueryResult = {
       }
     | {
         _key: string
+        _type: 'imageHero'
+        image: string | null
+        alt: string
+        subtitle: string | null
+        index: string | null
+        heading: string | null
+        lightPanel: boolean | null
+      }
+    | {
+        _key: string
+        _type: 'minimalHeader'
+        label: string | null
+        meta: string | null
+        heading: string | null
+      }
+    | {
+        _key: string
         _type: 'pageHeader'
         heading: Array<{
           children?: Array<{
@@ -2360,6 +2678,20 @@ export type PortfolioProjectQueryResult = {
 } | null
 
 // Source: sanity/lib/queries.ts
+// Variable: adjacentPortfolioProjectsQuery
+// Query: {    "prev": *[_type == "portfolioProject" && defined(slug.current) && _id != $id && orderRank < $orderRank] | order(orderRank desc) [0] {      "title": coalesce(title, "Untitled"),      "slug": slug.current    },    "next": *[_type == "portfolioProject" && defined(slug.current) && _id != $id && orderRank > $orderRank] | order(orderRank asc) [0] {      "title": coalesce(title, "Untitled"),      "slug": slug.current    }  }
+export type AdjacentPortfolioProjectsQueryResult = {
+  prev: {
+    title: string
+    slug: string
+  } | null
+  next: {
+    title: string
+    slug: string
+  } | null
+}
+
+// Source: sanity/lib/queries.ts
 // Variable: portfolioProjectPagesSlugs
 // Query: *[_type == "portfolioProject" && defined(slug.current)]  {"slug": slug.current}
 export type PortfolioProjectPagesSlugsResult = Array<{
@@ -2386,8 +2718,8 @@ import '@sanity/client'
 declare module '@sanity/client' {
   interface SanityQueries {
     '*[_type == "settings"][0]': SettingsQueryResult
-    '\n  *[_type == "homepage"][0]{\n    _id,\n    _type,\n    seoTitle,\n    seoDescription,\n    \n  "pageBuilder": pageBuilder[]{\n    ...,\n    _type == "callToAction" => {\n      ...,\n      button {\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n      }\n\n      }\n    },\n    _type == "infoSection" => {\n      content[]{\n        ...,\n        markDefs[]{\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      }\n    },\n    _type == "sectionHeading" => {\n      _type,\n      _key,\n      heading\n    },\n    _type == "minimalHeader" => {\n      _type,\n      _key,\n      label,\n      meta,\n      heading\n    },\n    _type == "heroSplitImageRight" => {\n      _type,\n      _key,\n      heading,\n      background,\n      contentAlignment,\n      "images": images[] {\n        "image": image.asset->url,\n        alt,\n        caption\n      }\n    },\n    _type == "deviceCropped" => {\n      _type,\n      _key,\n      label,\n      heading,\n      mediaType,\n      cropMode,\n      image {\n        image { asset-> { url } },\n        alt\n      },\n      "videoUrl": video.asset->url,\n      background,\n      contentAlignment,\n      items[] {\n        title,\n        body\n      }\n    },\n    _type == "contentBlockGrid" => {\n      _type,\n      _key,\n      heading,\n      intro,\n      background,\n      items[] {\n        title,\n        body\n      }\n    },\n    _type == "carouselCards" => {\n      _type,\n      _key,\n      background,\n      items[] {\n        "image": image.image.asset->url,\n        "alt": image.alt,\n        label,\n        title,\n        link {\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      }\n    },\n    _type == "abstractCardsCarousel" => {\n      _type,\n      _key,\n      items[] {\n        label,\n        heading,\n        body,\n        "image": image.image.asset->url,\n        "alt": image.alt,\n        link {\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      }\n    },\n    _type == "imageCollage" => {\n      _type,\n      _key,\n      background,\n      "images": images[] {\n        "image": image.asset->url,\n        alt\n      }\n    },\n    _type == "imageCollageContent" => {\n      _type,\n      _key,\n      heading,\n      client,\n      year,\n      "descriptions": descriptions[] {\n        "content": content[] {\n          ...,\n          markDefs[] {\n            ...,\n            \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n          }\n        }\n      },\n      background,\n    },\n    _type == "contentDetails" => {\n      _type,\n      _key,\n      background,\n      listItemsLabel,\n      mainContentLabel,\n      body[] {\n        ...,\n        markDefs[] {\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      },\n      items[] {\n        title\n      }\n    },\n    _type == "featuredPosts" => {\n      _type,\n      _key,\n      heading,\n      intro,\n      background,\n      selectionMode,\n      "resolvedPosts": select(\n        selectionMode == "tag" => *[_type == "post" && references(^.tag._ref)] | order(date desc) [0...6] {\n          _id,\n          title,\n          "slug": slug.current,\n          excerpt,\n          coverImage,\n          "date": coalesce(date, _updatedAt),\n          "tags": tags[]->{name, "slug": slug.current}\n        },\n        selectionMode == "manual" => posts[]->{\n          _id,\n          title,\n          "slug": slug.current,\n          excerpt,\n          coverImage,\n          "date": coalesce(date, _updatedAt),\n          "tags": tags[]->{name, "slug": slug.current}\n        },\n        []\n      )\n    },\n  }\n\n  }\n': HomepageQueryResult
-    '\n  *[_type == \'page\' && slug.current == $slug][0]{\n    _id,\n    _type,\n    name,\n    slug,\n    heading,\n    subheading,\n    \n  "pageBuilder": pageBuilder[]{\n    ...,\n    _type == "callToAction" => {\n      ...,\n      button {\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n      }\n\n      }\n    },\n    _type == "infoSection" => {\n      content[]{\n        ...,\n        markDefs[]{\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      }\n    },\n    _type == "sectionHeading" => {\n      _type,\n      _key,\n      heading\n    },\n    _type == "minimalHeader" => {\n      _type,\n      _key,\n      label,\n      meta,\n      heading\n    },\n    _type == "heroSplitImageRight" => {\n      _type,\n      _key,\n      heading,\n      background,\n      contentAlignment,\n      "images": images[] {\n        "image": image.asset->url,\n        alt,\n        caption\n      }\n    },\n    _type == "deviceCropped" => {\n      _type,\n      _key,\n      label,\n      heading,\n      mediaType,\n      cropMode,\n      image {\n        image { asset-> { url } },\n        alt\n      },\n      "videoUrl": video.asset->url,\n      background,\n      contentAlignment,\n      items[] {\n        title,\n        body\n      }\n    },\n    _type == "contentBlockGrid" => {\n      _type,\n      _key,\n      heading,\n      intro,\n      background,\n      items[] {\n        title,\n        body\n      }\n    },\n    _type == "carouselCards" => {\n      _type,\n      _key,\n      background,\n      items[] {\n        "image": image.image.asset->url,\n        "alt": image.alt,\n        label,\n        title,\n        link {\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      }\n    },\n    _type == "abstractCardsCarousel" => {\n      _type,\n      _key,\n      items[] {\n        label,\n        heading,\n        body,\n        "image": image.image.asset->url,\n        "alt": image.alt,\n        link {\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      }\n    },\n    _type == "imageCollage" => {\n      _type,\n      _key,\n      background,\n      "images": images[] {\n        "image": image.asset->url,\n        alt\n      }\n    },\n    _type == "imageCollageContent" => {\n      _type,\n      _key,\n      heading,\n      client,\n      year,\n      "descriptions": descriptions[] {\n        "content": content[] {\n          ...,\n          markDefs[] {\n            ...,\n            \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n          }\n        }\n      },\n      background,\n    },\n    _type == "contentDetails" => {\n      _type,\n      _key,\n      background,\n      listItemsLabel,\n      mainContentLabel,\n      body[] {\n        ...,\n        markDefs[] {\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      },\n      items[] {\n        title\n      }\n    },\n    _type == "featuredPosts" => {\n      _type,\n      _key,\n      heading,\n      intro,\n      background,\n      selectionMode,\n      "resolvedPosts": select(\n        selectionMode == "tag" => *[_type == "post" && references(^.tag._ref)] | order(date desc) [0...6] {\n          _id,\n          title,\n          "slug": slug.current,\n          excerpt,\n          coverImage,\n          "date": coalesce(date, _updatedAt),\n          "tags": tags[]->{name, "slug": slug.current}\n        },\n        selectionMode == "manual" => posts[]->{\n          _id,\n          title,\n          "slug": slug.current,\n          excerpt,\n          coverImage,\n          "date": coalesce(date, _updatedAt),\n          "tags": tags[]->{name, "slug": slug.current}\n        },\n        []\n      )\n    },\n  }\n\n  }\n': GetPageQueryResult
+    '\n  *[_type == "homepage"][0]{\n    _id,\n    _type,\n    seoTitle,\n    seoDescription,\n    \n  "pageBuilder": pageBuilder[]{\n    ...,\n    _type == "callToAction" => {\n      ...,\n      button {\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n      }\n\n      }\n    },\n    _type == "infoSection" => {\n      content[]{\n        ...,\n        markDefs[]{\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      }\n    },\n    _type == "sectionHeading" => {\n      _type,\n      _key,\n      heading\n    },\n    _type == "minimalHeader" => {\n      _type,\n      _key,\n      label,\n      meta,\n      heading\n    },\n    _type == "imageHero" => {\n      _type,\n      _key,\n      "image": image.asset->url,\n      alt,\n      subtitle,\n      index,\n      heading,\n      lightPanel\n    },\n    _type == "heroSplitImageRight" => {\n      _type,\n      _key,\n      heading,\n      background,\n      contentAlignment,\n      "images": images[] {\n        "image": image.asset->url,\n        alt,\n        caption\n      }\n    },\n    _type == "deviceCropped" => {\n      _type,\n      _key,\n      label,\n      heading,\n      mediaType,\n      cropMode,\n      image {\n        image { asset-> { url } },\n        alt\n      },\n      "videoUrl": video.asset->url,\n      background,\n      contentAlignment,\n      items[] {\n        title,\n        body\n      }\n    },\n    _type == "contentBlockGrid" => {\n      _type,\n      _key,\n      heading,\n      intro,\n      background,\n      items[] {\n        title,\n        body\n      }\n    },\n    _type == "carouselCards" => {\n      _type,\n      _key,\n      background,\n      items[] {\n        "image": image.image.asset->url,\n        "alt": image.alt,\n        label,\n        title,\n        link {\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      }\n    },\n    _type == "abstractCardsCarousel" => {\n      _type,\n      _key,\n      items[] {\n        label,\n        heading,\n        body,\n        "image": image.image.asset->url,\n        "alt": image.alt,\n        link {\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      }\n    },\n    _type == "imageCollage" => {\n      _type,\n      _key,\n      background,\n      "images": images[] {\n        "image": image.asset->url,\n        alt\n      }\n    },\n    _type == "imageCollageContent" => {\n      _type,\n      _key,\n      heading,\n      client,\n      year,\n      "descriptions": descriptions[] {\n        "content": content[] {\n          ...,\n          markDefs[] {\n            ...,\n            \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n          }\n        }\n      },\n      background,\n    },\n    _type == "contentDetails" => {\n      _type,\n      _key,\n      background,\n      listItemsLabel,\n      mainContentLabel,\n      body[] {\n        ...,\n        markDefs[] {\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      },\n      items[] {\n        title\n      }\n    },\n    _type == "bentoGrid" => {\n      _type,\n      _key,\n      background,\n      "items": items[] {\n        _key,\n        _type,\n        span,\n        // image fields\n        "image": image.asset->url,\n        "imageWidth": image.asset->metadata.dimensions.width,\n        "imageHeight": image.asset->metadata.dimensions.height,\n        alt,\n        overlayText,\n        overlayPosition,\n        // text fields\n        content,\n        textAlign,\n        fontSize,\n        // shared (text + cta)\n        backgroundColor,\n        // cta fields\n        headline,\n        description,\n        buttonText,\n        buttonLink,\n      }\n    },\n    _type == "featuredPosts" => {\n      _type,\n      _key,\n      heading,\n      intro,\n      background,\n      selectionMode,\n      "resolvedPosts": select(\n        selectionMode == "tag" => *[_type == "post" && references(^.tag._ref)] | order(date desc) [0...6] {\n          _id,\n          title,\n          "slug": slug.current,\n          excerpt,\n          coverImage,\n          "date": coalesce(date, _updatedAt),\n          "tags": tags[]->{name, "slug": slug.current}\n        },\n        selectionMode == "manual" => posts[]->{\n          _id,\n          title,\n          "slug": slug.current,\n          excerpt,\n          coverImage,\n          "date": coalesce(date, _updatedAt),\n          "tags": tags[]->{name, "slug": slug.current}\n        },\n        []\n      )\n    },\n  }\n\n  }\n': HomepageQueryResult
+    '\n  *[_type == \'page\' && slug.current == $slug][0]{\n    _id,\n    _type,\n    name,\n    slug,\n    heading,\n    subheading,\n    \n  "pageBuilder": pageBuilder[]{\n    ...,\n    _type == "callToAction" => {\n      ...,\n      button {\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n      }\n\n      }\n    },\n    _type == "infoSection" => {\n      content[]{\n        ...,\n        markDefs[]{\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      }\n    },\n    _type == "sectionHeading" => {\n      _type,\n      _key,\n      heading\n    },\n    _type == "minimalHeader" => {\n      _type,\n      _key,\n      label,\n      meta,\n      heading\n    },\n    _type == "imageHero" => {\n      _type,\n      _key,\n      "image": image.asset->url,\n      alt,\n      subtitle,\n      index,\n      heading,\n      lightPanel\n    },\n    _type == "heroSplitImageRight" => {\n      _type,\n      _key,\n      heading,\n      background,\n      contentAlignment,\n      "images": images[] {\n        "image": image.asset->url,\n        alt,\n        caption\n      }\n    },\n    _type == "deviceCropped" => {\n      _type,\n      _key,\n      label,\n      heading,\n      mediaType,\n      cropMode,\n      image {\n        image { asset-> { url } },\n        alt\n      },\n      "videoUrl": video.asset->url,\n      background,\n      contentAlignment,\n      items[] {\n        title,\n        body\n      }\n    },\n    _type == "contentBlockGrid" => {\n      _type,\n      _key,\n      heading,\n      intro,\n      background,\n      items[] {\n        title,\n        body\n      }\n    },\n    _type == "carouselCards" => {\n      _type,\n      _key,\n      background,\n      items[] {\n        "image": image.image.asset->url,\n        "alt": image.alt,\n        label,\n        title,\n        link {\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      }\n    },\n    _type == "abstractCardsCarousel" => {\n      _type,\n      _key,\n      items[] {\n        label,\n        heading,\n        body,\n        "image": image.image.asset->url,\n        "alt": image.alt,\n        link {\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      }\n    },\n    _type == "imageCollage" => {\n      _type,\n      _key,\n      background,\n      "images": images[] {\n        "image": image.asset->url,\n        alt\n      }\n    },\n    _type == "imageCollageContent" => {\n      _type,\n      _key,\n      heading,\n      client,\n      year,\n      "descriptions": descriptions[] {\n        "content": content[] {\n          ...,\n          markDefs[] {\n            ...,\n            \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n          }\n        }\n      },\n      background,\n    },\n    _type == "contentDetails" => {\n      _type,\n      _key,\n      background,\n      listItemsLabel,\n      mainContentLabel,\n      body[] {\n        ...,\n        markDefs[] {\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      },\n      items[] {\n        title\n      }\n    },\n    _type == "bentoGrid" => {\n      _type,\n      _key,\n      background,\n      "items": items[] {\n        _key,\n        _type,\n        span,\n        // image fields\n        "image": image.asset->url,\n        "imageWidth": image.asset->metadata.dimensions.width,\n        "imageHeight": image.asset->metadata.dimensions.height,\n        alt,\n        overlayText,\n        overlayPosition,\n        // text fields\n        content,\n        textAlign,\n        fontSize,\n        // shared (text + cta)\n        backgroundColor,\n        // cta fields\n        headline,\n        description,\n        buttonText,\n        buttonLink,\n      }\n    },\n    _type == "featuredPosts" => {\n      _type,\n      _key,\n      heading,\n      intro,\n      background,\n      selectionMode,\n      "resolvedPosts": select(\n        selectionMode == "tag" => *[_type == "post" && references(^.tag._ref)] | order(date desc) [0...6] {\n          _id,\n          title,\n          "slug": slug.current,\n          excerpt,\n          coverImage,\n          "date": coalesce(date, _updatedAt),\n          "tags": tags[]->{name, "slug": slug.current}\n        },\n        selectionMode == "manual" => posts[]->{\n          _id,\n          title,\n          "slug": slug.current,\n          excerpt,\n          coverImage,\n          "date": coalesce(date, _updatedAt),\n          "tags": tags[]->{name, "slug": slug.current}\n        },\n        []\n      )\n    },\n  }\n\n  }\n': GetPageQueryResult
     '\n  *[_type == "page" || _type == "post" && defined(slug.current)] | order(_type asc) {\n    "slug": slug.current,\n    _type,\n    _updatedAt,\n  }\n': SitemapDataResult
     '\n  *[_type == "post" && defined(slug.current)] | order(date desc, _updatedAt desc) {\n    \n  _id,\n  "status": select(_originalId in path("drafts.**") => "draft", "published"),\n  "title": coalesce(title, "Untitled"),\n  "slug": slug.current,\n  excerpt,\n  coverImage,\n  "date": coalesce(date, _updatedAt),\n  "author": author->{firstName, lastName, picture},\n\n  }\n': AllPostsQueryResult
     '\n  *[_type == "post" && _id != $skip && defined(slug.current)] | order(date desc, _updatedAt desc) [0...$limit] {\n    \n  _id,\n  "status": select(_originalId in path("drafts.**") => "draft", "published"),\n  "title": coalesce(title, "Untitled"),\n  "slug": slug.current,\n  excerpt,\n  coverImage,\n  "date": coalesce(date, _updatedAt),\n  "tags": tags[]->{name, "slug": slug.current}\n\n  }\n': MorePostsQueryResult
@@ -2398,12 +2730,13 @@ declare module '@sanity/client' {
     '\n  *[_type == "post" && defined(slug.current)] | order(date desc, _updatedAt desc) {\n    \n  _id,\n  "status": select(_originalId in path("drafts.**") => "draft", "published"),\n  "title": coalesce(title, "Untitled"),\n  "slug": slug.current,\n  excerpt,\n  coverImage,\n  "date": coalesce(date, _updatedAt),\n  "tags": tags[]->{name, "slug": slug.current}\n\n  }\n': AllPostsWithTagsQueryResult
     '\n  *[_type == "post" && defined(slug.current) && $tag in tags[]->slug.current] | order(date desc, _updatedAt desc) {\n    \n  _id,\n  "status": select(_originalId in path("drafts.**") => "draft", "published"),\n  "title": coalesce(title, "Untitled"),\n  "slug": slug.current,\n  excerpt,\n  coverImage,\n  "date": coalesce(date, _updatedAt),\n  "tags": tags[]->{name, "slug": slug.current}\n\n  }\n': PostsByTagQueryResult
     '\n  {\n    "prev": *[_type == "post" && defined(slug.current) && _id != $id && coalesce(date, _updatedAt) < $date] | order(date desc, _updatedAt desc) [0] {\n      title,\n      "slug": slug.current,\n      coverImage\n    },\n    "next": *[_type == "post" && defined(slug.current) && _id != $id && coalesce(date, _updatedAt) > $date] | order(date asc, _updatedAt asc) [0] {\n      title,\n      "slug": slug.current,\n      coverImage\n    }\n  }\n': AdjacentPostsQueryResult
-    '\n  *[_type == "portfolioOverview"][0]{\n    _id,\n    _type,\n    passwordProtected,\n    seoTitle,\n    seoDescription,\n    \n  "pageBuilder": pageBuilder[]{\n    ...,\n    _type == "callToAction" => {\n      ...,\n      button {\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n      }\n\n      }\n    },\n    _type == "infoSection" => {\n      content[]{\n        ...,\n        markDefs[]{\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      }\n    },\n    _type == "sectionHeading" => {\n      _type,\n      _key,\n      heading\n    },\n    _type == "minimalHeader" => {\n      _type,\n      _key,\n      label,\n      meta,\n      heading\n    },\n    _type == "heroSplitImageRight" => {\n      _type,\n      _key,\n      heading,\n      background,\n      contentAlignment,\n      "images": images[] {\n        "image": image.asset->url,\n        alt,\n        caption\n      }\n    },\n    _type == "deviceCropped" => {\n      _type,\n      _key,\n      label,\n      heading,\n      mediaType,\n      cropMode,\n      image {\n        image { asset-> { url } },\n        alt\n      },\n      "videoUrl": video.asset->url,\n      background,\n      contentAlignment,\n      items[] {\n        title,\n        body\n      }\n    },\n    _type == "contentBlockGrid" => {\n      _type,\n      _key,\n      heading,\n      intro,\n      background,\n      items[] {\n        title,\n        body\n      }\n    },\n    _type == "carouselCards" => {\n      _type,\n      _key,\n      background,\n      items[] {\n        "image": image.image.asset->url,\n        "alt": image.alt,\n        label,\n        title,\n        link {\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      }\n    },\n    _type == "abstractCardsCarousel" => {\n      _type,\n      _key,\n      items[] {\n        label,\n        heading,\n        body,\n        "image": image.image.asset->url,\n        "alt": image.alt,\n        link {\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      }\n    },\n    _type == "imageCollage" => {\n      _type,\n      _key,\n      background,\n      "images": images[] {\n        "image": image.asset->url,\n        alt\n      }\n    },\n    _type == "imageCollageContent" => {\n      _type,\n      _key,\n      heading,\n      client,\n      year,\n      "descriptions": descriptions[] {\n        "content": content[] {\n          ...,\n          markDefs[] {\n            ...,\n            \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n          }\n        }\n      },\n      background,\n    },\n    _type == "contentDetails" => {\n      _type,\n      _key,\n      background,\n      listItemsLabel,\n      mainContentLabel,\n      body[] {\n        ...,\n        markDefs[] {\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      },\n      items[] {\n        title\n      }\n    },\n    _type == "featuredPosts" => {\n      _type,\n      _key,\n      heading,\n      intro,\n      background,\n      selectionMode,\n      "resolvedPosts": select(\n        selectionMode == "tag" => *[_type == "post" && references(^.tag._ref)] | order(date desc) [0...6] {\n          _id,\n          title,\n          "slug": slug.current,\n          excerpt,\n          coverImage,\n          "date": coalesce(date, _updatedAt),\n          "tags": tags[]->{name, "slug": slug.current}\n        },\n        selectionMode == "manual" => posts[]->{\n          _id,\n          title,\n          "slug": slug.current,\n          excerpt,\n          coverImage,\n          "date": coalesce(date, _updatedAt),\n          "tags": tags[]->{name, "slug": slug.current}\n        },\n        []\n      )\n    },\n  }\n\n  }\n': PortfolioOverviewQueryResult
+    '\n  *[_type == "portfolioOverview"][0]{\n    _id,\n    _type,\n    passwordProtected,\n    seoTitle,\n    seoDescription,\n    \n  "pageBuilder": pageBuilder[]{\n    ...,\n    _type == "callToAction" => {\n      ...,\n      button {\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n      }\n\n      }\n    },\n    _type == "infoSection" => {\n      content[]{\n        ...,\n        markDefs[]{\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      }\n    },\n    _type == "sectionHeading" => {\n      _type,\n      _key,\n      heading\n    },\n    _type == "minimalHeader" => {\n      _type,\n      _key,\n      label,\n      meta,\n      heading\n    },\n    _type == "imageHero" => {\n      _type,\n      _key,\n      "image": image.asset->url,\n      alt,\n      subtitle,\n      index,\n      heading,\n      lightPanel\n    },\n    _type == "heroSplitImageRight" => {\n      _type,\n      _key,\n      heading,\n      background,\n      contentAlignment,\n      "images": images[] {\n        "image": image.asset->url,\n        alt,\n        caption\n      }\n    },\n    _type == "deviceCropped" => {\n      _type,\n      _key,\n      label,\n      heading,\n      mediaType,\n      cropMode,\n      image {\n        image { asset-> { url } },\n        alt\n      },\n      "videoUrl": video.asset->url,\n      background,\n      contentAlignment,\n      items[] {\n        title,\n        body\n      }\n    },\n    _type == "contentBlockGrid" => {\n      _type,\n      _key,\n      heading,\n      intro,\n      background,\n      items[] {\n        title,\n        body\n      }\n    },\n    _type == "carouselCards" => {\n      _type,\n      _key,\n      background,\n      items[] {\n        "image": image.image.asset->url,\n        "alt": image.alt,\n        label,\n        title,\n        link {\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      }\n    },\n    _type == "abstractCardsCarousel" => {\n      _type,\n      _key,\n      items[] {\n        label,\n        heading,\n        body,\n        "image": image.image.asset->url,\n        "alt": image.alt,\n        link {\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      }\n    },\n    _type == "imageCollage" => {\n      _type,\n      _key,\n      background,\n      "images": images[] {\n        "image": image.asset->url,\n        alt\n      }\n    },\n    _type == "imageCollageContent" => {\n      _type,\n      _key,\n      heading,\n      client,\n      year,\n      "descriptions": descriptions[] {\n        "content": content[] {\n          ...,\n          markDefs[] {\n            ...,\n            \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n          }\n        }\n      },\n      background,\n    },\n    _type == "contentDetails" => {\n      _type,\n      _key,\n      background,\n      listItemsLabel,\n      mainContentLabel,\n      body[] {\n        ...,\n        markDefs[] {\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      },\n      items[] {\n        title\n      }\n    },\n    _type == "bentoGrid" => {\n      _type,\n      _key,\n      background,\n      "items": items[] {\n        _key,\n        _type,\n        span,\n        // image fields\n        "image": image.asset->url,\n        "imageWidth": image.asset->metadata.dimensions.width,\n        "imageHeight": image.asset->metadata.dimensions.height,\n        alt,\n        overlayText,\n        overlayPosition,\n        // text fields\n        content,\n        textAlign,\n        fontSize,\n        // shared (text + cta)\n        backgroundColor,\n        // cta fields\n        headline,\n        description,\n        buttonText,\n        buttonLink,\n      }\n    },\n    _type == "featuredPosts" => {\n      _type,\n      _key,\n      heading,\n      intro,\n      background,\n      selectionMode,\n      "resolvedPosts": select(\n        selectionMode == "tag" => *[_type == "post" && references(^.tag._ref)] | order(date desc) [0...6] {\n          _id,\n          title,\n          "slug": slug.current,\n          excerpt,\n          coverImage,\n          "date": coalesce(date, _updatedAt),\n          "tags": tags[]->{name, "slug": slug.current}\n        },\n        selectionMode == "manual" => posts[]->{\n          _id,\n          title,\n          "slug": slug.current,\n          excerpt,\n          coverImage,\n          "date": coalesce(date, _updatedAt),\n          "tags": tags[]->{name, "slug": slug.current}\n        },\n        []\n      )\n    },\n  }\n\n  }\n': PortfolioOverviewQueryResult
     '\n  *[_type == "portfolioOverview"][0]{passwordProtected}\n': PortfolioProtectionQueryResult
     '\n  *[_type == "portfolioTag"] | order(name asc) {\n    name,\n    "slug": slug.current\n  }\n': AllPortfolioTagsQueryResult
     '\n  *[_type == "portfolioProject" && defined(slug.current)] | order(orderRank asc) {\n    \n  _id,\n  "status": select(_originalId in path("drafts.**") => "draft", "published"),\n  "title": coalesce(title, "Untitled"),\n  "slug": slug.current,\n  excerpt,\n  coverImage,\n  client,\n  year,\n  "tags": tags[]->{name, "slug": slug.current}\n\n  }\n': AllPortfolioProjectsQueryResult
     '\n  *[_type == "portfolioProject" && defined(slug.current) && $tag in tags[]->slug.current] | order(orderRank asc) {\n    \n  _id,\n  "status": select(_originalId in path("drafts.**") => "draft", "published"),\n  "title": coalesce(title, "Untitled"),\n  "slug": slug.current,\n  excerpt,\n  coverImage,\n  client,\n  year,\n  "tags": tags[]->{name, "slug": slug.current}\n\n  }\n': PortfolioProjectsByTagQueryResult
-    '\n  *[_type == "portfolioProject" && slug.current == $slug][0]{\n    _id,\n    _type,\n    "title": coalesce(title, "Untitled"),\n    "slug": slug.current,\n    excerpt,\n    coverImage,\n    client,\n    year,\n    seoTitle,\n    seoDescription,\n    \n  "pageBuilder": pageBuilder[]{\n    ...,\n    _type == "callToAction" => {\n      ...,\n      button {\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n      }\n\n      }\n    },\n    _type == "infoSection" => {\n      content[]{\n        ...,\n        markDefs[]{\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      }\n    },\n    _type == "sectionHeading" => {\n      _type,\n      _key,\n      heading\n    },\n    _type == "minimalHeader" => {\n      _type,\n      _key,\n      label,\n      meta,\n      heading\n    },\n    _type == "heroSplitImageRight" => {\n      _type,\n      _key,\n      heading,\n      background,\n      contentAlignment,\n      "images": images[] {\n        "image": image.asset->url,\n        alt,\n        caption\n      }\n    },\n    _type == "deviceCropped" => {\n      _type,\n      _key,\n      label,\n      heading,\n      mediaType,\n      cropMode,\n      image {\n        image { asset-> { url } },\n        alt\n      },\n      "videoUrl": video.asset->url,\n      background,\n      contentAlignment,\n      items[] {\n        title,\n        body\n      }\n    },\n    _type == "contentBlockGrid" => {\n      _type,\n      _key,\n      heading,\n      intro,\n      background,\n      items[] {\n        title,\n        body\n      }\n    },\n    _type == "carouselCards" => {\n      _type,\n      _key,\n      background,\n      items[] {\n        "image": image.image.asset->url,\n        "alt": image.alt,\n        label,\n        title,\n        link {\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      }\n    },\n    _type == "abstractCardsCarousel" => {\n      _type,\n      _key,\n      items[] {\n        label,\n        heading,\n        body,\n        "image": image.image.asset->url,\n        "alt": image.alt,\n        link {\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      }\n    },\n    _type == "imageCollage" => {\n      _type,\n      _key,\n      background,\n      "images": images[] {\n        "image": image.asset->url,\n        alt\n      }\n    },\n    _type == "imageCollageContent" => {\n      _type,\n      _key,\n      heading,\n      client,\n      year,\n      "descriptions": descriptions[] {\n        "content": content[] {\n          ...,\n          markDefs[] {\n            ...,\n            \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n          }\n        }\n      },\n      background,\n    },\n    _type == "contentDetails" => {\n      _type,\n      _key,\n      background,\n      listItemsLabel,\n      mainContentLabel,\n      body[] {\n        ...,\n        markDefs[] {\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      },\n      items[] {\n        title\n      }\n    },\n    _type == "featuredPosts" => {\n      _type,\n      _key,\n      heading,\n      intro,\n      background,\n      selectionMode,\n      "resolvedPosts": select(\n        selectionMode == "tag" => *[_type == "post" && references(^.tag._ref)] | order(date desc) [0...6] {\n          _id,\n          title,\n          "slug": slug.current,\n          excerpt,\n          coverImage,\n          "date": coalesce(date, _updatedAt),\n          "tags": tags[]->{name, "slug": slug.current}\n        },\n        selectionMode == "manual" => posts[]->{\n          _id,\n          title,\n          "slug": slug.current,\n          excerpt,\n          coverImage,\n          "date": coalesce(date, _updatedAt),\n          "tags": tags[]->{name, "slug": slug.current}\n        },\n        []\n      )\n    },\n  }\n\n  }\n': PortfolioProjectQueryResult
+    '\n  *[_type == "portfolioProject" && slug.current == $slug][0]{\n    _id,\n    _type,\n    "title": coalesce(title, "Untitled"),\n    "slug": slug.current,\n    excerpt,\n    coverImage,\n    client,\n    year,\n    orderRank,\n    seoTitle,\n    seoDescription,\n    \n  "pageBuilder": pageBuilder[]{\n    ...,\n    _type == "callToAction" => {\n      ...,\n      button {\n        ...,\n        \n  link {\n      ...,\n      \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n      }\n\n      }\n    },\n    _type == "infoSection" => {\n      content[]{\n        ...,\n        markDefs[]{\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      }\n    },\n    _type == "sectionHeading" => {\n      _type,\n      _key,\n      heading\n    },\n    _type == "minimalHeader" => {\n      _type,\n      _key,\n      label,\n      meta,\n      heading\n    },\n    _type == "imageHero" => {\n      _type,\n      _key,\n      "image": image.asset->url,\n      alt,\n      subtitle,\n      index,\n      heading,\n      lightPanel\n    },\n    _type == "heroSplitImageRight" => {\n      _type,\n      _key,\n      heading,\n      background,\n      contentAlignment,\n      "images": images[] {\n        "image": image.asset->url,\n        alt,\n        caption\n      }\n    },\n    _type == "deviceCropped" => {\n      _type,\n      _key,\n      label,\n      heading,\n      mediaType,\n      cropMode,\n      image {\n        image { asset-> { url } },\n        alt\n      },\n      "videoUrl": video.asset->url,\n      background,\n      contentAlignment,\n      items[] {\n        title,\n        body\n      }\n    },\n    _type == "contentBlockGrid" => {\n      _type,\n      _key,\n      heading,\n      intro,\n      background,\n      items[] {\n        title,\n        body\n      }\n    },\n    _type == "carouselCards" => {\n      _type,\n      _key,\n      background,\n      items[] {\n        "image": image.image.asset->url,\n        "alt": image.alt,\n        label,\n        title,\n        link {\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      }\n    },\n    _type == "abstractCardsCarousel" => {\n      _type,\n      _key,\n      items[] {\n        label,\n        heading,\n        body,\n        "image": image.image.asset->url,\n        "alt": image.alt,\n        link {\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      }\n    },\n    _type == "imageCollage" => {\n      _type,\n      _key,\n      background,\n      "images": images[] {\n        "image": image.asset->url,\n        alt\n      }\n    },\n    _type == "imageCollageContent" => {\n      _type,\n      _key,\n      heading,\n      client,\n      year,\n      "descriptions": descriptions[] {\n        "content": content[] {\n          ...,\n          markDefs[] {\n            ...,\n            \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n          }\n        }\n      },\n      background,\n    },\n    _type == "contentDetails" => {\n      _type,\n      _key,\n      background,\n      listItemsLabel,\n      mainContentLabel,\n      body[] {\n        ...,\n        markDefs[] {\n          ...,\n          \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n        }\n      },\n      items[] {\n        title\n      }\n    },\n    _type == "bentoGrid" => {\n      _type,\n      _key,\n      background,\n      "items": items[] {\n        _key,\n        _type,\n        span,\n        // image fields\n        "image": image.asset->url,\n        "imageWidth": image.asset->metadata.dimensions.width,\n        "imageHeight": image.asset->metadata.dimensions.height,\n        alt,\n        overlayText,\n        overlayPosition,\n        // text fields\n        content,\n        textAlign,\n        fontSize,\n        // shared (text + cta)\n        backgroundColor,\n        // cta fields\n        headline,\n        description,\n        buttonText,\n        buttonLink,\n      }\n    },\n    _type == "featuredPosts" => {\n      _type,\n      _key,\n      heading,\n      intro,\n      background,\n      selectionMode,\n      "resolvedPosts": select(\n        selectionMode == "tag" => *[_type == "post" && references(^.tag._ref)] | order(date desc) [0...6] {\n          _id,\n          title,\n          "slug": slug.current,\n          excerpt,\n          coverImage,\n          "date": coalesce(date, _updatedAt),\n          "tags": tags[]->{name, "slug": slug.current}\n        },\n        selectionMode == "manual" => posts[]->{\n          _id,\n          title,\n          "slug": slug.current,\n          excerpt,\n          coverImage,\n          "date": coalesce(date, _updatedAt),\n          "tags": tags[]->{name, "slug": slug.current}\n        },\n        []\n      )\n    },\n  }\n\n  }\n': PortfolioProjectQueryResult
+    '\n  {\n    "prev": *[_type == "portfolioProject" && defined(slug.current) && _id != $id && orderRank < $orderRank] | order(orderRank desc) [0] {\n      "title": coalesce(title, "Untitled"),\n      "slug": slug.current\n    },\n    "next": *[_type == "portfolioProject" && defined(slug.current) && _id != $id && orderRank > $orderRank] | order(orderRank asc) [0] {\n      "title": coalesce(title, "Untitled"),\n      "slug": slug.current\n    }\n  }\n': AdjacentPortfolioProjectsQueryResult
     '\n  *[_type == "portfolioProject" && defined(slug.current)]\n  {"slug": slug.current}\n': PortfolioProjectPagesSlugsResult
     '\n  *[_id == "navigation"][0]{\n    "links": links[visible != false]{\n      label,\n      url\n    }\n  }\n': NAVIGATION_QUERY_RESULT
   }
