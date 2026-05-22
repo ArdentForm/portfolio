@@ -1,17 +1,27 @@
 import { defineField, defineType } from 'sanity'
 import { ComponentIcon, ControlsIcon, ImageIcon, DocumentTextIcon, LinkIcon } from '@sanity/icons'
 
+const enabledField = defineField({
+  name: 'enabled',
+  title: 'Visible',
+  type: 'boolean',
+  initialValue: true,
+  description: 'Toggle off to hide this item from the grid without deleting it',
+})
+
+// Only shown when displayStyle === 'card' (or when the tile type has no displayStyle field).
+// Hidden for naked/hairline tiles since background has no effect on transparent surfaces.
 const backgroundColorField = defineField({
   name: 'backgroundColor',
   title: 'Background',
   type: 'string',
-  initialValue: 'warm',
+  initialValue: 'base',
+  hidden: ({ parent }) => parent?.displayStyle === 'naked' || parent?.displayStyle === 'hairline',
   options: {
     list: [
-      { title: 'Warm white', value: 'warm' },
-      { title: 'Tint', value: 'tint' },
-      { title: 'Dark', value: 'dark' },
-      { title: 'Ink', value: 'ink' },
+      { title: 'Base', value: 'base' },
+      { title: 'Reverse', value: 'reverse' },
+      { title: 'Brand', value: 'brand' },
     ],
     layout: 'radio',
   },
@@ -41,6 +51,7 @@ export default defineType({
           type: 'object',
           icon: ImageIcon,
           fields: [
+            enabledField,
             defineField({
               name: 'image',
               title: 'Image',
@@ -55,31 +66,20 @@ export default defineType({
               validation: (Rule) => Rule.required(),
             }),
             defineField({
-              name: 'overlayText',
-              title: 'Overlay label',
+              name: 'label',
+              title: 'Caption',
               type: 'string',
-              description: 'Optional caption shown over the image',
-            }),
-            defineField({
-              name: 'overlayPosition',
-              title: 'Label position',
-              type: 'string',
-              initialValue: 'bottom',
-              hidden: ({ parent }) => !parent?.overlayText,
-              options: {
-                list: [
-                  { title: 'Top', value: 'top' },
-                  { title: 'Center', value: 'center' },
-                  { title: 'Bottom', value: 'bottom' },
-                ],
-                layout: 'radio',
-              },
+              description: 'Short label shown top-right — e.g. "Portraits", "Patterns"',
             }),
           ],
           preview: {
-            select: { title: 'alt', media: 'image' },
-            prepare({ title, media }) {
-              return { title: title || 'Image', subtitle: 'Auto-sized from aspect ratio', media }
+            select: { title: 'alt', media: 'image', enabled: 'enabled' },
+            prepare({ title, media, enabled }) {
+              return {
+                title: title || 'Image',
+                subtitle: enabled === false ? '⚠ Hidden' : 'Auto-sized from aspect ratio',
+                media,
+              }
             },
           },
         }),
@@ -91,7 +91,28 @@ export default defineType({
           type: 'object',
           icon: DocumentTextIcon,
           fields: [
+            enabledField,
             backgroundColorField,
+            defineField({
+              name: 'displayStyle',
+              title: 'Display style',
+              type: 'string',
+              initialValue: 'card',
+              options: {
+                list: [
+                  { title: 'Card (filled background)', value: 'card' },
+                  { title: 'Naked (transparent)', value: 'naked' },
+                  { title: 'Hairline (border only)', value: 'hairline' },
+                ],
+                layout: 'radio',
+              },
+            }),
+            defineField({
+              name: 'label',
+              title: 'Label',
+              type: 'string',
+              description: 'Optional mono tag anchored top-left — hidden when display style is Naked or Hairline unless set',
+            }),
             defineField({
               name: 'content',
               title: 'Content',
@@ -129,9 +150,13 @@ export default defineType({
             }),
           ],
           preview: {
-            select: { bg: 'backgroundColor' },
-            prepare({ bg }) {
-              return { title: 'Text block', subtitle: bg ?? 'warm', media: DocumentTextIcon }
+            select: { bg: 'backgroundColor', enabled: 'enabled' },
+            prepare({ bg, enabled }) {
+              return {
+                title: 'Text block',
+                subtitle: enabled === false ? '⚠ Hidden' : (bg ?? 'base'),
+                media: DocumentTextIcon,
+              }
             },
           },
         }),
@@ -143,7 +168,14 @@ export default defineType({
           type: 'object',
           icon: LinkIcon,
           fields: [
+            enabledField,
             backgroundColorField,
+            defineField({
+              name: 'label',
+              title: 'Label',
+              type: 'string',
+              description: 'Optional mono tag anchored top-left of the tile',
+            }),
             defineField({
               name: 'headline',
               title: 'Headline',
@@ -168,9 +200,13 @@ export default defineType({
             }),
           ],
           preview: {
-            select: { title: 'headline', bg: 'backgroundColor' },
-            prepare({ title, bg }) {
-              return { title: title || 'CTA', subtitle: bg ?? 'warm', media: LinkIcon }
+            select: { title: 'headline', bg: 'backgroundColor', enabled: 'enabled' },
+            prepare({ title, bg, enabled }) {
+              return {
+                title: title || 'CTA',
+                subtitle: enabled === false ? '⚠ Hidden' : (bg ?? 'base'),
+                media: LinkIcon,
+              }
             },
           },
         }),

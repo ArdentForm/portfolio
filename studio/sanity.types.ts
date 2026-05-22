@@ -12,1039 +12,976 @@
  * ---------------------------------------------------------------------------------
  */
 
-export declare const internalGroqTypeReferenceTo: unique symbol
+export declare const internalGroqTypeReferenceTo: unique symbol;
 
 // Source: ../sanity.schema.json
 export type DeviceCroppedImage = {
-  image?: ImageImage
-  alt?: string
-}
+  image?: ImageImage;
+  alt?: string;
+};
 
 export type SanityImageAssetReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'sanity.imageAsset'
-}
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+};
 
 export type ImageImage = {
-  asset?: SanityImageAssetReference
+  asset?: SanityImageAssetReference;
   media?: unknown // Unable to locate the referenced type "media" in schema
-  hotspot?: SanityImageHotspot
-  crop?: SanityImageCrop
-  _type: 'image'
-}
+;
+  hotspot?: SanityImageHotspot;
+  crop?: SanityImageCrop;
+  _type: "image";
+};
 
 export type ImageBlockImage = {
-  asset?: SanityImageAssetReference
+  asset?: SanityImageAssetReference;
   media?: unknown // Unable to locate the referenced type "image.media" in schema
-  hotspot?: SanityImageHotspot
-  crop?: SanityImageCrop
-  _type: 'image'
-}
+;
+  hotspot?: SanityImageHotspot;
+  crop?: SanityImageCrop;
+  _type: "image";
+};
 
 export type CardImage = {
-  image: CardImageImage
-  alt: string
-}
+  image: CardImageImage;
+  alt: string;
+};
 
 export type CardImageImage = {
-  asset?: SanityImageAssetReference
+  asset?: SanityImageAssetReference;
   media?: unknown // Unable to locate the referenced type "image.image.media" in schema
-  hotspot?: SanityImageHotspot
-  crop?: SanityImageCrop
-  _type: 'image'
-}
+;
+  hotspot?: SanityImageHotspot;
+  crop?: SanityImageCrop;
+  _type: "image";
+};
 
 export type ItemsCardImage = {
-  image: ItemsCardImageImage
-  alt: string
-}
+  image: ItemsCardImageImage;
+  alt: string;
+};
 
 export type ItemsCardImageImage = {
-  asset?: SanityImageAssetReference
+  asset?: SanityImageAssetReference;
   media?: unknown // Unable to locate the referenced type "card.image.image.media" in schema
-  hotspot?: SanityImageHotspot
-  crop?: SanityImageCrop
-  _type: 'image'
-}
+;
+  hotspot?: SanityImageHotspot;
+  crop?: SanityImageCrop;
+  _type: "image";
+};
 
 export type ImagesImageBlockImage = {
-  asset?: SanityImageAssetReference
+  asset?: SanityImageAssetReference;
   media?: unknown // Unable to locate the referenced type "imageBlock.image.media" in schema
-  hotspot?: SanityImageHotspot
-  crop?: SanityImageCrop
-  _type: 'image'
-}
+;
+  hotspot?: SanityImageHotspot;
+  crop?: SanityImageCrop;
+  _type: "image";
+};
+
+export type BentoImageImage = {
+  asset?: SanityImageAssetReference;
+  media?: unknown // Unable to locate the referenced type "bentoImage.image.media" in schema
+;
+  hotspot?: SanityImageHotspot;
+  crop?: SanityImageCrop;
+  _type: "image";
+};
+
+export type BentoGrid = {
+  _type: "bentoGrid";
+  items: Array<{
+    enabled?: boolean;
+    image: BentoImageImage;
+    alt: string;
+    label?: string;
+    _type: "bentoImage";
+    _key: string;
+  } | {
+    enabled?: boolean;
+    backgroundColor?: "base" | "reverse" | "brand";
+    displayStyle?: "card" | "naked" | "hairline";
+    label?: string;
+    content: BlockContentTextOnly;
+    textAlign?: "left" | "center" | "right";
+    fontSize?: "sm" | "base" | "lg" | "xl";
+    _type: "bentoText";
+    _key: string;
+  } | {
+    enabled?: boolean;
+    backgroundColor?: "base" | "reverse" | "brand";
+    label?: string;
+    headline?: string;
+    description?: string;
+    buttonText?: string;
+    buttonLink?: string;
+    _type: "bentoCta";
+    _key: string;
+  }>;
+  background?: "none" | "tint" | "tile" | "gradient";
+};
+
+export type ImageHero = {
+  _type: "imageHero";
+  image: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+  alt: string;
+  subtitle?: string;
+  index?: string;
+  heading?: string;
+  lightPanel?: boolean;
+};
 
 export type MinimalHeader = {
-  _type: 'minimalHeader'
-  label?: string
-  meta?: string
-  heading?: string
-}
+  _type: "minimalHeader";
+  label?: string;
+  meta?: string;
+  heading?: string;
+};
 
 export type StatsBlock = {
-  _type: 'statsBlock'
+  _type: "statsBlock";
   items: Array<{
-    value: string
-    label: string
-    _type: 'stat'
-    _key: string
-  }>
-  background?: 'none' | 'tint' | 'tile' | 'gradient'
-}
+    value: string;
+    label: string;
+    _type: "stat";
+    _key: string;
+  }>;
+  background?: "none" | "tint" | "tile" | "gradient";
+};
 
 export type PageHeader = {
-  _type: 'pageHeader'
+  _type: "pageHeader";
   heading: Array<{
     children?: Array<{
-      marks?: Array<string>
-      text?: string
-      _type: 'span'
-      _key: string
-    }>
-    style?: 'normal'
-    listItem?: never
-    markDefs?: null
-    level?: number
-    _type: 'block'
-    _key: string
-  }>
-  subheading?: string
-}
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal";
+    listItem?: never;
+    markDefs?: null;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  subheading?: string;
+};
 
 export type PostTagReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'postTag'
-}
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "postTag";
+};
 
 export type PostReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'post'
-}
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "post";
+};
 
 export type FeaturedPosts = {
-  _type: 'featuredPosts'
-  heading?: string
-  intro?: string
-  background?: 'none' | 'tint' | 'tile' | 'gradient'
-  selectionMode?: 'tag' | 'manual'
-  tag?: PostTagReference
-  posts?: Array<
-    {
-      _key: string
-    } & PostReference
-  >
-}
+  _type: "featuredPosts";
+  heading?: string;
+  intro?: string;
+  background?: "none" | "tint" | "tile" | "gradient";
+  selectionMode?: "tag" | "manual";
+  tag?: PostTagReference;
+  posts?: Array<{
+    _key: string;
+  } & PostReference>;
+};
 
 export type ContentDetails = {
-  _type: 'contentDetails'
-  listItemsLabel?: string
+  _type: "contentDetails";
+  listItemsLabel?: string;
   items: Array<{
-    title: string
-    _type: 'item'
-    _key: string
-  }>
-  mainContentLabel?: string
-  body: BlockContent
-  background?: 'none' | 'tint' | 'tile' | 'gradient'
-}
+    title: string;
+    _type: "item";
+    _key: string;
+  }>;
+  mainContentLabel?: string;
+  body: BlockContent;
+  background?: "none" | "tint" | "tile" | "gradient";
+};
 
 export type SectionHeading = {
-  _type: 'sectionHeading'
+  _type: "sectionHeading";
   heading?: Array<{
     children?: Array<{
-      marks?: Array<string>
-      text?: string
-      _type: 'span'
-      _key: string
-    }>
-    style?: 'normal'
-    listItem?: never
-    markDefs?: null
-    level?: number
-    _type: 'block'
-    _key: string
-  }>
-}
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal";
+    listItem?: never;
+    markDefs?: null;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+};
 
 export type ImageCollageContent = {
-  _type: 'imageCollageContent'
-  heading: string
-  label?: string
-  year?: string
-  description?: BlockContentTextOnly
-  background?: 'none' | 'tint' | 'tile' | 'gradient'
-}
+  _type: "imageCollageContent";
+  heading: string;
+  label?: string;
+  year?: string;
+  description?: BlockContentTextOnly;
+  background?: "none" | "tint" | "tile" | "gradient";
+};
 
 export type ImageCollage = {
-  _type: 'imageCollage'
+  _type: "imageCollage";
   images: Array<{
-    image: ImagesImageBlockImage
-    alt: string
-    _type: 'imageBlock'
-    _key: string
-  }>
-  background?: 'none' | 'tint' | 'tile' | 'gradient'
-}
+    image: ImagesImageBlockImage;
+    alt: string;
+    _type: "imageBlock";
+    _key: string;
+  }>;
+  background?: "none" | "tint" | "tile" | "gradient";
+};
 
 export type AbstractCardsCarousel = {
-  _type: 'abstractCardsCarousel'
+  _type: "abstractCardsCarousel";
   items: Array<{
-    label: string
-    heading: string
-    body: string
-    image?: ItemsCardImage
-    link: Link
-    _type: 'card'
-    _key: string
-  }>
-}
+    label: string;
+    heading: string;
+    body: string;
+    image?: ItemsCardImage;
+    link: Link;
+    _type: "card";
+    _key: string;
+  }>;
+};
 
 export type CarouselCards = {
-  _type: 'carouselCards'
-  background?: 'none' | 'tint' | 'tile' | 'gradient'
+  _type: "carouselCards";
+  background?: "none" | "tint" | "tile" | "gradient";
   items: Array<{
-    image?: CardImage
-    label: string
-    title: string
-    link?: Link
-    _type: 'card'
-    _key: string
-  }>
-}
+    image?: CardImage;
+    label: string;
+    title: string;
+    link?: Link;
+    _type: "card";
+    _key: string;
+  }>;
+};
 
 export type ContentBlockGrid = {
-  _type: 'contentBlockGrid'
-  heading: string
-  intro: string
-  background?: 'none' | 'tint' | 'tile' | 'gradient'
+  _type: "contentBlockGrid";
+  heading: string;
+  intro: string;
+  background?: "none" | "tint" | "tile" | "gradient";
   items: Array<{
-    title: string
-    body: string
-    _type: 'item'
-    _key: string
-  }>
-}
+    title: string;
+    body: string;
+    _type: "item";
+    _key: string;
+  }>;
+};
 
 export type SanityFileAssetReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'sanity.fileAsset'
-}
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "sanity.fileAsset";
+};
 
 export type DeviceCropped = {
-  _type: 'deviceCropped'
-  label?: string
-  heading: string
-  mediaType?: 'image' | 'video'
-  image?: DeviceCroppedImage
+  _type: "deviceCropped";
+  label?: string;
+  heading: string;
+  mediaType?: "image" | "video";
+  image?: DeviceCroppedImage;
   video?: {
-    asset?: SanityFileAssetReference
-    media?: unknown
-    _type: 'file'
-  }
+    asset?: SanityFileAssetReference;
+    media?: unknown;
+    _type: "file";
+  };
   items: Array<{
-    title: string
-    body: string
-    _type: 'item'
-    _key: string
-  }>
-  background?: 'none' | 'tint' | 'tile' | 'gradient'
-  cropMode?: 'cropped' | 'full'
-  contentAlignment?: 'imageRight' | 'imageFirst'
-}
+    title: string;
+    body: string;
+    _type: "item";
+    _key: string;
+  }>;
+  background?: "none" | "tint" | "tile" | "gradient";
+  cropMode?: "cropped" | "full";
+  contentAlignment?: "imageRight" | "imageFirst";
+};
 
 export type HeroSplitImageRight = {
-  _type: 'heroSplitImageRight'
-  heading: string
+  _type: "heroSplitImageRight";
+  heading: string;
   images: Array<{
-    image: ImageBlockImage
-    alt: string
-    caption?: string
-    _type: 'imageBlock'
-    _key: string
-  }>
-  background?: 'none' | 'tint' | 'tile' | 'gradient'
-  contentAlignment?: 'imageRight' | 'imageFirst'
-}
+    image: ImageBlockImage;
+    alt: string;
+    caption?: string;
+    _type: "imageBlock";
+    _key: string;
+  }>;
+  background?: "none" | "tint" | "tile" | "gradient";
+  contentAlignment?: "imageRight" | "imageFirst";
+};
 
 export type PageReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'page'
-}
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "page";
+};
 
 export type Link = {
-  _type: 'link'
-  linkType?: 'href' | 'page' | 'post'
-  href?: string
-  page?: PageReference
-  post?: PostReference
-  openInNewTab?: boolean
-}
+  _type: "link";
+  linkType?: "href" | "page" | "post";
+  href?: string;
+  page?: PageReference;
+  post?: PostReference;
+  openInNewTab?: boolean;
+};
 
 export type CallToAction = {
-  _type: 'callToAction'
-  eyebrow?: string
-  heading: string
-  body?: BlockContentTextOnly
-  button?: Button
+  _type: "callToAction";
+  eyebrow?: string;
+  heading: string;
+  body?: BlockContentTextOnly;
+  button?: Button;
   image?: {
-    asset?: SanityImageAssetReference
-    media?: unknown
-    hotspot?: SanityImageHotspot
-    crop?: SanityImageCrop
-    _type: 'image'
-  }
-  background?: 'none' | 'tint' | 'tile' | 'gradient'
-  contentAlignment?: 'textFirst' | 'imageFirst'
-}
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+  background?: "none" | "tint" | "tile" | "gradient";
+  contentAlignment?: "textFirst" | "imageFirst";
+};
 
 export type InfoSection = {
-  _type: 'infoSection'
-  heading?: string
-  subheading?: string
-  content?: BlockContent
-}
+  _type: "infoSection";
+  heading?: string;
+  subheading?: string;
+  content?: BlockContent;
+};
 
-export type BlockContent = Array<
-  | {
-      children?: Array<{
-        marks?: Array<string>
-        text?: string
-        _type: 'span'
-        _key: string
-      }>
-      style?: 'normal' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote'
-      listItem?: 'bullet' | 'number'
-      markDefs?: Array<{
-        linkType?: 'href' | 'page' | 'post'
-        href?: string
-        page?: PageReference
-        post?: PostReference
-        openInNewTab?: boolean
-        _type: 'link'
-        _key: string
-      }>
-      level?: number
-      _type: 'block'
-      _key: string
-    }
-  | {
-      asset?: SanityImageAssetReference
-      media?: unknown
-      hotspot?: SanityImageHotspot
-      crop?: SanityImageCrop
-      _type: 'image'
-      _key: string
-    }
->
+export type BlockContent = Array<{
+  children?: Array<{
+    marks?: Array<string>;
+    text?: string;
+    _type: "span";
+    _key: string;
+  }>;
+  style?: "normal" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "blockquote";
+  listItem?: "bullet" | "number";
+  markDefs?: Array<{
+    linkType?: "href" | "page" | "post";
+    href?: string;
+    page?: PageReference;
+    post?: PostReference;
+    openInNewTab?: boolean;
+    _type: "link";
+    _key: string;
+  }>;
+  level?: number;
+  _type: "block";
+  _key: string;
+} | {
+  asset?: SanityImageAssetReference;
+  media?: unknown;
+  hotspot?: SanityImageHotspot;
+  crop?: SanityImageCrop;
+  _type: "image";
+  _key: string;
+}>;
 
 export type BlockContentTextOnly = Array<{
   children?: Array<{
-    marks?: Array<string>
-    text?: string
-    _type: 'span'
-    _key: string
-  }>
-  style?: 'normal' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote'
-  listItem?: 'bullet' | 'number'
+    marks?: Array<string>;
+    text?: string;
+    _type: "span";
+    _key: string;
+  }>;
+  style?: "normal" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "blockquote";
+  listItem?: "bullet" | "number";
   markDefs?: Array<{
-    href?: string
-    _type: 'link'
-    _key: string
-  }>
-  level?: number
-  _type: 'block'
-  _key: string
-}>
+    href?: string;
+    _type: "link";
+    _key: string;
+  }>;
+  level?: number;
+  _type: "block";
+  _key: string;
+}>;
 
 export type Button = {
-  _type: 'button'
-  buttonText?: string
-  link?: Link
-}
+  _type: "button";
+  buttonText?: string;
+  link?: Link;
+};
 
 export type PortfolioTag = {
-  _id: string
-  _type: 'portfolioTag'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
-  name: string
-  slug: Slug
-}
+  _id: string;
+  _type: "portfolioTag";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name: string;
+  slug: Slug;
+};
 
 export type Slug = {
-  _type: 'slug'
-  current: string
-  source?: string
-}
+  _type: "slug";
+  current: string;
+  source?: string;
+};
 
 export type PortfolioTagReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'portfolioTag'
-}
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "portfolioTag";
+};
 
 export type PortfolioProject = {
-  _id: string
-  _type: 'portfolioProject'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
-  orderRank?: string
-  title: string
-  slug: Slug
-  excerpt?: string
+  _id: string;
+  _type: "portfolioProject";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  orderRank?: string;
+  title: string;
+  slug: Slug;
+  excerpt?: string;
   coverImage?: {
-    asset?: SanityImageAssetReference
-    media?: unknown
-    hotspot?: SanityImageHotspot
-    crop?: SanityImageCrop
-    alt?: string
-    _type: 'image'
-  }
-  client?: string
-  year?: string
-  tags?: Array<
-    {
-      _key: string
-    } & PortfolioTagReference
-  >
-  pageBuilder?: Array<
-    | ({
-        _key: string
-      } & PageHeader)
-    | ({
-        _key: string
-      } & SectionHeading)
-    | ({
-        _key: string
-      } & StatsBlock)
-    | ({
-        _key: string
-      } & DeviceCropped)
-    | ({
-        _key: string
-      } & HeroSplitImageRight)
-    | ({
-        _key: string
-      } & ContentBlockGrid)
-    | ({
-        _key: string
-      } & CarouselCards)
-    | ({
-        _key: string
-      } & AbstractCardsCarousel)
-    | ({
-        _key: string
-      } & ImageCollageContent)
-    | ({
-        _key: string
-      } & ImageCollage)
-    | ({
-        _key: string
-      } & ContentDetails)
-  >
-  seoTitle?: string
-  seoDescription?: string
-}
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  client?: string;
+  year?: string;
+  tags?: Array<{
+    _key: string;
+  } & PortfolioTagReference>;
+  pageBuilder?: Array<{
+    _key: string;
+  } & PageHeader | {
+    _key: string;
+  } & MinimalHeader | {
+    _key: string;
+  } & SectionHeading | {
+    _key: string;
+  } & StatsBlock | {
+    _key: string;
+  } & ImageHero | {
+    _key: string;
+  } & DeviceCropped | {
+    _key: string;
+  } & HeroSplitImageRight | {
+    _key: string;
+  } & ContentBlockGrid | {
+    _key: string;
+  } & CarouselCards | {
+    _key: string;
+  } & AbstractCardsCarousel | {
+    _key: string;
+  } & ImageCollageContent | {
+    _key: string;
+  } & ImageCollage | {
+    _key: string;
+  } & ContentDetails | {
+    _key: string;
+  } & BentoGrid>;
+  seoTitle?: string;
+  seoDescription?: string;
+};
 
 export type SanityImageCrop = {
-  _type: 'sanity.imageCrop'
-  top: number
-  bottom: number
-  left: number
-  right: number
-}
+  _type: "sanity.imageCrop";
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
+};
 
 export type SanityImageHotspot = {
-  _type: 'sanity.imageHotspot'
-  x: number
-  y: number
-  height: number
-  width: number
-}
+  _type: "sanity.imageHotspot";
+  x: number;
+  y: number;
+  height: number;
+  width: number;
+};
 
 export type PostTag = {
-  _id: string
-  _type: 'postTag'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
-  name: string
-  slug: Slug
-}
+  _id: string;
+  _type: "postTag";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name: string;
+  slug: Slug;
+};
 
 export type PortfolioOverview = {
-  _id: string
-  _type: 'portfolioOverview'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
-  passwordProtected?: boolean
-  seoTitle?: string
-  seoDescription?: string
-  pageBuilder?: Array<
-    | ({
-        _key: string
-      } & PageHeader)
-    | ({
-        _key: string
-      } & SectionHeading)
-    | ({
-        _key: string
-      } & StatsBlock)
-    | ({
-        _key: string
-      } & DeviceCropped)
-    | ({
-        _key: string
-      } & HeroSplitImageRight)
-    | ({
-        _key: string
-      } & ContentBlockGrid)
-    | ({
-        _key: string
-      } & CarouselCards)
-    | ({
-        _key: string
-      } & AbstractCardsCarousel)
-    | ({
-        _key: string
-      } & ImageCollageContent)
-    | ({
-        _key: string
-      } & ImageCollage)
-    | ({
-        _key: string
-      } & ContentDetails)
-  >
-}
+  _id: string;
+  _type: "portfolioOverview";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  passwordProtected?: boolean;
+  seoTitle?: string;
+  seoDescription?: string;
+  pageBuilder?: Array<{
+    _key: string;
+  } & PageHeader | {
+    _key: string;
+  } & SectionHeading | {
+    _key: string;
+  } & StatsBlock | {
+    _key: string;
+  } & DeviceCropped | {
+    _key: string;
+  } & HeroSplitImageRight | {
+    _key: string;
+  } & ContentBlockGrid | {
+    _key: string;
+  } & CarouselCards | {
+    _key: string;
+  } & AbstractCardsCarousel | {
+    _key: string;
+  } & ImageCollageContent | {
+    _key: string;
+  } & ImageCollage | {
+    _key: string;
+  } & ContentDetails>;
+};
 
 export type Navigation = {
-  _id: string
-  _type: 'navigation'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
+  _id: string;
+  _type: "navigation";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
   links?: Array<{
-    label: string
-    url: string
-    visible?: boolean
-    _key: string
-  }>
-}
+    label: string;
+    url: string;
+    visible?: boolean;
+    _key: string;
+  }>;
+};
 
 export type Homepage = {
-  _id: string
-  _type: 'homepage'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
-  seoTitle?: string
-  seoDescription?: string
-  pageBuilder?: Array<
-    | ({
-        _key: string
-      } & CallToAction)
-    | ({
-        _key: string
-      } & MinimalHeader)
-    | ({
-        _key: string
-      } & SectionHeading)
-    | ({
-        _key: string
-      } & DeviceCropped)
-    | ({
-        _key: string
-      } & HeroSplitImageRight)
-    | ({
-        _key: string
-      } & ContentBlockGrid)
-    | ({
-        _key: string
-      } & CarouselCards)
-    | ({
-        _key: string
-      } & AbstractCardsCarousel)
-    | ({
-        _key: string
-      } & ImageCollage)
-    | ({
-        _key: string
-      } & ContentDetails)
-    | ({
-        _key: string
-      } & FeaturedPosts)
-  >
-}
+  _id: string;
+  _type: "homepage";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  pageBuilder?: Array<{
+    _key: string;
+  } & CallToAction | {
+    _key: string;
+  } & MinimalHeader | {
+    _key: string;
+  } & SectionHeading | {
+    _key: string;
+  } & DeviceCropped | {
+    _key: string;
+  } & ImageHero | {
+    _key: string;
+  } & HeroSplitImageRight | {
+    _key: string;
+  } & ContentBlockGrid | {
+    _key: string;
+  } & CarouselCards | {
+    _key: string;
+  } & AbstractCardsCarousel | {
+    _key: string;
+  } & ImageCollage | {
+    _key: string;
+  } & ContentDetails | {
+    _key: string;
+  } & FeaturedPosts | {
+    _key: string;
+  } & BentoGrid>;
+};
 
 export type Settings = {
-  _id: string
-  _type: 'settings'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
-  title: string
+  _id: string;
+  _type: "settings";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title: string;
   description?: Array<{
     children?: Array<{
-      marks?: Array<string>
-      text?: string
-      _type: 'span'
-      _key: string
-    }>
-    style?: 'normal'
-    listItem?: never
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal";
+    listItem?: never;
     markDefs?: Array<{
-      linkType?: 'href' | 'page' | 'post'
-      href?: string
-      page?: PageReference
-      post?: PostReference
-      openInNewTab?: boolean
-      _type: 'link'
-      _key: string
-    }>
-    level?: number
-    _type: 'block'
-    _key: string
-  }>
+      linkType?: "href" | "page" | "post";
+      href?: string;
+      page?: PageReference;
+      post?: PostReference;
+      openInNewTab?: boolean;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
   favicon?: {
-    asset?: SanityImageAssetReference
-    hotspot?: SanityImageHotspot
-    crop?: SanityImageCrop
-    _type: 'image'
-  }
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
   ogImage?: {
-    asset?: SanityImageAssetReference
-    media?: unknown
-    hotspot?: SanityImageHotspot
-    crop?: SanityImageCrop
-    alt?: string
-    metadataBase?: string
-    _type: 'image'
-  }
-}
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    metadataBase?: string;
+    _type: "image";
+  };
+};
 
 export type Page = {
-  _id: string
-  _type: 'page'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
-  name: string
-  slug: Slug
-  heading: string
-  subheading?: string
-  pageBuilder?: Array<
-    | ({
-        _key: string
-      } & PageHeader)
-    | ({
-        _key: string
-      } & CallToAction)
-    | ({
-        _key: string
-      } & SectionHeading)
-    | ({
-        _key: string
-      } & MinimalHeader)
-    | ({
-        _key: string
-      } & StatsBlock)
-    | ({
-        _key: string
-      } & DeviceCropped)
-    | ({
-        _key: string
-      } & HeroSplitImageRight)
-    | ({
-        _key: string
-      } & ContentBlockGrid)
-    | ({
-        _key: string
-      } & CarouselCards)
-    | ({
-        _key: string
-      } & AbstractCardsCarousel)
-    | ({
-        _key: string
-      } & ImageCollageContent)
-    | ({
-        _key: string
-      } & ImageCollage)
-    | ({
-        _key: string
-      } & ContentDetails)
-    | ({
-        _key: string
-      } & FeaturedPosts)
-  >
-}
+  _id: string;
+  _type: "page";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name: string;
+  slug: Slug;
+  heading: string;
+  subheading?: string;
+  pageBuilder?: Array<{
+    _key: string;
+  } & PageHeader | {
+    _key: string;
+  } & CallToAction | {
+    _key: string;
+  } & SectionHeading | {
+    _key: string;
+  } & MinimalHeader | {
+    _key: string;
+  } & StatsBlock | {
+    _key: string;
+  } & DeviceCropped | {
+    _key: string;
+  } & ImageHero | {
+    _key: string;
+  } & HeroSplitImageRight | {
+    _key: string;
+  } & ContentBlockGrid | {
+    _key: string;
+  } & CarouselCards | {
+    _key: string;
+  } & AbstractCardsCarousel | {
+    _key: string;
+  } & ImageCollageContent | {
+    _key: string;
+  } & ImageCollage | {
+    _key: string;
+  } & ContentDetails | {
+    _key: string;
+  } & FeaturedPosts | {
+    _key: string;
+  } & BentoGrid>;
+};
 
 export type PersonReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'person'
-}
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "person";
+};
 
 export type Post = {
-  _id: string
-  _type: 'post'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
-  title: string
-  slug: Slug
-  content?: BlockContent
-  excerpt?: string
+  _id: string;
+  _type: "post";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title: string;
+  slug: Slug;
+  content?: BlockContent;
+  excerpt?: string;
   coverImage?: {
-    asset?: SanityImageAssetReference
-    media?: unknown
-    hotspot?: SanityImageHotspot
-    crop?: SanityImageCrop
-    alt?: string
-    _type: 'image'
-  }
-  date?: string
-  author?: PersonReference
-  tags?: Array<
-    {
-      _key: string
-    } & PostTagReference
-  >
-}
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  date?: string;
+  author?: PersonReference;
+  tags?: Array<{
+    _key: string;
+  } & PostTagReference>;
+};
 
 export type Person = {
-  _id: string
-  _type: 'person'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
-  firstName: string
-  lastName: string
+  _id: string;
+  _type: "person";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  firstName: string;
+  lastName: string;
   picture: {
-    asset?: SanityImageAssetReference
-    media?: unknown
-    hotspot?: SanityImageHotspot
-    crop?: SanityImageCrop
-    alt?: string
-    _type: 'image'
-  }
-}
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+};
 
 export type SanityAssistInstructionTask = {
-  _type: 'sanity.assist.instructionTask'
-  path?: string
-  instructionKey?: string
-  started?: string
-  updated?: string
-  info?: string
-}
+  _type: "sanity.assist.instructionTask";
+  path?: string;
+  instructionKey?: string;
+  started?: string;
+  updated?: string;
+  info?: string;
+};
 
 export type SanityAssistTaskStatus = {
-  _type: 'sanity.assist.task.status'
-  tasks?: Array<
-    {
-      _key: string
-    } & SanityAssistInstructionTask
-  >
-}
+  _type: "sanity.assist.task.status";
+  tasks?: Array<{
+    _key: string;
+  } & SanityAssistInstructionTask>;
+};
 
 export type SanityAssistSchemaTypeAnnotations = {
-  _type: 'sanity.assist.schemaType.annotations'
-  title?: string
-  fields?: Array<
-    {
-      _key: string
-    } & SanityAssistSchemaTypeField
-  >
-}
+  _type: "sanity.assist.schemaType.annotations";
+  title?: string;
+  fields?: Array<{
+    _key: string;
+  } & SanityAssistSchemaTypeField>;
+};
 
 export type SanityAssistOutputType = {
-  _type: 'sanity.assist.output.type'
-  type?: string
-}
+  _type: "sanity.assist.output.type";
+  type?: string;
+};
 
 export type SanityAssistOutputField = {
-  _type: 'sanity.assist.output.field'
-  path?: string
-}
+  _type: "sanity.assist.output.field";
+  path?: string;
+};
 
 export type AssistInstructionContextReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'assist.instruction.context'
-}
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "assist.instruction.context";
+};
 
 export type SanityAssistInstructionContext = {
-  _type: 'sanity.assist.instruction.context'
-  reference: AssistInstructionContextReference
-}
+  _type: "sanity.assist.instruction.context";
+  reference: AssistInstructionContextReference;
+};
 
 export type AssistInstructionContext = {
-  _id: string
-  _type: 'assist.instruction.context'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
-  title?: string
+  _id: string;
+  _type: "assist.instruction.context";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
   context?: Array<{
     children?: Array<{
-      marks?: Array<string>
-      text?: string
-      _type: 'span'
-      _key: string
-    }>
-    style?: 'normal'
-    listItem?: never
-    markDefs?: null
-    level?: number
-    _type: 'block'
-    _key: string
-  }>
-}
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal";
+    listItem?: never;
+    markDefs?: null;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+};
 
 export type SanityAssistInstructionUserInput = {
-  _type: 'sanity.assist.instruction.userInput'
-  message: string
-  description?: string
-}
+  _type: "sanity.assist.instruction.userInput";
+  message: string;
+  description?: string;
+};
 
 export type SanityAssistInstructionPrompt = Array<{
-  children?: Array<
-    | {
-        marks?: Array<string>
-        text?: string
-        _type: 'span'
-        _key: string
-      }
-    | ({
-        _key: string
-      } & SanityAssistInstructionFieldRef)
-    | ({
-        _key: string
-      } & SanityAssistInstructionContext)
-    | ({
-        _key: string
-      } & SanityAssistInstructionUserInput)
-  >
-  style?: 'normal'
-  listItem?: never
-  markDefs?: null
-  level?: number
-  _type: 'block'
-  _key: string
-}>
+  children?: Array<{
+    marks?: Array<string>;
+    text?: string;
+    _type: "span";
+    _key: string;
+  } | {
+    _key: string;
+  } & SanityAssistInstructionFieldRef | {
+    _key: string;
+  } & SanityAssistInstructionContext | {
+    _key: string;
+  } & SanityAssistInstructionUserInput>;
+  style?: "normal";
+  listItem?: never;
+  markDefs?: null;
+  level?: number;
+  _type: "block";
+  _key: string;
+}>;
 
 export type SanityAssistInstructionFieldRef = {
-  _type: 'sanity.assist.instruction.fieldRef'
-  path?: string
-}
+  _type: "sanity.assist.instruction.fieldRef";
+  path?: string;
+};
 
 export type SanityAssistInstruction = {
-  _type: 'sanity.assist.instruction'
-  prompt?: SanityAssistInstructionPrompt
-  icon?: string
-  title?: string
-  userId?: string
-  createdById?: string
-  output?: Array<
-    | ({
-        _key: string
-      } & SanityAssistOutputField)
-    | ({
-        _key: string
-      } & SanityAssistOutputType)
-  >
-}
+  _type: "sanity.assist.instruction";
+  prompt?: SanityAssistInstructionPrompt;
+  icon?: string;
+  title?: string;
+  userId?: string;
+  createdById?: string;
+  output?: Array<{
+    _key: string;
+  } & SanityAssistOutputField | {
+    _key: string;
+  } & SanityAssistOutputType>;
+};
 
 export type SanityAssistSchemaTypeField = {
-  _type: 'sanity.assist.schemaType.field'
-  path?: string
-  instructions?: Array<
-    {
-      _key: string
-    } & SanityAssistInstruction
-  >
-}
+  _type: "sanity.assist.schemaType.field";
+  path?: string;
+  instructions?: Array<{
+    _key: string;
+  } & SanityAssistInstruction>;
+};
 
 export type SanityImagePaletteSwatch = {
-  _type: 'sanity.imagePaletteSwatch'
-  background?: string
-  foreground?: string
-  population?: number
-  title?: string
-}
+  _type: "sanity.imagePaletteSwatch";
+  background?: string;
+  foreground?: string;
+  population?: number;
+  title?: string;
+};
 
 export type SanityImagePalette = {
-  _type: 'sanity.imagePalette'
-  darkMuted?: SanityImagePaletteSwatch
-  lightVibrant?: SanityImagePaletteSwatch
-  darkVibrant?: SanityImagePaletteSwatch
-  vibrant?: SanityImagePaletteSwatch
-  dominant?: SanityImagePaletteSwatch
-  lightMuted?: SanityImagePaletteSwatch
-  muted?: SanityImagePaletteSwatch
-}
+  _type: "sanity.imagePalette";
+  darkMuted?: SanityImagePaletteSwatch;
+  lightVibrant?: SanityImagePaletteSwatch;
+  darkVibrant?: SanityImagePaletteSwatch;
+  vibrant?: SanityImagePaletteSwatch;
+  dominant?: SanityImagePaletteSwatch;
+  lightMuted?: SanityImagePaletteSwatch;
+  muted?: SanityImagePaletteSwatch;
+};
 
 export type SanityImageDimensions = {
-  _type: 'sanity.imageDimensions'
-  height: number
-  width: number
-  aspectRatio: number
-}
+  _type: "sanity.imageDimensions";
+  height: number;
+  width: number;
+  aspectRatio: number;
+};
 
 export type SanityImageMetadata = {
-  _type: 'sanity.imageMetadata'
-  location?: Geopoint
-  dimensions?: SanityImageDimensions
-  palette?: SanityImagePalette
-  lqip?: string
-  blurHash?: string
-  thumbHash?: string
-  hasAlpha?: boolean
-  isOpaque?: boolean
-}
+  _type: "sanity.imageMetadata";
+  location?: Geopoint;
+  dimensions?: SanityImageDimensions;
+  palette?: SanityImagePalette;
+  lqip?: string;
+  blurHash?: string;
+  thumbHash?: string;
+  hasAlpha?: boolean;
+  isOpaque?: boolean;
+};
 
 export type SanityFileAsset = {
-  _id: string
-  _type: 'sanity.fileAsset'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
-  originalFilename?: string
-  label?: string
-  title?: string
-  description?: string
-  altText?: string
-  sha1hash: string
-  extension: string
-  mimeType: string
-  size: number
-  assetId: string
-  uploadId?: string
-  path: string
-  url: string
-  source?: SanityAssetSourceData
-}
+  _id: string;
+  _type: "sanity.fileAsset";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  originalFilename?: string;
+  label?: string;
+  title?: string;
+  description?: string;
+  altText?: string;
+  sha1hash: string;
+  extension: string;
+  mimeType: string;
+  size: number;
+  assetId: string;
+  uploadId?: string;
+  path: string;
+  url: string;
+  source?: SanityAssetSourceData;
+};
 
 export type SanityAssetSourceData = {
-  _type: 'sanity.assetSourceData'
-  name?: string
-  id?: string
-  url?: string
-}
+  _type: "sanity.assetSourceData";
+  name?: string;
+  id?: string;
+  url?: string;
+};
 
 export type SanityImageAsset = {
-  _id: string
-  _type: 'sanity.imageAsset'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
-  originalFilename?: string
-  label?: string
-  title?: string
-  description?: string
-  altText?: string
-  sha1hash: string
-  extension: string
-  mimeType: string
-  size: number
-  assetId: string
-  uploadId?: string
-  path: string
-  url: string
-  metadata?: SanityImageMetadata
-  source?: SanityAssetSourceData
-}
+  _id: string;
+  _type: "sanity.imageAsset";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  originalFilename?: string;
+  label?: string;
+  title?: string;
+  description?: string;
+  altText?: string;
+  sha1hash: string;
+  extension: string;
+  mimeType: string;
+  size: number;
+  assetId: string;
+  uploadId?: string;
+  path: string;
+  url: string;
+  metadata?: SanityImageMetadata;
+  source?: SanityAssetSourceData;
+};
 
 export type Geopoint = {
-  _type: 'geopoint'
-  lat?: number
-  lng?: number
-  alt?: number
-}
+  _type: "geopoint";
+  lat?: number;
+  lng?: number;
+  alt?: number;
+};
 
-export type AllSanitySchemaTypes =
-  | DeviceCroppedImage
-  | SanityImageAssetReference
-  | ImageImage
-  | ImageBlockImage
-  | CardImage
-  | CardImageImage
-  | ItemsCardImage
-  | ItemsCardImageImage
-  | ImagesImageBlockImage
-  | MinimalHeader
-  | StatsBlock
-  | PageHeader
-  | PostTagReference
-  | PostReference
-  | FeaturedPosts
-  | ContentDetails
-  | SectionHeading
-  | ImageCollageContent
-  | ImageCollage
-  | AbstractCardsCarousel
-  | CarouselCards
-  | ContentBlockGrid
-  | SanityFileAssetReference
-  | DeviceCropped
-  | HeroSplitImageRight
-  | PageReference
-  | Link
-  | CallToAction
-  | InfoSection
-  | BlockContent
-  | BlockContentTextOnly
-  | Button
-  | PortfolioTag
-  | Slug
-  | PortfolioTagReference
-  | PortfolioProject
-  | SanityImageCrop
-  | SanityImageHotspot
-  | PostTag
-  | PortfolioOverview
-  | Navigation
-  | Homepage
-  | Settings
-  | Page
-  | PersonReference
-  | Post
-  | Person
-  | SanityAssistInstructionTask
-  | SanityAssistTaskStatus
-  | SanityAssistSchemaTypeAnnotations
-  | SanityAssistOutputType
-  | SanityAssistOutputField
-  | AssistInstructionContextReference
-  | SanityAssistInstructionContext
-  | AssistInstructionContext
-  | SanityAssistInstructionUserInput
-  | SanityAssistInstructionPrompt
-  | SanityAssistInstructionFieldRef
-  | SanityAssistInstruction
-  | SanityAssistSchemaTypeField
-  | SanityImagePaletteSwatch
-  | SanityImagePalette
-  | SanityImageDimensions
-  | SanityImageMetadata
-  | SanityFileAsset
-  | SanityAssetSourceData
-  | SanityImageAsset
-  | Geopoint
+export type AllSanitySchemaTypes = DeviceCroppedImage | SanityImageAssetReference | ImageImage | ImageBlockImage | CardImage | CardImageImage | ItemsCardImage | ItemsCardImageImage | ImagesImageBlockImage | BentoImageImage | BentoGrid | ImageHero | MinimalHeader | StatsBlock | PageHeader | PostTagReference | PostReference | FeaturedPosts | ContentDetails | SectionHeading | ImageCollageContent | ImageCollage | AbstractCardsCarousel | CarouselCards | ContentBlockGrid | SanityFileAssetReference | DeviceCropped | HeroSplitImageRight | PageReference | Link | CallToAction | InfoSection | BlockContent | BlockContentTextOnly | Button | PortfolioTag | Slug | PortfolioTagReference | PortfolioProject | SanityImageCrop | SanityImageHotspot | PostTag | PortfolioOverview | Navigation | Homepage | Settings | Page | PersonReference | Post | Person | SanityAssistInstructionTask | SanityAssistTaskStatus | SanityAssistSchemaTypeAnnotations | SanityAssistOutputType | SanityAssistOutputField | AssistInstructionContextReference | SanityAssistInstructionContext | AssistInstructionContext | SanityAssistInstructionUserInput | SanityAssistInstructionPrompt | SanityAssistInstructionFieldRef | SanityAssistInstruction | SanityAssistSchemaTypeField | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageMetadata | SanityFileAsset | SanityAssetSourceData | SanityImageAsset | Geopoint;
+

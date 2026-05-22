@@ -32,9 +32,11 @@ function AnchorLink({id}: {id?: string}) {
 export default function CustomPortableText({
   className,
   value,
+  anchors = true,
 }: {
   className?: string
   value: PortableTextBlock[]
+  anchors?: boolean
 }) {
   const components: PortableTextComponents = {
     types: {
@@ -57,21 +59,21 @@ export default function CustomPortableText({
     block: {
       normal: ({children}) => <p>{children}</p>,
       h1: ({children, value}) => (
-        <h1 id={value?._key} className="group relative text-3xl sm:text-4xl mt-10 mb-4">
+        <h1 id={anchors ? value?._key : undefined} className={`${anchors ? 'group relative' : ''} text-3xl sm:text-4xl mt-10 mb-4`}>
           {children}
-          <AnchorLink id={value?._key} />
+          {anchors && <AnchorLink id={value?._key} />}
         </h1>
       ),
       h2: ({children, value}) => (
-        <h2 id={value?._key} className="group relative text-2xl sm:text-3xl mt-8 mb-4">
+        <h2 id={anchors ? value?._key : undefined} className={`${anchors ? 'group relative' : ''} text-2xl sm:text-3xl mt-8 mb-4`}>
           {children}
-          <AnchorLink id={value?._key} />
+          {anchors && <AnchorLink id={value?._key} />}
         </h2>
       ),
       h3: ({children, value}) => (
-        <h3 id={value?._key} className="group relative text-xl sm:text-2xl mt-6 mb-3">
+        <h3 id={anchors ? value?._key : undefined} className={`${anchors ? 'group relative' : ''} text-xl sm:text-2xl mt-6 mb-3`}>
           {children}
-          <AnchorLink id={value?._key} />
+          {anchors && <AnchorLink id={value?._key} />}
         </h3>
       ),
       h4: ({children}) => (

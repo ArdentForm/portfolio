@@ -412,6 +412,13 @@
                 {
                   "type": "object",
                   "attributes": {
+                    "enabled": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "boolean"
+                      },
+                      "optional": true
+                    },
                     "image": {
                       "type": "objectAttribute",
                       "value": {
@@ -427,31 +434,10 @@
                       },
                       "optional": false
                     },
-                    "overlayText": {
+                    "label": {
                       "type": "objectAttribute",
                       "value": {
                         "type": "string"
-                      },
-                      "optional": true
-                    },
-                    "overlayPosition": {
-                      "type": "objectAttribute",
-                      "value": {
-                        "type": "union",
-                        "of": [
-                          {
-                            "type": "string",
-                            "value": "top"
-                          },
-                          {
-                            "type": "string",
-                            "value": "center"
-                          },
-                          {
-                            "type": "string",
-                            "value": "bottom"
-                          }
-                        ]
                       },
                       "optional": true
                     },
@@ -478,6 +464,13 @@
                 {
                   "type": "object",
                   "attributes": {
+                    "enabled": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "boolean"
+                      },
+                      "optional": true
+                    },
                     "backgroundColor": {
                       "type": "objectAttribute",
                       "value": {
@@ -485,21 +478,45 @@
                         "of": [
                           {
                             "type": "string",
-                            "value": "warm"
+                            "value": "base"
                           },
                           {
                             "type": "string",
-                            "value": "tint"
+                            "value": "reverse"
                           },
                           {
                             "type": "string",
-                            "value": "dark"
-                          },
-                          {
-                            "type": "string",
-                            "value": "ink"
+                            "value": "brand"
                           }
                         ]
+                      },
+                      "optional": true
+                    },
+                    "displayStyle": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "union",
+                        "of": [
+                          {
+                            "type": "string",
+                            "value": "card"
+                          },
+                          {
+                            "type": "string",
+                            "value": "naked"
+                          },
+                          {
+                            "type": "string",
+                            "value": "hairline"
+                          }
+                        ]
+                      },
+                      "optional": true
+                    },
+                    "label": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "string"
                       },
                       "optional": true
                     },
@@ -580,6 +597,13 @@
                 {
                   "type": "object",
                   "attributes": {
+                    "enabled": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "boolean"
+                      },
+                      "optional": true
+                    },
                     "backgroundColor": {
                       "type": "objectAttribute",
                       "value": {
@@ -587,21 +611,24 @@
                         "of": [
                           {
                             "type": "string",
-                            "value": "warm"
+                            "value": "base"
                           },
                           {
                             "type": "string",
-                            "value": "tint"
+                            "value": "reverse"
                           },
                           {
                             "type": "string",
-                            "value": "dark"
-                          },
-                          {
-                            "type": "string",
-                            "value": "ink"
+                            "value": "brand"
                           }
                         ]
+                      },
+                      "optional": true
+                    },
+                    "label": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "string"
                       },
                       "optional": true
                     },

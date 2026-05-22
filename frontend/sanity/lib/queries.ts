@@ -201,18 +201,19 @@ const pageBuilderFields = /* groq */ `
       "items": items[] {
         _key,
         _type,
+        enabled,
         span,
         // image fields
         "image": image.asset->url,
         "imageWidth": image.asset->metadata.dimensions.width,
         "imageHeight": image.asset->metadata.dimensions.height,
         alt,
-        overlayText,
-        overlayPosition,
+        label,
         // text fields
         content,
         textAlign,
         fontSize,
+        displayStyle,
         // shared (text + cta)
         backgroundColor,
         // cta fields

@@ -10,7 +10,7 @@ type ImageHeroProps = {
 }
 
 export default function ImageHero({image, alt, subtitle, index, heading, lightPanel = false}: ImageHeroProps) {
-  const panelBg = lightPanel ? 'oklch(99% 0.003 60 / 0.85)' : 'oklch(9% 0.007 50 / 0.5)'
+  const panelBg = lightPanel ? 'oklch(99% 0.003 60 / 0.85)' : 'oklch(9% 0.007 50 / 0.15)'
   const textPrimary = lightPanel ? 'text-black' : 'text-white'
   const textMuted = lightPanel ? 'text-black/50' : 'text-white/70'
 

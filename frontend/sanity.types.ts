@@ -96,19 +96,21 @@ export type BentoGrid = {
   items: Array<{
     image: BentoImageImage;
     alt: string;
-    overlayText?: string;
-    overlayPosition?: "top" | "center" | "bottom";
+    label?: string;
     _type: "bentoImage";
     _key: string;
   } | {
-    backgroundColor?: "warm" | "tint" | "dark" | "ink";
+    backgroundColor?: "base" | "reverse" | "brand";
+    displayStyle?: "card" | "naked" | "hairline";
+    label?: string;
     content: BlockContentTextOnly;
     textAlign?: "left" | "center" | "right";
     fontSize?: "sm" | "base" | "lg" | "xl";
     _type: "bentoText";
     _key: string;
   } | {
-    backgroundColor?: "warm" | "tint" | "dark" | "ink";
+    backgroundColor?: "base" | "reverse" | "brand";
+    label?: string;
     headline?: string;
     description?: string;
     buttonText?: string;
@@ -1072,7 +1074,7 @@ export type HomepageQueryResult = {
       content: null;
       textAlign: null;
       fontSize: null;
-      backgroundColor: "dark" | "ink" | "tint" | "warm" | null;
+      backgroundColor: "base" | "brand" | "reverse" | null;
       headline: string | null;
       description: string | null;
       buttonText: string | null;
@@ -1085,8 +1087,8 @@ export type HomepageQueryResult = {
       imageWidth: number | null;
       imageHeight: number | null;
       alt: string;
-      overlayText: string | null;
-      overlayPosition: "bottom" | "center" | "top" | null;
+      overlayText: null;
+      overlayPosition: null;
       content: null;
       textAlign: null;
       fontSize: null;
@@ -1108,7 +1110,7 @@ export type HomepageQueryResult = {
       content: BlockContentTextOnly;
       textAlign: "center" | "left" | "right" | null;
       fontSize: "base" | "lg" | "sm" | "xl" | null;
-      backgroundColor: "dark" | "ink" | "tint" | "warm" | null;
+      backgroundColor: "base" | "brand" | "reverse" | null;
       headline: null;
       description: null;
       buttonText: null;
@@ -1364,7 +1366,7 @@ export type GetPageQueryResult = {
       content: null;
       textAlign: null;
       fontSize: null;
-      backgroundColor: "dark" | "ink" | "tint" | "warm" | null;
+      backgroundColor: "base" | "brand" | "reverse" | null;
       headline: string | null;
       description: string | null;
       buttonText: string | null;
@@ -1377,8 +1379,8 @@ export type GetPageQueryResult = {
       imageWidth: number | null;
       imageHeight: number | null;
       alt: string;
-      overlayText: string | null;
-      overlayPosition: "bottom" | "center" | "top" | null;
+      overlayText: null;
+      overlayPosition: null;
       content: null;
       textAlign: null;
       fontSize: null;
@@ -1400,7 +1402,7 @@ export type GetPageQueryResult = {
       content: BlockContentTextOnly;
       textAlign: "center" | "left" | "right" | null;
       fontSize: "base" | "lg" | "sm" | "xl" | null;
-      backgroundColor: "dark" | "ink" | "tint" | "warm" | null;
+      backgroundColor: "base" | "brand" | "reverse" | null;
       headline: null;
       description: null;
       buttonText: null;
@@ -2200,7 +2202,7 @@ export type PortfolioProjectQueryResult = {
       content: null;
       textAlign: null;
       fontSize: null;
-      backgroundColor: "dark" | "ink" | "tint" | "warm" | null;
+      backgroundColor: "base" | "brand" | "reverse" | null;
       headline: string | null;
       description: string | null;
       buttonText: string | null;
@@ -2213,8 +2215,8 @@ export type PortfolioProjectQueryResult = {
       imageWidth: number | null;
       imageHeight: number | null;
       alt: string;
-      overlayText: string | null;
-      overlayPosition: "bottom" | "center" | "top" | null;
+      overlayText: null;
+      overlayPosition: null;
       content: null;
       textAlign: null;
       fontSize: null;
@@ -2236,7 +2238,7 @@ export type PortfolioProjectQueryResult = {
       content: BlockContentTextOnly;
       textAlign: "center" | "left" | "right" | null;
       fontSize: "base" | "lg" | "sm" | "xl" | null;
-      backgroundColor: "dark" | "ink" | "tint" | "warm" | null;
+      backgroundColor: "base" | "brand" | "reverse" | null;
       headline: null;
       description: null;
       buttonText: null;

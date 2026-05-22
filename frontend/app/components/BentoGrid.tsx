@@ -11,10 +11,11 @@ import { backgroundVariants, tileOverlay } from '@/app/components/backgrounds'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export type BentoColor = 'warm' | 'tint' | 'dark' | 'ink'
+export type BentoColor = 'base' | 'reverse' | 'brand'
 
 interface BaseBentoItem {
   _key: string
+  enabled?: boolean | null
 }
 
 export interface BentoImageItem extends BaseBentoItem {
@@ -23,8 +24,7 @@ export interface BentoImageItem extends BaseBentoItem {
   imageWidth?: number | null
   imageHeight?: number | null
   alt?: string | null
-  overlayText?: string | null
-  overlayPosition?: 'top' | 'center' | 'bottom' | null
+  label?: string | null
 }
 
 export interface BentoTextItem extends BaseBentoItem {
@@ -33,6 +33,8 @@ export interface BentoTextItem extends BaseBentoItem {
   textAlign?: 'left' | 'center' | 'right' | null
   backgroundColor?: BentoColor | null
   fontSize?: 'sm' | 'base' | 'lg' | 'xl' | null
+  label?: string | null
+  displayStyle?: 'card' | 'naked' | 'hairline' | null
 }
 
 export interface BentoCtaItem extends BaseBentoItem {
@@ -42,6 +44,7 @@ export interface BentoCtaItem extends BaseBentoItem {
   buttonText?: string | null
   buttonLink?: string | null
   backgroundColor?: BentoColor | null
+  label?: string | null
 }
 
 export type BentoItem = BentoImageItem | BentoTextItem | BentoCtaItem
@@ -363,39 +366,60 @@ const itemVariants = {
 }
 
 // ─── Color maps ───────────────────────────────────────────────────────────────
+// Three surface options. Only applied when displayStyle === 'card'.
+// base    — warm surface-100: slightly darker than the page background, light
+// reverse — warm ink: inverts the surface/text relationship
+// brand   — precision signal orange: one charged tile maximum
 
 const bgMap: Record<BentoColor, string> = {
-  warm: 'bg-gray-50',
-  tint: 'bg-gray-100',
-  dark: 'bg-gray-900',
-  ink: 'bg-black',
+  base:    'bg-[oklch(93%_0.006_55)]',
+  reverse: 'bg-[oklch(9%_0.007_50)]',
+  brand:   'bg-[oklch(62%_0.22_35)]',
 }
 
 const fgMap: Record<BentoColor, string> = {
-  warm: 'text-black',
-  tint: 'text-black',
-  dark: 'text-white',
-  ink: 'text-white',
+  base:    'text-[oklch(9%_0.007_50)]',
+  reverse: 'text-[oklch(99%_0.003_60)]',
+  brand:   'text-[oklch(99%_0.003_60)]',
 }
 
-// Button styles invert relative to the surface
+// Supporting / muted text — one tier below fg
+const mutedMap: Record<BentoColor, string> = {
+  base:    'text-[oklch(58%_0.012_50)]',
+  reverse: 'text-[oklch(72%_0.010_50)]',
+  brand:   'text-[oklch(88%_0.07_35)]', // warm-peach — readable on orange, clearly secondary
+}
+
+// Buttons invert relative to their surface
 const btnMap: Record<BentoColor, string> = {
-  warm: 'bg-black text-white hover:bg-gray-800',
-  tint: 'bg-black text-white hover:bg-gray-800',
-  dark: 'bg-white text-black hover:bg-gray-100',
-  ink: 'bg-white text-black hover:bg-gray-100',
+  base:    'bg-[oklch(9%_0.007_50)] text-[oklch(99%_0.003_60)] hover:bg-[oklch(23%_0.012_50)]',
+  reverse: 'bg-[oklch(99%_0.003_60)] text-[oklch(9%_0.007_50)] hover:bg-[oklch(93%_0.006_55)]',
+  brand:   'bg-[oklch(99%_0.003_60)] text-[oklch(9%_0.007_50)] hover:bg-[oklch(93%_0.006_55)]',
 }
 
-const overlayAnchor: Record<string, string> = {
-  top: 'justify-start',
-  center: 'justify-center',
-  bottom: 'justify-end',
+// Extra classes applied to the article wrapper based on tile content type.
+// Hairline uses an inset box-shadow — paints inside the border-box, respects
+// border-radius, and is not clipped by overflow:hidden.
+function tileModifierClass(item: BentoItem): string {
+  if (item._type !== 'bentoText') return ''
+  const ds = stegaClean(item.displayStyle) ?? 'card'
+  if (ds === 'hairline') return 'border border-gray-200 dark:border-gray-800'
+  return ''
+}
+
+// ─── Padding helper ───────────────────────────────────────────────────────────
+// Larger tiles get more interior breathing room; small tiles stay tight.
+
+function tilePadding(span: Span): string {
+  const area = span.cols * span.rows
+  if (area >= 4) return 'p-8'
+  if (area >= 2) return 'p-6'
+  return 'p-5'
 }
 
 // ─── Image block ──────────────────────────────────────────────────────────────
 
 function BentoImageBlock({ item, span }: { item: BentoImageItem; span: Span }) {
-  const pos = stegaClean(item.overlayPosition) ?? 'bottom'
   if (!item.image) return null
 
   return (
@@ -407,10 +431,11 @@ function BentoImageBlock({ item, span }: { item: BentoImageItem; span: Span }) {
         sizes={SIZES_BY_COLS[span.cols] ?? SIZES_BY_COLS[1]}
         className="object-cover transition-[transform,filter] duration-[500ms] ease-out group-hover:scale-[1.03] group-hover:brightness-105"
       />
-      {item.overlayText && (
-        <div className={`absolute inset-0 flex flex-col ${overlayAnchor[pos] ?? 'justify-end'} p-4`}>
-          <span className="font-mono text-[0.7rem] uppercase tracking-[0.12em] text-white bg-black/75 px-3 py-1.5 rounded-sm w-fit max-w-[85%]">
-            {item.overlayText}
+      {/* Single caption — always top-right, consistent across every tile type */}
+      {item.label && (
+        <div className="absolute top-0 right-0 p-4">
+          <span className="font-mono text-[0.7rem] uppercase tracking-[0.12em] text-[oklch(99%_0.003_60)] bg-[oklch(9%_0.007_50)]/75 px-3 py-1.5 rounded-sm">
+            {item.label}
           </span>
         </div>
       )}
@@ -420,38 +445,59 @@ function BentoImageBlock({ item, span }: { item: BentoImageItem; span: Span }) {
 
 // ─── Text block ───────────────────────────────────────────────────────────────
 
-function BentoTextBlock({ item }: { item: BentoTextItem }) {
-  const color = item.backgroundColor ?? 'warm'
+function BentoTextBlock({ item, span }: { item: BentoTextItem; span: Span }) {
+  const color = item.backgroundColor ?? 'base'
   const align = stegaClean(item.textAlign) ?? 'left'
   const size = stegaClean(item.fontSize) ?? 'base'
+  const displayStyle = stegaClean(item.displayStyle) ?? 'card'
+  const pad = tilePadding(span)
+
+  const isTransparent = displayStyle === 'naked' || displayStyle === 'hairline'
+  // Transparent tiles inherit the page surface — use ink text regardless of color setting
+  const bgClass  = isTransparent ? 'bg-transparent' : bgMap[color]
+  const fgClass  = isTransparent ? 'text-[oklch(9%_0.007_50)]' : fgMap[color]
+  const lblClass = isTransparent ? 'text-[oklch(58%_0.012_50)]' : mutedMap[color]
 
   const sizeClass: Record<string, string> = {
-    sm: '[&_p]:text-sm [&_p]:leading-relaxed',
+    sm:   '[&_p]:text-sm [&_p]:leading-relaxed',
     base: '[&_p]:text-base [&_p]:leading-relaxed',
-    lg: '[&_p]:text-lg [&_p]:leading-snug',
-    xl: '[&_p]:text-xl [&_p]:leading-snug [&_p]:tracking-tight',
+    lg:   '[&_p]:text-lg [&_p]:leading-snug',
+    xl:   '[&_p]:text-xl [&_p]:leading-snug [&_p]:tracking-tight',
   }
 
   const alignClass: Record<string, string> = {
-    left: 'text-left',
+    left:   'text-left',
     center: 'text-center',
-    right: 'text-right',
+    right:  'text-right',
   }
+
+  // Cap line length; centred text gets a symmetric max-width instead
+  const proseWidthClass = align === 'center' ? 'max-w-[55ch] mx-auto w-full' : 'max-w-[65ch]'
+  // Label pushes content to bottom; without label, justify-end anchors naturally
+  const justifyClass = item.label ? 'justify-between' : 'justify-end'
 
   return (
     <div
-      className={`h-full flex flex-col justify-center p-6 ${bgMap[color]} ${fgMap[color]} ${alignClass[align] ?? 'text-left'} ${sizeClass[size] ?? ''}`}
+      className={`h-full flex flex-col ${justifyClass} ${pad} ${bgClass} ${fgClass} ${alignClass[align] ?? 'text-left'} ${sizeClass[size] ?? ''}`}
     >
-      {item.content && <PortableText value={item.content} />}
+      {item.label && (
+        <span className={`font-mono text-[0.7rem] uppercase tracking-[0.12em] self-end ${lblClass}`}>
+          {item.label}
+        </span>
+      )}
+      <div className={proseWidthClass}>
+        {item.content && <PortableText value={item.content} anchors={false} />}
+      </div>
     </div>
   )
 }
 
 // ─── CTA block ────────────────────────────────────────────────────────────────
 
-function BentoCtaBlock({ item }: { item: BentoCtaItem }) {
-  const color = item.backgroundColor ?? 'warm'
+function BentoCtaBlock({ item, span }: { item: BentoCtaItem; span: Span }) {
+  const color = item.backgroundColor ?? 'base'
   const isExternal = item.buttonLink?.startsWith('http')
+  const pad = tilePadding(span)
 
   const btnClass = `inline-flex items-center font-mono text-[0.7rem] uppercase tracking-[0.12em] px-5 py-2.5 rounded-[8px] transition-colors duration-200 ease-out ${btnMap[color]}`
 
@@ -459,38 +505,46 @@ function BentoCtaBlock({ item }: { item: BentoCtaItem }) {
     ? `${item.buttonText}${item.headline ? ` — ${item.headline}` : ''}`
     : (item.headline ?? undefined)
 
+  const buttonNode = item.buttonText && item.buttonLink ? (
+    isExternal ? (
+      <a
+        href={item.buttonLink}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={ariaLabel}
+        className={btnClass}
+      >
+        {item.buttonText}
+      </a>
+    ) : (
+      <Link href={item.buttonLink} aria-label={ariaLabel} className={btnClass}>
+        {item.buttonText}
+      </Link>
+    )
+  ) : null
+
+  // Label at top-left pushes the content group to the bottom via justify-between
+  const justifyClass = item.label ? 'justify-between' : 'justify-end'
+
   return (
-    <div className={`h-full flex flex-col justify-between p-6 ${bgMap[color]} ${fgMap[color]}`}>
-      <div className="flex flex-col gap-3">
+    <div className={`h-full flex flex-col ${justifyClass} gap-4 ${pad} ${bgMap[color]} ${fgMap[color]}`}>
+      {item.label && (
+        <span className={`font-mono text-[0.7rem] uppercase tracking-[0.12em] self-end ${mutedMap[color]}`}>
+          {item.label}
+        </span>
+      )}
+      {/* Content group — headline, description, button sit together at the bottom */}
+      <div className="flex flex-col gap-4">
         {item.headline && (
-          <h3 className="text-xl font-medium tracking-tight leading-snug text-wrap-balance">
+          <h3 className="text-2xl font-medium tracking-tight leading-snug text-balance">
             {item.headline}
           </h3>
         )}
         {item.description && (
-          <p className="text-sm leading-relaxed opacity-60">{item.description}</p>
+          <p className={`text-sm leading-relaxed ${mutedMap[color]}`}>{item.description}</p>
         )}
+        {buttonNode && <div>{buttonNode}</div>}
       </div>
-
-      {item.buttonText && item.buttonLink && (
-        <div className="mt-6">
-          {isExternal ? (
-            <a
-              href={item.buttonLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={ariaLabel}
-              className={btnClass}
-            >
-              {item.buttonText}
-            </a>
-          ) : (
-            <Link href={item.buttonLink} aria-label={ariaLabel} className={btnClass}>
-              {item.buttonText}
-            </Link>
-          )}
-        </div>
-      )}
     </div>
   )
 }
@@ -499,14 +553,16 @@ function BentoCtaBlock({ item }: { item: BentoCtaItem }) {
 // A small designed accent showing the item count — placed by the solver as a
 // real tile, not a blank filler.
 
-function BentoCounterBlock({ count, label, large }: { count: number; label: string; large: boolean }) {
+function BentoCounterBlock({ count, label, large, span }: { count: number; label: string; large: boolean; span: Span }) {
+  const pad = tilePadding(span)
   return (
-    <div className="h-full flex flex-col justify-between p-6 bg-gray-50">
-      <span className="font-mono text-[0.7rem] uppercase tracking-[0.12em] text-gray-400">
+    // Inverted: ink background punches out against the light tile grid — one dark accent
+    <div className={`h-full flex flex-col justify-between ${pad} bg-[oklch(9%_0.007_50)]`}>
+      <span className="font-mono text-[0.7rem] uppercase tracking-[0.12em] text-[oklch(72%_0.010_50)]">
         {label}
       </span>
       <p
-        className={`font-bold leading-none tracking-tight text-gray-900 ${
+        className={`font-bold leading-none tracking-tight text-[oklch(99%_0.003_60)] ${
           large ? 'text-[clamp(3rem,5vw,4.75rem)]' : 'text-[2.5rem]'
         }`}
       >
@@ -524,17 +580,20 @@ export default function BentoGrid({ block }: BentoGridProps) {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
 
-  const hasItems = !!items && items.length > 0
+  // Filter before the solver — disabled items are invisible to the layout engine
+  const visibleItems = items?.filter((i) => i.enabled !== false) ?? []
+  const hasItems = visibleItems.length > 0
   const { placed, fillers } = useMemo(
     () =>
       hasItems
-        ? computeLayout(items)
+        ? computeLayout(visibleItems)
         : { placed: new Map<string, PlacedItem>(), fillers: [] as PlacedItem[] },
-    [hasItems, items],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [hasItems, visibleItems],
   )
 
-  const imageCount = hasItems ? items.filter((i) => i._type === 'bentoImage').length : 0
-  const counterCount = imageCount > 0 ? imageCount : (items?.length ?? 0)
+  const imageCount = hasItems ? visibleItems.filter((i) => i._type === 'bentoImage').length : 0
+  const counterCount = imageCount > 0 ? imageCount : visibleItems.length
   const counterLabel = imageCount > 0 ? 'Images' : 'Items'
   const counterPlaced = placed.get(COUNTER_KEY) ?? null
 
@@ -549,7 +608,7 @@ export default function BentoGrid({ block }: BentoGridProps) {
       )}
       <div className="max-w-[1440px] mx-auto w-full px-4 sm:px-6 lg:px-10">
         <section className="py-12">
-          {items && items.length > 0 && (
+          {hasItems && (
             <motion.div
               ref={ref}
               variants={containerVariants}
@@ -557,13 +616,13 @@ export default function BentoGrid({ block }: BentoGridProps) {
               animate={inView ? 'visible' : 'hidden'}
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 [grid-auto-rows:minmax(220px,auto)] [grid-auto-flow:dense] gap-2"
             >
-              {items.map((item) => {
+              {visibleItems.map((item) => {
                 const p = placed.get(item._key) ?? { span: { cols: 1, rows: 1 } as Span, row: 0, col: 0 }
                 return (
                   <motion.article
                     key={item._key}
                     variants={itemVariants}
-                    className={`relative overflow-hidden rounded-sm transition-[filter] duration-200 ease-out hover:brightness-95 ${cellClass(p)}`}
+                    className={`relative overflow-hidden rounded-sm transition-[filter] duration-200 ease-out hover:brightness-95 ${cellClass(p)} ${tileModifierClass(item)}`}
                     aria-label={
                       item._type === 'bentoImage'
                         ? (item.alt ?? undefined)
@@ -573,8 +632,8 @@ export default function BentoGrid({ block }: BentoGridProps) {
                     }
                   >
                     {item._type === 'bentoImage' && <BentoImageBlock item={item} span={p.span} />}
-                    {item._type === 'bentoText' && <BentoTextBlock item={item} />}
-                    {item._type === 'bentoCta' && <BentoCtaBlock item={item} />}
+                    {item._type === 'bentoText' && <BentoTextBlock item={item} span={p.span} />}
+                    {item._type === 'bentoCta' && <BentoCtaBlock item={item} span={p.span} />}
                   </motion.article>
                 )
               })}
@@ -590,6 +649,7 @@ export default function BentoGrid({ block }: BentoGridProps) {
                     count={counterCount}
                     label={counterLabel}
                     large={counterPlaced.span.cols * counterPlaced.span.rows >= 2}
+                    span={counterPlaced.span}
                   />
                 </motion.article>
               )}
@@ -601,7 +661,7 @@ export default function BentoGrid({ block }: BentoGridProps) {
                   aria-hidden="true"
                   className={`relative overflow-hidden rounded-sm hidden lg:block ${cellClass(f)}`}
                 >
-                  <div className="h-full bg-gray-50" />
+                  <div className="h-full bg-[oklch(97%_0.004_60)]" />
                 </motion.article>
               ))}
             </motion.div>
