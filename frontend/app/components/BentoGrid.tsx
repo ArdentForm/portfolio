@@ -56,42 +56,53 @@ export interface BentoGridProps {
   }
 }
 
-// ─── Layout ───────────────────────────────────────────────────────────────────
+// ─── Layout constants ─────────────────────────────────────────────────────────
 
-interface Span { cols: 1 | 2 | 3 | 4; rows: 1 | 2 | 3 }
-
-// Exact cell geometry at 1440px desktop:
-// container = 1440 - 80px padding - 24px gap = 1336px / 4 cols = 334px per col
+// Desktop (4-col): container = 1440 - 80px padding - 24px gap = 1336px / 4 = 334px per col
 const COL_W = 334
 const ROW_H = 220
 const GAP = 8
 const SIZE_PENALTY = 0.15
+const GRID_COLS = 4
+
+// Tablet (3-col): container ≈ 768–1023px - 48px padding - 16px gap / 3 cols ≈ 260px per col
+// Biased toward smaller tablet width so crops feel correct where stretching is most visible.
+const SM_GRID_COLS = 3
+const SM_COL_W = 260
+const SM_IMAGE_AR_BAND = 0.55  // wider band than desktop — lets portrait flex to 1×1 to avoid gap penalty
+const SM_SIZE_PENALTY = 0.20   // slightly higher than desktop — prefers smaller tiles on narrower viewports
+
+interface Span { cols: 1 | 2 | 3 | 4; rows: 1 | 2 | 3 }
 
 function effectiveAr(cols: number, rows: number): number {
   return (cols * COL_W + (cols - 1) * GAP) / (rows * ROW_H + (rows - 1) * GAP)
 }
 
+function smEffectiveAr(cols: number, rows: number): number {
+  return (cols * SM_COL_W + (cols - 1) * GAP) / (rows * ROW_H + (rows - 1) * GAP)
+}
+
+// ─── Desktop span options (4-col) ─────────────────────────────────────────────
 const SPAN_OPTIONS: Span[] = [
   { cols: 1, rows: 1 }, { cols: 2, rows: 1 }, { cols: 3, rows: 1 }, { cols: 4, rows: 1 },
   { cols: 1, rows: 2 }, { cols: 2, rows: 2 }, { cols: 3, rows: 2 }, { cols: 4, rows: 2 },
   { cols: 1, rows: 3 }, { cols: 2, rows: 3 },
 ]
 
-// ─── Layout solver ─────────────────────────────────────────────────────────────
-// Every item carries a ranked list of spans it may occupy, each with a penalty.
-// The solver searches span combinations, simulates CSS grid-auto-flow:dense for
-// each, and keeps the cheapest gap-free tiling. Images flex only within a modest
-// aspect-ratio band and are the preferred absorber of leftover space; text/CTA
-// boxes flex freely; the counter is a small accent that grows only as a last
-// resort. Every cell ends up owned by a real item or the counter — there are no
-// blank filler tiles.
+// Tablet span options (3-col) — no cols: 4
+const SM_SPAN_OPTIONS: Span[] = [
+  { cols: 1, rows: 1 }, { cols: 2, rows: 1 }, { cols: 3, rows: 1 },
+  { cols: 1, rows: 2 }, { cols: 2, rows: 2 }, { cols: 3, rows: 2 },
+  { cols: 1, rows: 3 }, { cols: 2, rows: 3 },
+]
 
-// A span an item may occupy, paired with the cost of choosing it.
+// ─── Solver types ──────────────────────────────────────────────────────────────
+
 interface Candidate { span: Span; penalty: number }
 
-// Images may drift up to ~55% off their best aspect-ratio fit — enough to grow
-// one step and absorb space (object-cover crops), not enough to lose the shot.
-const IMAGE_AR_BAND = 0.44 // ≈ log(1.55)
+// ─── Desktop image candidates ──────────────────────────────────────────────────
+// Images may drift up to ~55% off their best aspect-ratio fit.
+const IMAGE_AR_BAND = 0.44
 
 function imageCandidates(item: BentoImageItem): Candidate[] {
   if (!item.imageWidth || !item.imageHeight) {
@@ -107,16 +118,38 @@ function imageCandidates(item: BentoImageItem): Candidate[] {
     .filter((s) => s.dev <= bestDev + IMAGE_AR_BAND)
     .map((s) => ({
       span: s.span,
-      // Crop drift dominates; a mild size term breaks ties toward smaller spans.
       penalty: (s.dev - bestDev) * 4 + Math.log(s.span.cols * s.span.rows) * SIZE_PENALTY,
     }))
     .sort((a, b) => a.penalty - b.penalty)
     .slice(0, 5)
 }
 
-// Text/CTA penalties encode reading comfort: 2-wide shapes read best, 1×1 is
-// cramped, thin or oversized shapes are a last resort. Costs sit above the image
-// band so images absorb leftover space before a text box stretches to fill it.
+// ─── Tablet image candidates ───────────────────────────────────────────────────
+// Wider AR band (0.55 vs 0.44) lets portrait images flex between 1×2 (ideal crop)
+// and 1×1 (compact). When many portraits pile up and create gaps, the hole penalty
+// (4000) overwhelms the crop drift penalty (~1.7), so the solver naturally collapses
+// them to 1×1 and eliminates the tall-strip problem.
+function smImageCandidates(item: BentoImageItem): Candidate[] {
+  if (!item.imageWidth || !item.imageHeight) {
+    return [{ span: { cols: 1, rows: 1 }, penalty: 0 }]
+  }
+  const imageAr = item.imageWidth / item.imageHeight
+  const scored = SM_SPAN_OPTIONS.map((span) => ({
+    span,
+    dev: Math.abs(Math.log(smEffectiveAr(span.cols, span.rows) / imageAr)),
+  }))
+  const bestDev = Math.min(...scored.map((s) => s.dev))
+  return scored
+    .filter((s) => s.dev <= bestDev + SM_IMAGE_AR_BAND)
+    .map((s) => ({
+      span: s.span,
+      penalty: (s.dev - bestDev) * 4 + Math.log(s.span.cols * s.span.rows) * SM_SIZE_PENALTY,
+    }))
+    .sort((a, b) => a.penalty - b.penalty)
+    .slice(0, 5)
+}
+
+// ─── Desktop flex / counter candidates ────────────────────────────────────────
 const FLEX_CANDIDATES: Candidate[] = [
   { span: { cols: 2, rows: 1 }, penalty: 0 },
   { span: { cols: 2, rows: 2 }, penalty: 0.6 },
@@ -128,8 +161,6 @@ const FLEX_CANDIDATES: Candidate[] = [
   { span: { cols: 2, rows: 3 }, penalty: 3.6 },
 ]
 
-// The counter is a designed accent, not a blank filler. It strongly prefers a
-// single cell and only grows when nothing else can close a gap.
 const COUNTER_KEY = '__bento_counter__'
 const COUNTER_CANDIDATES: Candidate[] = [
   { span: { cols: 1, rows: 1 }, penalty: 0 },
@@ -142,19 +173,47 @@ const COUNTER_CANDIDATES: Candidate[] = [
   { span: { cols: 2, rows: 3 }, penalty: 11 },
 ]
 
-interface PlacedItem { span: Span; row: number; col: number }
+// ─── Tablet flex / counter candidates ─────────────────────────────────────────
+// Text/CTA prefer narrower shapes on tablet: 2×1 first, then 3×1 (full-width banner).
+// 2×2 is a secondary option — avoids the "orphaned white-space block" from the old
+// fixed assignment that always gave text a full 2×2 tile.
+const SM_FLEX_CANDIDATES: Candidate[] = [
+  { span: { cols: 2, rows: 1 }, penalty: 0 },
+  { span: { cols: 3, rows: 1 }, penalty: 0.5 },
+  { span: { cols: 2, rows: 2 }, penalty: 1.0 },
+  { span: { cols: 3, rows: 2 }, penalty: 1.8 },
+  { span: { cols: 1, rows: 2 }, penalty: 2.5 },
+  { span: { cols: 1, rows: 1 }, penalty: 3.0 },
+  { span: { cols: 1, rows: 3 }, penalty: 4.0 },
+  { span: { cols: 2, rows: 3 }, penalty: 4.5 },
+]
 
-const GRID_COLS = 4
+const SM_COUNTER_CANDIDATES: Candidate[] = [
+  { span: { cols: 1, rows: 1 }, penalty: 0 },
+  { span: { cols: 2, rows: 1 }, penalty: 1.5 },
+  { span: { cols: 1, rows: 2 }, penalty: 1.5 },
+  { span: { cols: 2, rows: 2 }, penalty: 4 },
+  { span: { cols: 3, rows: 1 }, penalty: 7 },
+  { span: { cols: 1, rows: 3 }, penalty: 7 },
+  { span: { cols: 3, rows: 2 }, penalty: 11 },
+  { span: { cols: 2, rows: 3 }, penalty: 11 },
+]
+
+// ─── Grid state helpers ────────────────────────────────────────────────────────
+// All functions accept a `gridCols` parameter (default = GRID_COLS = 4) so the
+// same logic can drive both the 4-col desktop solver and the 3-col tablet solver.
+
+interface PlacedItem { span: Span; row: number; col: number }
 type GridState = boolean[][]
 
-function gEnsure(g: GridState, row: number) {
-  while (g.length <= row) g.push(new Array(GRID_COLS).fill(false))
+function gEnsure(g: GridState, row: number, gridCols = GRID_COLS) {
+  while (g.length <= row) g.push(new Array(gridCols).fill(false))
 }
 
-function gFree(g: GridState, row: number, col: number, cols: number, rows: number): boolean {
-  if (col + cols > GRID_COLS) return false
+function gFree(g: GridState, row: number, col: number, cols: number, rows: number, gridCols = GRID_COLS): boolean {
+  if (col + cols > gridCols) return false
   for (let r = row; r < row + rows; r++) {
-    gEnsure(g, r)
+    gEnsure(g, r, gridCols)
     for (let c = col; c < col + cols; c++) {
       if (g[r][c]) return false
     }
@@ -162,34 +221,34 @@ function gFree(g: GridState, row: number, col: number, cols: number, rows: numbe
   return true
 }
 
-function gPlace(g: GridState, row: number, col: number, cols: number, rows: number) {
+function gPlace(g: GridState, row: number, col: number, cols: number, rows: number, gridCols = GRID_COLS) {
   for (let r = row; r < row + rows; r++) {
-    gEnsure(g, r)
+    gEnsure(g, r, gridCols)
     for (let c = col; c < col + cols; c++) { g[r][c] = true }
   }
 }
 
-function gFindDense(g: GridState, cols: number, rows: number): { row: number; col: number } {
+function gFindDense(g: GridState, cols: number, rows: number, gridCols = GRID_COLS): { row: number; col: number } {
   for (let r = 0; ; r++) {
-    gEnsure(g, r)
-    for (let c = 0; c <= GRID_COLS - cols; c++) {
-      if (gFree(g, r, c, cols, rows)) return { row: r, col: c }
+    gEnsure(g, r, gridCols)
+    for (let c = 0; c <= gridCols - cols; c++) {
+      if (gFree(g, r, c, cols, rows, gridCols)) return { row: r, col: c }
     }
   }
 }
 
 // Decomposes every empty cell into capped rectangles (non-destructive).
-function holeRects(g: GridState, height: number): PlacedItem[] {
+function holeRects(g: GridState, height: number, gridCols = GRID_COLS): PlacedItem[] {
   const c: boolean[][] = []
   for (let r = 0; r < height; r++) {
-    c.push((g[r] ?? new Array(GRID_COLS).fill(false)).slice())
+    c.push((g[r] ?? new Array(gridCols).fill(false)).slice())
   }
   const rects: PlacedItem[] = []
   for (let r = 0; r < height; r++) {
-    for (let col = 0; col < GRID_COLS; col++) {
+    for (let col = 0; col < gridCols; col++) {
       if (c[r][col]) continue
       let w = 0
-      while (w < GRID_COLS && col + w < GRID_COLS && !c[r][col + w]) w++
+      while (w < gridCols && col + w < gridCols && !c[r][col + w]) w++
       let h = 1
       while (h < 3 && r + h < height) {
         let rowFree = true
@@ -210,19 +269,17 @@ function holeRects(g: GridState, height: number): PlacedItem[] {
 
 interface KeyedSpan { key: string; span: Span }
 
-// Places items in document order by dense flow (counter appended last).
-function simulate(items: KeyedSpan[]) {
+function simulate(items: KeyedSpan[], gridCols = GRID_COLS) {
   const g: GridState = []
   const placed = new Map<string, PlacedItem>()
   for (const it of items) {
-    const pos = gFindDense(g, it.span.cols, it.span.rows)
-    gPlace(g, pos.row, pos.col, it.span.cols, it.span.rows)
+    const pos = gFindDense(g, it.span.cols, it.span.rows, gridCols)
+    gPlace(g, pos.row, pos.col, it.span.cols, it.span.rows, gridCols)
     placed.set(it.key, { span: it.span, row: pos.row, col: pos.col })
   }
   return { placed, height: g.length, grid: g }
 }
 
-// Two rectangles share an edge (used to keep text boxes apart).
 function rectsAdjacent(a: PlacedItem, b: PlacedItem): boolean {
   const aR2 = a.row + a.span.rows, aC2 = a.col + a.span.cols
   const bR2 = b.row + b.span.rows, bC2 = b.col + b.span.cols
@@ -235,10 +292,10 @@ function rectsAdjacent(a: PlacedItem, b: PlacedItem): boolean {
 
 interface SolverItem { key: string; isFlex: boolean; candidates: Candidate[] }
 
-// Upper bound on span combinations searched. Candidate lists are trimmed evenly
-// (costliest first) until the product fits, keeping the search near-instant.
 const MAX_COMBOS = 80000
 
+// ─── Desktop layout solver (4-col) ────────────────────────────────────────────
+// Do not touch — drives the lg: breakpoint. See handover notes for full context.
 function computeLayout(items: BentoItem[]): {
   placed: Map<string, PlacedItem>
   fillers: PlacedItem[]
@@ -248,7 +305,6 @@ function computeLayout(items: BentoItem[]): {
     isFlex: it._type === 'bentoText' || it._type === 'bentoCta',
     candidates: it._type === 'bentoImage' ? imageCandidates(it) : [...FLEX_CANDIDATES],
   }))
-  // The counter is appended last so dense flow lets it mop up a leftover cell.
   solverItems.push({ key: COUNTER_KEY, isFlex: false, candidates: [...COUNTER_CANDIDATES] })
 
   for (const si of solverItems) si.candidates.sort((a, b) => a.penalty - b.penalty)
@@ -281,8 +337,8 @@ function computeLayout(items: BentoItem[]): {
       penaltySum += c.penalty
       return { key: si.key, span: c.span }
     })
-    const sim = simulate(keyed)
-    const holes = holeRects(sim.grid, sim.height)
+    const sim = simulate(keyed, GRID_COLS)
+    const holes = holeRects(sim.grid, sim.height, GRID_COLS)
     const holeArea = holes.reduce((t, h) => t + h.span.cols * h.span.rows, 0)
 
     let adjacent = 0
@@ -295,8 +351,6 @@ function computeLayout(items: BentoItem[]): {
       }
     }
 
-    // Holes dominate so a gap-free rectangle always wins; span penalties and
-    // text-box adjacency are fine-grained tiebreakers among clean tilings.
     const cost = holes.length * 4000 + holeArea * 300 + penaltySum + adjacent * 10
     if (cost < bestCost) {
       bestCost = cost
@@ -306,12 +360,83 @@ function computeLayout(items: BentoItem[]): {
     }
   }
 
-  return { placed: bestPlaced!, fillers: holeRects(bestGrid, bestHeight) }
+  return { placed: bestPlaced!, fillers: holeRects(bestGrid, bestHeight, GRID_COLS) }
 }
 
-// Explicit grid-line classes for lg — complete strings required for Tailwind JIT.
-// start + end are two separate longhands, so neither resets the other; the
-// col-span shorthand would clobber grid-column-start and break placement.
+// ─── Tablet layout solver (3-col) ─────────────────────────────────────────────
+// Mirrors computeLayout but uses SM_* constants and candidates throughout.
+// Outputs explicit sm: grid-line placements that the lg: desktop placements
+// cascade over at the lg breakpoint — the two solvers never conflict.
+function computeTabletLayout(items: BentoItem[]): {
+  placed: Map<string, PlacedItem>
+  fillers: PlacedItem[]
+} {
+  const solverItems: SolverItem[] = items.map((it) => ({
+    key: it._key,
+    isFlex: it._type === 'bentoText' || it._type === 'bentoCta',
+    candidates: it._type === 'bentoImage' ? smImageCandidates(it) : [...SM_FLEX_CANDIDATES],
+  }))
+  solverItems.push({ key: COUNTER_KEY, isFlex: false, candidates: [...SM_COUNTER_CANDIDATES] })
+
+  for (const si of solverItems) si.candidates.sort((a, b) => a.penalty - b.penalty)
+  const comboCount = () => solverItems.reduce((p, si) => p * si.candidates.length, 1)
+  while (comboCount() > MAX_COMBOS) {
+    let widest: SolverItem | null = null
+    for (const si of solverItems) {
+      if (si.candidates.length > 1 && (!widest || si.candidates.length > widest.candidates.length)) {
+        widest = si
+      }
+    }
+    if (!widest) break
+    widest.candidates.pop()
+  }
+
+  const flexKeys = new Set(solverItems.filter((s) => s.isFlex).map((s) => s.key))
+  const total = comboCount()
+  let bestPlaced: Map<string, PlacedItem> | null = null
+  let bestGrid: GridState = []
+  let bestHeight = 0
+  let bestCost = Infinity
+
+  for (let combo = 0; combo < total; combo++) {
+    let n = combo
+    let penaltySum = 0
+    const keyed: KeyedSpan[] = solverItems.map((si) => {
+      const len = si.candidates.length
+      const c = si.candidates[n % len]
+      n = Math.floor(n / len)
+      penaltySum += c.penalty
+      return { key: si.key, span: c.span }
+    })
+    const sim = simulate(keyed, SM_GRID_COLS)
+    const holes = holeRects(sim.grid, sim.height, SM_GRID_COLS)
+    const holeArea = holes.reduce((t, h) => t + h.span.cols * h.span.rows, 0)
+
+    let adjacent = 0
+    const flexPlaced = keyed
+      .filter((k) => flexKeys.has(k.key))
+      .map((k) => sim.placed.get(k.key)!)
+    for (let i = 0; i < flexPlaced.length; i++) {
+      for (let j = i + 1; j < flexPlaced.length; j++) {
+        if (rectsAdjacent(flexPlaced[i], flexPlaced[j])) adjacent++
+      }
+    }
+
+    const cost = holes.length * 4000 + holeArea * 300 + penaltySum + adjacent * 10
+    if (cost < bestCost) {
+      bestCost = cost
+      bestPlaced = sim.placed
+      bestGrid = sim.grid
+      bestHeight = sim.height
+    }
+  }
+
+  return { placed: bestPlaced!, fillers: holeRects(bestGrid, bestHeight, SM_GRID_COLS) }
+}
+
+// ─── Desktop grid-line class maps (lg:) ───────────────────────────────────────
+// Complete strings required for Tailwind JIT. col-start + col-end longhands
+// avoid clobbering grid-column-start via the span shorthand.
 const LG_COL_START: Record<number, string> = {
   1: 'lg:col-start-1', 2: 'lg:col-start-2', 3: 'lg:col-start-3', 4: 'lg:col-start-4',
 }
@@ -330,23 +455,63 @@ const LG_ROW_END: Record<number, string> = {
   10: 'lg:row-end-10', 11: 'lg:row-end-11', 12: 'lg:row-end-12', 13: 'lg:row-end-13',
   14: 'lg:row-end-14', 15: 'lg:row-end-15', 16: 'lg:row-end-16', 17: 'lg:row-end-17',
 }
-const SIZES_BY_COLS: Record<number, string> = {
-  1: '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw',
-  2: '(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 50vw',
-  3: '(max-width: 640px) 100vw, 75vw',
-  4: '100vw',
+
+// ─── Tablet grid-line class maps (sm:) ────────────────────────────────────────
+// At lg, these sm: classes are superseded by the lg: classes above — CSS breakpoints
+// cascade in ascending order, so lg: always wins over sm: at the desktop viewport.
+const SM_COL_START: Record<number, string> = {
+  1: 'sm:col-start-1', 2: 'sm:col-start-2', 3: 'sm:col-start-3',
+}
+const SM_COL_END: Record<number, string> = {
+  2: 'sm:col-end-2', 3: 'sm:col-end-3', 4: 'sm:col-end-4',
+}
+const SM_ROW_START: Record<number, string> = {
+  1: 'sm:row-start-1', 2: 'sm:row-start-2', 3: 'sm:row-start-3', 4: 'sm:row-start-4',
+  5: 'sm:row-start-5', 6: 'sm:row-start-6', 7: 'sm:row-start-7', 8: 'sm:row-start-8',
+  9: 'sm:row-start-9', 10: 'sm:row-start-10', 11: 'sm:row-start-11', 12: 'sm:row-start-12',
+  13: 'sm:row-start-13', 14: 'sm:row-start-14',
+}
+const SM_ROW_END: Record<number, string> = {
+  2: 'sm:row-end-2', 3: 'sm:row-end-3', 4: 'sm:row-end-4', 5: 'sm:row-end-5',
+  6: 'sm:row-end-6', 7: 'sm:row-end-7', 8: 'sm:row-end-8', 9: 'sm:row-end-9',
+  10: 'sm:row-end-10', 11: 'sm:row-end-11', 12: 'sm:row-end-12', 13: 'sm:row-end-13',
+  14: 'sm:row-end-14', 15: 'sm:row-end-15', 16: 'sm:row-end-16', 17: 'sm:row-end-17',
 }
 
 function cellClass(p: PlacedItem): string {
-  const smSpan = p.span.cols >= 2 ? 'sm:col-span-2' : ''
-  const smRows = p.span.rows >= 3 ? 'sm:row-span-3' : p.span.rows === 2 ? 'sm:row-span-2' : ''
   return [
-    smSpan, smRows,
     LG_COL_START[p.col + 1] ?? '',
     LG_COL_END[p.col + 1 + p.span.cols] ?? '',
     LG_ROW_START[p.row + 1] ?? '',
     LG_ROW_END[p.row + 1 + p.span.rows] ?? '',
   ].filter(Boolean).join(' ')
+}
+
+function tabletCellClass(p: PlacedItem): string {
+  return [
+    SM_COL_START[p.col + 1] ?? '',
+    SM_COL_END[p.col + 1 + p.span.cols] ?? '',
+    SM_ROW_START[p.row + 1] ?? '',
+    SM_ROW_END[p.row + 1 + p.span.rows] ?? '',
+  ].filter(Boolean).join(' ')
+}
+
+// Mobile-only layout (below sm) — 2-column grid, aspect-ratio-driven heights.
+// All sm:/lg: placement comes from tabletCellClass / cellClass; this function
+// only emits classes for the mobile breakpoint plus sm:aspect-auto to clear
+// the aspect ratio once grid-auto-rows takes over.
+function mobileClass(item: BentoItem): string {
+  if (item._type === 'bentoImage') {
+    const img = item as BentoImageItem
+    if (!img.imageWidth || !img.imageHeight) {
+      return 'col-span-2 aspect-video sm:aspect-auto'
+    }
+    const ratio = img.imageWidth / img.imageHeight
+    if (ratio > 1.5) return 'col-span-2 aspect-video sm:aspect-auto'
+    if (ratio < 0.75) return 'col-span-2 aspect-[3/4] sm:aspect-auto'
+    return 'col-span-2 aspect-square sm:aspect-auto'
+  }
+  return 'col-span-2 min-h-[180px] sm:min-h-0'
 }
 
 // ─── Animation ────────────────────────────────────────────────────────────────
@@ -366,10 +531,6 @@ const itemVariants = {
 }
 
 // ─── Color maps ───────────────────────────────────────────────────────────────
-// Three surface options. Only applied when displayStyle === 'card'.
-// base    — warm surface-100: slightly darker than the page background, light
-// reverse — warm ink: inverts the surface/text relationship
-// brand   — precision signal orange: one charged tile maximum
 
 const bgMap: Record<BentoColor, string> = {
   base:    'bg-[oklch(93%_0.006_55)]',
@@ -383,32 +544,19 @@ const fgMap: Record<BentoColor, string> = {
   brand:   'text-[oklch(99%_0.003_60)]',
 }
 
-// Supporting / muted text — one tier below fg
 const mutedMap: Record<BentoColor, string> = {
   base:    'text-[oklch(58%_0.012_50)]',
   reverse: 'text-[oklch(72%_0.010_50)]',
-  brand:   'text-[oklch(88%_0.07_35)]', // warm-peach — readable on orange, clearly secondary
+  brand:   'text-[oklch(88%_0.07_35)]',
 }
 
-// Buttons invert relative to their surface
-const btnMap: Record<BentoColor, string> = {
-  base:    'bg-[oklch(9%_0.007_50)] text-[oklch(99%_0.003_60)] hover:bg-[oklch(23%_0.012_50)]',
-  reverse: 'bg-[oklch(99%_0.003_60)] text-[oklch(9%_0.007_50)] hover:bg-[oklch(93%_0.006_55)]',
-  brand:   'bg-[oklch(99%_0.003_60)] text-[oklch(9%_0.007_50)] hover:bg-[oklch(93%_0.006_55)]',
-}
 
-// Extra classes applied to the article wrapper based on tile content type.
-// Hairline uses an inset box-shadow — paints inside the border-box, respects
-// border-radius, and is not clipped by overflow:hidden.
 function tileModifierClass(item: BentoItem): string {
   if (item._type !== 'bentoText') return ''
   const ds = stegaClean(item.displayStyle) ?? 'card'
   if (ds === 'hairline') return 'border border-gray-200 dark:border-gray-800'
   return ''
 }
-
-// ─── Padding helper ───────────────────────────────────────────────────────────
-// Larger tiles get more interior breathing room; small tiles stay tight.
 
 function tilePadding(span: Span): string {
   const area = span.cols * span.rows
@@ -419,19 +567,30 @@ function tilePadding(span: Span): string {
 
 // ─── Image block ──────────────────────────────────────────────────────────────
 
-function BentoImageBlock({ item, span }: { item: BentoImageItem; span: Span }) {
+function BentoImageBlock({
+  item,
+  span,
+  smSpan,
+}: {
+  item: BentoImageItem
+  span: Span
+  smSpan: Span
+}) {
   if (!item.image) return null
 
+  const smPct = Math.round((smSpan.cols / SM_GRID_COLS) * 100)
+  const lgPct = Math.round((span.cols / GRID_COLS) * 100)
+  const sizes = `(max-width: 640px) 100vw, (max-width: 1024px) ${smPct}vw, ${lgPct}vw`
+
   return (
-    <div className="group absolute inset-0">
+    <div className="absolute inset-0">
       <Image
         src={item.image}
         alt={item.alt ?? ''}
         fill
-        sizes={SIZES_BY_COLS[span.cols] ?? SIZES_BY_COLS[1]}
-        className="object-cover transition-[transform,filter] duration-[500ms] ease-out group-hover:scale-[1.03] group-hover:brightness-105"
+        sizes={sizes}
+        className="object-cover"
       />
-      {/* Single caption — always top-right, consistent across every tile type */}
       {item.label && (
         <div className="absolute top-0 right-0 p-4">
           <span className="font-mono text-[0.7rem] uppercase tracking-[0.12em] text-[oklch(99%_0.003_60)] bg-[oklch(9%_0.007_50)]/75 px-3 py-1.5 rounded-sm">
@@ -453,7 +612,6 @@ function BentoTextBlock({ item, span }: { item: BentoTextItem; span: Span }) {
   const pad = tilePadding(span)
 
   const isTransparent = displayStyle === 'naked' || displayStyle === 'hairline'
-  // Transparent tiles inherit the page surface — use ink text regardless of color setting
   const bgClass  = isTransparent ? 'bg-transparent' : bgMap[color]
   const fgClass  = isTransparent ? 'text-[oklch(9%_0.007_50)]' : fgMap[color]
   const lblClass = isTransparent ? 'text-[oklch(58%_0.012_50)]' : mutedMap[color]
@@ -471,19 +629,18 @@ function BentoTextBlock({ item, span }: { item: BentoTextItem; span: Span }) {
     right:  'text-right',
   }
 
-  // Cap line length; centred text gets a symmetric max-width instead
   const proseWidthClass = align === 'center' ? 'max-w-[55ch] mx-auto w-full' : 'max-w-[65ch]'
-  // Label pushes content to bottom; without label, justify-end anchors naturally
-  const justifyClass = item.label ? 'justify-between' : 'justify-end'
 
   return (
     <div
-      className={`h-full flex flex-col ${justifyClass} ${pad} ${bgClass} ${fgClass} ${alignClass[align] ?? 'text-left'} ${sizeClass[size] ?? ''}`}
+      className={`h-full flex flex-col justify-end ${pad} ${bgClass} ${fgClass} ${alignClass[align] ?? 'text-left'} ${sizeClass[size] ?? ''}`}
     >
       {item.label && (
-        <span className={`font-mono text-[0.7rem] uppercase tracking-[0.12em] self-end ${lblClass}`}>
-          {item.label}
-        </span>
+        <div className="absolute top-0 right-0 p-4">
+          <span className={`font-mono text-[0.7rem] uppercase tracking-[0.12em] py-1.5 ${lblClass}`}>
+            {item.label}
+          </span>
+        </div>
       )}
       <div className={proseWidthClass}>
         {item.content && <PortableText value={item.content} anchors={false} />}
@@ -493,74 +650,79 @@ function BentoTextBlock({ item, span }: { item: BentoTextItem; span: Span }) {
 }
 
 // ─── CTA block ────────────────────────────────────────────────────────────────
+// The whole tile is the link — no button. The article's hover:brightness-95
+// is the interaction signal; a small arrow at bottom-right confirms tappability.
 
 function BentoCtaBlock({ item, span }: { item: BentoCtaItem; span: Span }) {
   const color = item.backgroundColor ?? 'base'
-  const isExternal = item.buttonLink?.startsWith('http')
   const pad = tilePadding(span)
+  const isExternal = item.buttonLink?.startsWith('http')
 
-  const btnClass = `inline-flex items-center font-mono text-[0.7rem] uppercase tracking-[0.12em] px-5 py-2.5 rounded-[8px] transition-colors duration-200 ease-out ${btnMap[color]}`
-
-  const ariaLabel = item.buttonText
-    ? `${item.buttonText}${item.headline ? ` — ${item.headline}` : ''}`
-    : (item.headline ?? undefined)
-
-  const buttonNode = item.buttonText && item.buttonLink ? (
-    isExternal ? (
-      <a
-        href={item.buttonLink}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={ariaLabel}
-        className={btnClass}
-      >
-        {item.buttonText}
-      </a>
-    ) : (
-      <Link href={item.buttonLink} aria-label={ariaLabel} className={btnClass}>
-        {item.buttonText}
-      </Link>
-    )
-  ) : null
-
-  // Label at top-left pushes the content group to the bottom via justify-between
-  const justifyClass = item.label ? 'justify-between' : 'justify-end'
-
-  return (
-    <div className={`h-full flex flex-col ${justifyClass} gap-4 ${pad} ${bgMap[color]} ${fgMap[color]}`}>
+  const inner = (
+    <>
       {item.label && (
-        <span className={`font-mono text-[0.7rem] uppercase tracking-[0.12em] self-end ${mutedMap[color]}`}>
-          {item.label}
-        </span>
+        <div className="absolute top-0 right-0 p-4">
+          <span className={`font-mono text-[0.7rem] uppercase tracking-[0.12em] py-1.5 ${mutedMap[color]}`}>
+            {item.label}
+          </span>
+        </div>
       )}
-      {/* Content group — headline, description, button sit together at the bottom */}
       <div className="flex flex-col gap-4">
         {item.headline && (
           <h3 className="text-2xl font-medium tracking-tight leading-snug text-balance">
             {item.headline}
           </h3>
         )}
-        {item.description && (
-          <p className={`text-sm leading-relaxed ${mutedMap[color]}`}>{item.description}</p>
+        {(item.description || item.buttonLink) && (
+          <div className="flex items-end gap-4">
+            {item.description && (
+              <p className={`flex-1 text-sm leading-relaxed ${mutedMap[color]}`}>{item.description}</p>
+            )}
+            {item.buttonLink && (
+              <span className={`font-mono text-sm leading-none ml-auto flex-shrink-0 ${mutedMap[color]}`}>
+                {isExternal ? '↗' : '→'}
+              </span>
+            )}
+          </div>
         )}
-        {buttonNode && <div>{buttonNode}</div>}
       </div>
-    </div>
+    </>
   )
+
+  const baseClass = `h-full flex flex-col justify-end ${pad} ${bgMap[color]} ${fgMap[color]}`
+
+  if (item.buttonLink) {
+    return isExternal ? (
+      <a
+        href={item.buttonLink}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={item.headline ?? undefined}
+        className={baseClass}
+      >
+        {inner}
+      </a>
+    ) : (
+      <Link href={item.buttonLink} aria-label={item.headline ?? undefined} className={baseClass}>
+        {inner}
+      </Link>
+    )
+  }
+
+  return <div className={baseClass}>{inner}</div>
 }
 
 // ─── Counter block ────────────────────────────────────────────────────────────
-// A small designed accent showing the item count — placed by the solver as a
-// real tile, not a blank filler.
 
 function BentoCounterBlock({ count, label, large, span }: { count: number; label: string; large: boolean; span: Span }) {
   const pad = tilePadding(span)
   return (
-    // Inverted: ink background punches out against the light tile grid — one dark accent
-    <div className={`h-full flex flex-col justify-between ${pad} bg-[oklch(9%_0.007_50)]`}>
-      <span className="font-mono text-[0.7rem] uppercase tracking-[0.12em] text-[oklch(72%_0.010_50)]">
-        {label}
-      </span>
+    <div className={`h-full flex flex-col justify-end ${pad} bg-[oklch(9%_0.007_50)]`}>
+      <div className="absolute top-0 left-0 p-4">
+        <span className="font-mono text-[0.7rem] uppercase tracking-[0.12em] py-1.5 text-[oklch(72%_0.010_50)]">
+          {label}
+        </span>
+      </div>
       <p
         className={`font-bold leading-none tracking-tight text-[oklch(99%_0.003_60)] ${
           large ? 'text-[clamp(3rem,5vw,4.75rem)]' : 'text-[2.5rem]'
@@ -580,9 +742,10 @@ export default function BentoGrid({ block }: BentoGridProps) {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
 
-  // Filter before the solver — disabled items are invisible to the layout engine
   const visibleItems = items?.filter((i) => i.enabled !== false) ?? []
   const hasItems = visibleItems.length > 0
+
+  // Desktop solver (4-col) — drives lg: placement
   const { placed, fillers } = useMemo(
     () =>
       hasItems
@@ -592,10 +755,21 @@ export default function BentoGrid({ block }: BentoGridProps) {
     [hasItems, visibleItems],
   )
 
+  // Tablet solver (3-col) — drives sm: placement; lg: classes cascade over it
+  const { placed: smPlaced, fillers: smFillers } = useMemo(
+    () =>
+      hasItems
+        ? computeTabletLayout(visibleItems)
+        : { placed: new Map<string, PlacedItem>(), fillers: [] as PlacedItem[] },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [hasItems, visibleItems],
+  )
+
   const imageCount = hasItems ? visibleItems.filter((i) => i._type === 'bentoImage').length : 0
   const counterCount = imageCount > 0 ? imageCount : visibleItems.length
   const counterLabel = imageCount > 0 ? 'Images' : 'Items'
   const counterPlaced = placed.get(COUNTER_KEY) ?? null
+  const smCounterPlaced = smPlaced.get(COUNTER_KEY) ?? null
 
   return (
     <div
@@ -614,15 +788,16 @@ export default function BentoGrid({ block }: BentoGridProps) {
               variants={containerVariants}
               initial="hidden"
               animate={inView ? 'visible' : 'hidden'}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 [grid-auto-rows:minmax(220px,auto)] [grid-auto-flow:dense] gap-2"
+              className="grid grid-cols-2 sm:grid-cols-3 sm:[grid-auto-rows:minmax(220px,auto)] lg:grid-cols-4 lg:[grid-auto-rows:minmax(220px,auto)] [grid-auto-flow:dense] gap-2"
             >
               {visibleItems.map((item) => {
                 const p = placed.get(item._key) ?? { span: { cols: 1, rows: 1 } as Span, row: 0, col: 0 }
+                const sp = smPlaced.get(item._key) ?? { span: { cols: 1, rows: 1 } as Span, row: 0, col: 0 }
                 return (
                   <motion.article
                     key={item._key}
                     variants={itemVariants}
-                    className={`relative overflow-hidden rounded-sm transition-[filter] duration-200 ease-out hover:brightness-95 ${cellClass(p)} ${tileModifierClass(item)}`}
+                    className={`relative overflow-hidden rounded-sm transition-[filter] duration-200 ease-out hover:brightness-95 ${mobileClass(item)} ${tabletCellClass(sp)} ${cellClass(p)} ${tileModifierClass(item)}`}
                     aria-label={
                       item._type === 'bentoImage'
                         ? (item.alt ?? undefined)
@@ -631,29 +806,44 @@ export default function BentoGrid({ block }: BentoGridProps) {
                         : undefined
                     }
                   >
-                    {item._type === 'bentoImage' && <BentoImageBlock item={item} span={p.span} />}
+                    {item._type === 'bentoImage' && (
+                      <BentoImageBlock item={item} span={p.span} smSpan={sp.span} />
+                    )}
                     {item._type === 'bentoText' && <BentoTextBlock item={item} span={p.span} />}
                     {item._type === 'bentoCta' && <BentoCtaBlock item={item} span={p.span} />}
                   </motion.article>
                 )
               })}
 
-              {counterPlaced && (
+              {(counterPlaced || smCounterPlaced) && (
                 <motion.article
                   key="bento-counter"
                   variants={itemVariants}
                   aria-hidden="true"
-                  className={`relative overflow-hidden rounded-sm ${cellClass(counterPlaced)}`}
+                  className={`relative overflow-hidden rounded-sm hidden sm:block lg:min-h-0 ${smCounterPlaced ? tabletCellClass(smCounterPlaced) : ''} ${counterPlaced ? cellClass(counterPlaced) : ''}`}
                 >
                   <BentoCounterBlock
                     count={counterCount}
                     label={counterLabel}
-                    large={counterPlaced.span.cols * counterPlaced.span.rows >= 2}
-                    span={counterPlaced.span}
+                    large={(counterPlaced ?? smCounterPlaced)!.span.cols * (counterPlaced ?? smCounterPlaced)!.span.rows >= 2}
+                    span={(counterPlaced ?? smCounterPlaced)!.span}
                   />
                 </motion.article>
               )}
 
+              {/* Tablet fillers — visible sm only, hidden at lg where desktop fillers take over */}
+              {smFillers.map((f, i) => (
+                <motion.article
+                  key={`bento-sm-filler-${i}`}
+                  variants={itemVariants}
+                  aria-hidden="true"
+                  className={`relative overflow-hidden rounded-sm hidden sm:block lg:hidden ${tabletCellClass(f)}`}
+                >
+                  <div className="h-full bg-[oklch(97%_0.004_60)]" />
+                </motion.article>
+              ))}
+
+              {/* Desktop fillers — visible lg only */}
               {fillers.map((f, i) => (
                 <motion.article
                   key={`bento-filler-${i}`}

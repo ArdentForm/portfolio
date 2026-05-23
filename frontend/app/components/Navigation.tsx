@@ -82,7 +82,7 @@ export function Navigation({ links }: NavigationProps) {
 
   const toggleTheme = () => setTheme(theme === 'light' ? 'dark' : 'light');
   const closeMenu = () => setIsMenuOpen(false);
-  const isActive = (url: string) => pathname === url;
+  const isActive = (url: string) => pathname === url || (url !== '/' && pathname.startsWith(url));
 
   return (
     <>
